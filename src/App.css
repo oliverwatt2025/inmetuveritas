@@ -1,0 +1,204 @@
+/* Page + background */
+.page {
+  min-height: 100vh;
+  padding: 140px 36px 48px;
+}
+
+/* Background image on BODY is handled in index.css.
+   Here we keep content readable and compact. */
+
+.hero {
+  margin-bottom: 22px;
+  text-align: center;  
+}
+
+.brandTitle {
+  font-size: 33px;
+  letter-spacing: 0.22em;
+  font-weight: 700;
+  opacity: 0.65;
+}
+
+.brandSub {
+  margin-top: 150px;
+  font-size: 22px;
+  opacity: 0.55;
+  max-width: 900px;
+}
+
+/* Compact grid: 5 columns (2 rows when 10 cards) */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(220px, 1fr));
+  gap: 14px;
+  align-items: stretch;
+}
+
+/* Responsive fallbacks */
+@media (max-width: 1300px) {
+  .grid { grid-template-columns: repeat(3, minmax(220px, 1fr)); }
+}
+@media (max-width: 860px) {
+  .grid { grid-template-columns: repeat(1, minmax(220px, 1fr)); }
+  .brandTitle { font-size: 34px; }
+  .brandSub { font-size: 18px; }
+}
+
+/* Card (tight + glass) */
+.card {
+  border-radius: 18px;
+  padding: 12px 14px 14px; /* <-- compact top padding */
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  overflow: hidden;
+}
+
+/* Card header row */
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px; /* <-- pulls black box down */
+}
+
+.cardTitle {
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  opacity: 0.78;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pill {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(0,0,0,0.35);
+  white-space: nowrap;
+}
+
+.pillGood {
+  color: rgba(110, 255, 185, 0.95);
+  border-color: rgba(110, 255, 185, 0.25);
+}
+
+.pillWarn {
+  color: rgba(255, 210, 130, 0.95);
+  border-color: rgba(255, 210, 130, 0.25);
+}
+
+.pillDelayed {
+  color: rgba(255, 210, 130, 0.85);
+  border-color: rgba(255, 210, 130, 0.18);
+  opacity: 0.85;
+}
+
+/* Body: gauge + readout */
+.cardBody {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 14px;
+  align-items: center;
+}
+
+/* Gauge area */
+.gaugeWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gauge {
+  position: relative;
+  width: 60px;
+  height: 48px;
+}
+
+.arc {
+  width: 60px;
+  height: 45px;
+  display: block;
+  filter: drop-shadow(0 10px 18px rgba(0,0,0,0.55));
+}
+
+/* Labels around arc */
+.lbl {
+  position: absolute;
+  font-size: 12px;
+  opacity: 0.55;
+  user-select: none;
+}
+
+.lblMin { left: -1px; top: 33px; }
+.lblMid { right: 22px; top: -5px; }
+.lblMax { left: 41px; bottom: -3px; }
+
+/* Needle */
+.needleBase {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 10px;
+}
+
+.needle {
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  transform-origin: 50% 100%;
+  transform: rotate(0deg);
+  transition: transform 450ms ease;
+}
+
+.needleStem {
+  width: 2px;
+  height: 26px;
+  background: rgba(255,255,255,0.88);
+  border-radius: 999px;
+  box-shadow: 0 10px 18px rgba(0,0,0,0.5);
+  transform: translateX(-50%);
+}
+
+.hub {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translate(-50%, 50%);
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.22);
+  border: 3px solid rgba(255,255,255,0.60);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.6);
+}
+
+/* Readout */
+.readout {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.value {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.updated {
+  font-size: 13px;
+  opacity: 0.72;
+}
