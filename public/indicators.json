@@ -1,0 +1,34 @@
+{
+  "asOf": "2026-01-20T19:45:00Z",
+  "cards": [
+    {
+      "id": "credit",
+      "type": "gauge",
+      "title": "CREDIT STRESS",
+      "status": "WARN",
+      "value": 142,
+      "unit": "bp",
+      "min": 0,
+      "max": 200
+    },
+    {
+      "id": "vol",
+      "type": "gauge",
+      "title": "VOLATILITY REGIME",
+      "status": "GOOD",
+      "value": 18.7,
+      "unit": "",
+      "min": 10,
+      "max": 40
+    },
+    {
+      "id": "liq",
+      "type": "label",
+      "title": "LIQUIDITY CONDITIONS",
+      "status": "GOOD",
+      "valueText": "Adequate",
+      "minLabel": "Tight",
+      "maxLabel": "Ample"
+    }
+  ]
+}

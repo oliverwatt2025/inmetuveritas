@@ -1,23 +1,45 @@
+import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 
 type Status = "GOOD" | "WARN" | "DELAYED";
 
-type Gauge = {
+export type Gauge = {
   key: string;
   title: string;
   status: Status;
-  valueText: string;   // e.g. "142 bp"
-  updatedText: string; // e.g. "2h 8m ago"
+
+  valueText: string; // e.g. "142 bp"
+
+  /**
+   * Prefer this for real updates:
+   * ISO timestamp like "2026-01-20T19:45:00Z"
+   */
+  updatedAt?: string;
+
+  /**
+   * Back-compat / fallback: if you still provide "2h 8m ago" in JSON,
+   * we will display it as-is.
+   */
+  updatedText?: string;
+
   // 0..100 where 0=far left, 100=far right
   pct: number;
+
   // labels around dial
   minLabel?: string;
   midLabel?: string;
   maxLabel?: string;
+
   tooltip: string;
 };
 
-const gauges: Gauge[] = [
+type IndicatorsPayload = {
+  asOf?: string; // optional global timestamp
+  cards?: Gauge[];
+};
+
+// --- Your current placeholders (used as initial state + fallback) ---
+const defaultGauges: Gauge[] = [
   {
     key: "credit",
     title: "Credit Stress",
@@ -152,8 +174,29 @@ function needleRotationFromPct(pct: number) {
   return -120 + (240 * clamped) / 100;
 }
 
-function GaugeCard({ g }: { g: Gauge }) {
+function timeAgo(iso: string) {
+  const t = new Date(iso).getTime();
+  if (!Number.isFinite(t)) return "—";
+  const seconds = Math.max(0, Math.floor((Date.now() - t) / 1000));
+
+  if (seconds < 15) return "Just now";
+
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ${minutes % 60}m ago`;
+
+  const days = Math.floor(hours / 24);
+  return `${days}d ${hours % 24}h ago`;
+}
+
+function GaugeCard({ g, fallbackAsOf }: { g: Gauge; fallbackAsOf?: string | null }) {
   const rot = needleRotationFromPct(g.pct);
+
+  // Prefer per-card updatedAt, otherwise use global asOf, otherwise use existing updatedText
+  const updatedLine =
+    g.updatedAt ? timeAgo(g.updatedAt) : fallbackAsOf ? timeAgo(fallbackAsOf) : g.updatedText ?? "—";
 
   return (
     <div className="card" title={g.tooltip}>
@@ -218,7 +261,7 @@ function GaugeCard({ g }: { g: Gauge }) {
 
         <div className="readout">
           <div className="value">{g.valueText}</div>
-          <div className="updated">Updated • {g.updatedText}</div>
+          <div className="updated">Updated • {updatedLine}</div>
         </div>
       </div>
     </div>
@@ -226,18 +269,62 @@ function GaugeCard({ g }: { g: Gauge }) {
 }
 
 export default function App() {
+  const [gauges, setGauges] = useState<Gauge[]>(defaultGauges);
+  const [asOf, setAsOf] = useState<string | null>(null);
+
+  // Keep the "Updated • x ago" text fresh even if data hasn't changed
+  const [, forceTick] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => forceTick((x) => x + 1), 60_000); // every minute
+    return () => clearInterval(t);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      const res = await fetch(`/indicators.json?cb=${Date.now()}`, { cache: "no-store" });
+      if (!res.ok) throw new Error(`Fetch indicators.json failed: ${res.status}`);
+
+      const data = (await res.json()) as IndicatorsPayload;
+
+      if (cancelled) return;
+
+      if (Array.isArray(data.cards) && data.cards.length) setGauges(data.cards);
+      if (typeof data.asOf === "string") setAsOf(data.asOf);
+    }
+
+    // initial load
+    load().catch((e) => console.warn(e));
+
+    // refresh every 5 minutes
+    const t = setInterval(() => {
+      load().catch((e) => console.warn(e));
+    }, 5 * 60 * 1000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(t);
+    };
+  }, []);
+
+  const subtitle = useMemo(() => {
+    // optional: show something useful later; leaving blank keeps your design clean.
+    return "";
+  }, []);
+
   return (
     <div className="page">
       <header className="hero">
         <div className="brand">
           <div className="brandTitle">IN METU VERITAS</div>
-          <div className="brandSub"></div>
+          <div className="brandSub">{subtitle}</div>
         </div>
       </header>
 
       <main className="grid">
         {gauges.map((g) => (
-          <GaugeCard key={g.key} g={g} />
+          <GaugeCard key={g.key} g={g} fallbackAsOf={asOf} />
         ))}
       </main>
     </div>
