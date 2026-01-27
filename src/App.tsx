@@ -33,9 +33,39 @@ export type Gauge = {
   tooltip: string;
 };
 
+// This matches your current indicators.json schema (id/type/value/min/max/etc.)
+// and also supports the "native gauge" schema (pct/valueText) if you later use it.
+type RawCard = {
+  id?: string;
+  key?: string;
+  type?: string;
+
+  title?: string;
+  status?: Status;
+
+  value?: number;
+  unit?: string;
+
+  min?: number;
+  max?: number;
+
+  // Optional overrides
+  valueText?: string;
+  pct?: number;
+
+  minLabel?: string;
+  midLabel?: string;
+  maxLabel?: string;
+
+  tooltip?: string;
+
+  updatedAt?: string;
+  updatedText?: string;
+};
+
 type IndicatorsPayload = {
   asOf?: string; // optional global timestamp
-  cards?: Gauge[];
+  cards?: RawCard[];
 };
 
 // --- Your current placeholders (used as initial state + fallback) ---
@@ -191,6 +221,66 @@ function timeAgo(iso: string) {
   return `${days}d ${hours % 24}h ago`;
 }
 
+/**
+ * Convert your indicators.json card (RawCard) into a proper Gauge the UI can render.
+ * - If pct/valueText already exist, we use them directly.
+ * - Otherwise we compute pct from value/min/max and build valueText.
+ */
+function toGauge(c: RawCard): Gauge | null {
+  const key = (c.key ?? c.id ?? "").toString().trim();
+  if (!key) return null;
+
+  const title = (c.title ?? "UNTITLED").toString();
+  const status: Status = (c.status ?? "DELAYED") as Status;
+
+  // If JSON already provides pct + valueText, accept it as-is
+  if (typeof c.pct === "number" && typeof c.valueText === "string") {
+    return {
+      key,
+      title,
+      status,
+      valueText: c.valueText,
+      pct: Math.max(0, Math.min(100, c.pct)),
+      minLabel: c.minLabel,
+      midLabel: c.midLabel,
+      maxLabel: c.maxLabel,
+      tooltip: c.tooltip ?? "",
+      updatedAt: c.updatedAt,
+      updatedText: c.updatedText,
+    };
+  }
+
+  const min = typeof c.min === "number" ? c.min : 0;
+  const max = typeof c.max === "number" ? c.max : 100;
+
+  let pct = 50;
+  if (typeof c.value === "number" && max !== min) {
+    pct = ((c.value - min) / (max - min)) * 100;
+  }
+  pct = Math.max(0, Math.min(100, pct));
+
+  const valueText =
+    typeof c.valueText === "string"
+      ? c.valueText
+      : typeof c.value === "number"
+        ? `${c.value}${c.unit ?? ""}`
+        : "—";
+
+  return {
+    key,
+    title,
+    status,
+    valueText,
+    pct,
+    minLabel: c.minLabel ?? String(min),
+    midLabel: c.midLabel ?? "",
+    maxLabel: c.maxLabel ?? String(max),
+    tooltip: c.tooltip ?? "",
+    updatedAt: c.updatedAt,
+    updatedText: c.updatedText,
+  };
+}
+
 function GaugeCard({ g, fallbackAsOf }: { g: Gauge; fallbackAsOf?: string | null }) {
   const rot = needleRotationFromPct(g.pct);
 
@@ -287,10 +377,13 @@ export default function App() {
       if (!res.ok) throw new Error(`Fetch indicators.json failed: ${res.status}`);
 
       const data = (await res.json()) as IndicatorsPayload;
-
       if (cancelled) return;
 
-      if (Array.isArray(data.cards) && data.cards.length) setGauges(data.cards);
+      if (Array.isArray(data.cards) && data.cards.length) {
+        const mapped = data.cards.map(toGauge).filter(Boolean) as Gauge[];
+        if (mapped.length) setGauges(mapped);
+      }
+
       if (typeof data.asOf === "string") setAsOf(data.asOf);
     }
 
