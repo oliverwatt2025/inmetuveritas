@@ -10,18 +10,25 @@ Dials included (v1):
 5) SPY 1M drawdown (21 trading days)              -> Stooq
 6) KRE 3M drawdown (63 trading days)              -> Stooq
 
+Added (v2):
+7) RECESSION RISK (0–100 composite)               -> FRED (T10Y3M, SAHMREALTIME, RECPROUSM156N)
+8) CREDIT STRESS (0–100 composite)                -> FRED (HY/IG/BBB OAS, CPFF, STLFSI4, NFCIRISK)
+
 Notes:
 - FRED requires an API key. Set env var FRED_API_KEY (your GitHub Action already does).
 - Stooq is used for price series because it's simple and free.
+- Composite dials are percentile-based and smoothed using yesterday's indicators.json
+  (no database required).
 """
 
 from __future__ import annotations
 
+import bisect
 import csv
 import json
 import os
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -44,6 +51,30 @@ def http_get_text(url: str, timeout: int = 20) -> str:
     req = urllib.request.Request(url, headers={"User-Agent": "inmetuveritas/1.0"})
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         return resp.read().decode("utf-8")
+
+
+def load_previous_payload() -> Dict:
+    """Read yesterday's indicators.json if present (for smoothing / continuity)."""
+    if OUTFILE.exists():
+        try:
+            return json.loads(OUTFILE.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    return {}
+
+
+def prev_card_value(prev_payload: Dict, card_id: str) -> Optional[float]:
+    """Get previous numeric 'value' for a given card id, if available."""
+    try:
+        for c in prev_payload.get("cards", []):
+            if c.get("id") == card_id:
+                v = c.get("value", None)
+                if v is None:
+                    return None
+                return float(v)
+    except Exception:
+        return None
+    return None
 
 
 # ----------------------------
@@ -129,6 +160,45 @@ def fred_latest(series_id: str, api_key: Optional[str]) -> Optional[Tuple[str, f
         return None
 
 
+def fred_series(series_id: str, api_key: Optional[str], limit: int = 6000, sort_order: str = "asc") -> List[Tuple[str, float]]:
+    """
+    Fetch up to `limit` observations for a FRED series.
+    Returns list of (date, value) sorted ascending by date (default).
+    """
+    base = "https://api.stlouisfed.org/fred/series/observations"
+    params = f"?series_id={series_id}&file_type=json&sort_order={sort_order}&limit={limit}"
+    if api_key:
+        params += f"&api_key={api_key}"
+    url = base + params
+
+    data = json.loads(http_get_text(url))
+    out: List[Tuple[str, float]] = []
+    for o in data.get("observations", []):
+        v = o.get("value", ".")
+        if v in (".", "", None):
+            continue
+        try:
+            out.append((o.get("date", ""), float(v)))
+        except Exception:
+            continue
+    out.sort(key=lambda x: x[0])
+    return out
+
+
+def _to_date(s: str) -> date:
+    y, m, d = s.split("-")
+    return date(int(y), int(m), int(d))
+
+
+def tail_since(series: List[Tuple[str, float]], years: int = 10) -> List[Tuple[str, float]]:
+    """Keep last N years using a date cutoff."""
+    if not series:
+        return series
+    last_d = _to_date(series[-1][0])
+    cutoff = last_d.replace(year=last_d.year - years)
+    return [(d, v) for (d, v) in series if _to_date(d) >= cutoff]
+
+
 # ----------------------------
 # Dial construction
 # ----------------------------
@@ -159,9 +229,234 @@ def status_from_band(value: float, good_max: float, warn_max: float, higher_is_w
         return "DELAYED"
 
 
+def percentile_score(current: float, history_vals: List[float], invert: bool = False) -> float:
+    """
+    Map current value to 0-100 percentile in history.
+    invert=True means lower is worse (e.g., curve slope), so low values map to high scores.
+    """
+    if not history_vals:
+        return 50.0
+    vals = sorted(history_vals)
+    r = bisect.bisect_right(vals, current) / len(vals)  # fraction <= current
+    if invert:
+        r = 1.0 - r
+    return clamp(r * 100.0, 0.0, 100.0)
+
+
+def smooth_with_previous(current: float, prev: Optional[float], alpha: float = 0.20) -> float:
+    """
+    Simple EWMA smoothing: new = alpha*current + (1-alpha)*prev
+    alpha~0.2 gives a calm-ish dial without becoming too laggy.
+    """
+    if prev is None:
+        return current
+    return alpha * current + (1.0 - alpha) * prev
+
+
+def align_by_date(a: List[Tuple[str, float]], b: List[Tuple[str, float]]) -> List[Tuple[str, float, float]]:
+    """Inner join by date on two (date,val) series."""
+    db = {d: v for d, v in b}
+    out = []
+    for d, va in a:
+        vb = db.get(d)
+        if vb is None:
+            continue
+        out.append((d, va, vb))
+    return out
+
+
+# ----------------------------
+# Composite dial builders
+# ----------------------------
+
+def build_recession_dial(fred_key: Optional[str]) -> Tuple[Optional[float], str, List[str]]:
+    """
+    Returns (score_0_100, tooltip, warnings)
+
+    Practical composite:
+      - Curve stress: inverted percentile of 10y-3m (T10Y3M) [leading]
+      - Sahm Rule realtime (SAHMREALTIME) mapped to 0-100 [near-coincident]
+      - Smoothed recession probability (RECPROUSM156N) [coincident-ish]
+
+    Too-early antidote:
+      If Sahm < 20 and Coincident < 15, cap curve contribution at 35.
+    """
+    warnings: List[str] = []
+
+    # 1) Curve: 10y-3m
+    curve_score: Optional[float]
+    try:
+        curve_series = tail_since(fred_series("T10Y3M", fred_key, limit=6000), years=15)
+        if not curve_series:
+            raise RuntimeError("empty series")
+        curve_vals = [v for _, v in curve_series]
+        _, curve_now = curve_series[-1]
+        curve_score = percentile_score(curve_now, curve_vals, invert=True)
+    except Exception as e:
+        curve_score = None
+        warnings.append(f"Curve(T10Y3M) unavailable: {e}")
+
+    # 2) Sahm Rule realtime
+    sahm_score: Optional[float]
+    try:
+        sahm_series = tail_since(fred_series("SAHMREALTIME", fred_key, limit=5000), years=20)
+        if not sahm_series:
+            raise RuntimeError("empty series")
+        _, sahm_now = sahm_series[-1]
+        sahm_score = clamp((sahm_now / 1.0) * 100.0, 0.0, 100.0)
+    except Exception as e:
+        sahm_score = None
+        warnings.append(f"Sahm(SAHMREALTIME) unavailable: {e}")
+
+    # 3) Coincident-ish recession probability
+    coin_score: Optional[float]
+    try:
+        recp_series = tail_since(fred_series("RECPROUSM156N", fred_key, limit=5000), years=20)
+        if not recp_series:
+            raise RuntimeError("empty series")
+        _, recp_now = recp_series[-1]
+        coin_score = clamp(recp_now, 0.0, 100.0)
+    except Exception as e:
+        coin_score = None
+        warnings.append(f"Coincident(RECPROUSM156N) unavailable: {e}")
+
+    components: List[Tuple[str, Optional[float], float]] = [
+        ("curve", curve_score, 0.50),
+        ("sahm", sahm_score, 0.30),
+        ("coin", coin_score, 0.20),
+    ]
+    available = [(name, val, w) for (name, val, w) in components if val is not None]
+    if not available:
+        return None, "Recession dial unavailable (all components missing).", warnings
+
+    wsum = sum(w for _, _, w in available)
+    norm = [(name, float(val), w / wsum) for (name, val, w) in available]
+
+    # Too-early antidote
+    sahm_ok = (sahm_score is not None and sahm_score >= 20)
+    coin_ok = (coin_score is not None and coin_score >= 15)
+    curve_effective = curve_score
+    if curve_score is not None and (not sahm_ok) and (not coin_ok):
+        curve_effective = min(curve_score, 35.0)
+
+    score = 0.0
+    for name, val, w in norm:
+        if name == "curve" and curve_effective is not None:
+            score += w * curve_effective
+        else:
+            score += w * val
+
+    tooltip = (
+        "Composite recession risk dial (0–100). "
+        "Blend: inverted curve stress (T10Y3M), Sahm Rule realtime, and smoothed recession probability. "
+        "Curve is capped when labour/coincident confirmation is low."
+    )
+    if warnings:
+        tooltip += " Warnings: " + " | ".join(warnings)
+
+    return clamp(score, 0.0, 100.0), tooltip, warnings
+
+
+def build_credit_stress_dial(fred_key: Optional[str]) -> Tuple[Optional[float], str, List[str]]:
+    """
+    Composite 0-100 credit stress using percentiles over ~15y history:
+      - HY OAS (BAMLH0A0HYM2)       30%
+      - BBB OAS (BAMLC0A4CBBB)     10%
+      - HY-IG differential          10%
+      - CPFF funding stress         20%
+      - STLFSI4                     15%
+      - NFCIRISK                    15%
+
+    Momentum kicker:
+      If HY OAS ~1m widening is top-decile, add +5 (capped overall).
+    """
+    warnings: List[str] = []
+
+    def get_pct_score(series_id: str, years: int = 15) -> Optional[float]:
+        try:
+            s = tail_since(fred_series(series_id, fred_key, limit=6000), years=years)
+            if not s:
+                return None
+            vals = [v for _, v in s]
+            _, now = s[-1]
+            return percentile_score(now, vals, invert=False)
+        except Exception as e:
+            warnings.append(f"{series_id} unavailable: {e}")
+            return None
+
+    hy_score = get_pct_score("BAMLH0A0HYM2", years=15)
+    bbb_score = get_pct_score("BAMLC0A4CBBB", years=15)
+
+    # HY-IG differential
+    hy_ig_score: Optional[float] = None
+    try:
+        hy_s = tail_since(fred_series("BAMLH0A0HYM2", fred_key, limit=6000), years=15)
+        ig_s = tail_since(fred_series("BAMLC0A0CM", fred_key, limit=6000), years=15)
+        joined = align_by_date(hy_s, ig_s)
+        diffs = [(d, (hy - ig)) for (d, hy, ig) in joined]
+        if diffs:
+            vals = [v for _, v in diffs]
+            _, now = diffs[-1]
+            hy_ig_score = percentile_score(now, vals, invert=False)
+    except Exception as e:
+        warnings.append(f"HY-IG diff unavailable: {e}")
+
+    cpff_score = get_pct_score("CPFF", years=15)
+    stlfsi_score = get_pct_score("STLFSI4", years=15)
+    nfci_risk_score = get_pct_score("NFCIRISK", years=15)
+
+    weights = [
+        ("HY OAS", hy_score, 0.30),
+        ("BBB OAS", bbb_score, 0.10),
+        ("HY-IG", hy_ig_score, 0.10),
+        ("CPFF", cpff_score, 0.20),
+        ("STLFSI4", stlfsi_score, 0.15),
+        ("NFCIRISK", nfci_risk_score, 0.15),
+    ]
+    available = [(n, v, w) for (n, v, w) in weights if v is not None]
+    if not available:
+        return None, "Credit stress dial unavailable (all components missing).", warnings
+
+    wsum = sum(w for _, _, w in available)
+    score = sum((w / wsum) * float(v) for _, v, w in available)
+
+    # Momentum kicker: HY OAS widening over ~1 month
+    try:
+        hy_s = tail_since(fred_series("BAMLH0A0HYM2", fred_key, limit=6000), years=15)
+        if len(hy_s) > 40:
+            now = hy_s[-1][1]
+            prev = hy_s[-31][1]  # rough 1 month (calendar obs in daily series)
+            chg = now - prev
+            chgs = []
+            for i in range(31, len(hy_s)):
+                chgs.append(hy_s[i][1] - hy_s[i - 31][1])
+            pct = percentile_score(chg, chgs, invert=False)
+            if pct >= 90.0:
+                score += 5.0
+    except Exception as e:
+        warnings.append(f"HY momentum kicker unavailable: {e}")
+
+    score = clamp(score, 0.0, 100.0)
+
+    tooltip = (
+        "Composite credit stress dial (0–100, percentile-based). "
+        "Blend of HY/BBB spreads, HY–IG repricing, CPFF funding stress, STLFSI4 and NFCIRISK. "
+        "Adds a small kicker when HY spreads widen rapidly."
+    )
+    if warnings:
+        tooltip += " Warnings: " + " | ".join(warnings)
+
+    return score, tooltip, warnings
+
+
+# ----------------------------
+# Main dial construction
+# ----------------------------
+
 def make_cards() -> Dict:
     as_of = utc_now_iso()
     fred_key = os.environ.get("FRED_API_KEY", "").strip() or None
+    prev_payload = load_previous_payload()
 
     cards = []
 
@@ -387,6 +682,82 @@ def make_cards() -> Dict:
             "midLabel": "-15%",
             "maxLabel": "0%",
             "tooltip": f"KRE fetch failed: {e}",
+            "updatedAt": as_of
+        })
+
+    # 7) RECESSION RISK (Composite 0–100)
+    try:
+        rec_score, rec_tooltip, _ = build_recession_dial(fred_key)
+        if rec_score is None:
+            raise RuntimeError("missing components")
+        prev = prev_card_value(prev_payload, "recession_risk")
+        rec_sm = smooth_with_previous(rec_score, prev, alpha=0.20)
+
+        cards.append({
+            "id": "recession_risk",
+            "type": "gauge",
+            "title": "RECESSION RISK",
+            "status": "GOOD" if rec_sm < 35 else ("WARN" if rec_sm < 60 else "DELAYED"),
+            "value": round(rec_sm, 0),
+            "unit": "",
+            "min": 0,
+            "max": 100,
+            "minLabel": "Low",
+            "midLabel": "Elevated",
+            "maxLabel": "High",
+            "tooltip": rec_tooltip,
+            "updatedAt": as_of
+        })
+    except Exception as e:
+        cards.append({
+            "id": "recession_risk",
+            "type": "gauge",
+            "title": "RECESSION RISK",
+            "status": "DELAYED",
+            "valueText": "—",
+            "pct": 50,
+            "minLabel": "Low",
+            "midLabel": "Elevated",
+            "maxLabel": "High",
+            "tooltip": f"Recession dial build failed: {e}",
+            "updatedAt": as_of
+        })
+
+    # 8) CREDIT STRESS (Composite 0–100)
+    try:
+        cs_score, cs_tooltip, _ = build_credit_stress_dial(fred_key)
+        if cs_score is None:
+            raise RuntimeError("missing components")
+        prev = prev_card_value(prev_payload, "credit_stress")
+        cs_sm = smooth_with_previous(cs_score, prev, alpha=0.20)
+
+        cards.append({
+            "id": "credit_stress",
+            "type": "gauge",
+            "title": "CREDIT STRESS",
+            "status": "GOOD" if cs_sm < 40 else ("WARN" if cs_sm < 65 else "DELAYED"),
+            "value": round(cs_sm, 0),
+            "unit": "",
+            "min": 0,
+            "max": 100,
+            "minLabel": "Easy",
+            "midLabel": "Tightening",
+            "maxLabel": "Crisis",
+            "tooltip": cs_tooltip,
+            "updatedAt": as_of
+        })
+    except Exception as e:
+        cards.append({
+            "id": "credit_stress",
+            "type": "gauge",
+            "title": "CREDIT STRESS",
+            "status": "DELAYED",
+            "valueText": "—",
+            "pct": 50,
+            "minLabel": "Easy",
+            "midLabel": "Tightening",
+            "maxLabel": "Crisis",
+            "tooltip": f"Credit stress dial build failed: {e}",
             "updatedAt": as_of
         })
 
