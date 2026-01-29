@@ -3,7 +3,7 @@
 Update public/indicators.json with daily macro dials.
 
 Dials included (v1):
-1) VIX level (proxy for vol regime)               -> Stooq
+1) VIX level (proxy for vol regime)               -> FRED (VIXCLS)  ✅ (replaces Stooq)
 2) US HY OAS spread (BAMLH0A0HYM2)                -> FRED
 3) US IG OAS spread (BAMLC0A0CM)                  -> FRED
 4) 10Y-2Y yield curve spread (T10Y2Y)             -> FRED
@@ -11,7 +11,7 @@ Dials included (v1):
 6) KRE 3M drawdown (63 trading days)              -> Stooq
 
 Notes:
-- FRED usually requires an API key. Set env var FRED_API_KEY.
+- FRED requires an API key. Set env var FRED_API_KEY (your GitHub Action already does).
 - Stooq is used for price series because it's simple and free.
 """
 
@@ -20,7 +20,6 @@ from __future__ import annotations
 import csv
 import json
 import os
-import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -61,16 +60,15 @@ def stooq_daily_closes(symbol: str) -> List[PriceBar]:
     """
     Fetch daily OHLC from Stooq CSV and return closes sorted ascending by date.
     Example symbols:
-      - "^vix" for VIX
       - "spy.us" for SPY ETF
       - "kre.us" for KRE ETF
     """
     url = f"https://stooq.com/q/d/l/?s={symbol}&i=d"
     txt = http_get_text(url)
+    # Stooq returns "No data" sometimes; csv.DictReader will then yield no rows.
     rows = list(csv.DictReader(txt.splitlines()))
     bars: List[PriceBar] = []
     for r in rows:
-        # Stooq uses columns: Date, Open, High, Low, Close, Volume
         try:
             bars.append(PriceBar(date=r["Date"], close=float(r["Close"])))
         except Exception:
@@ -102,26 +100,31 @@ def drawdown_pct(bars: List[PriceBar], lookback_days: int) -> Optional[float]:
 
 def fred_latest(series_id: str, api_key: Optional[str]) -> Optional[Tuple[str, float]]:
     """
-    Fetch latest observation for a FRED series_id.
+    Fetch latest *valid* observation for a FRED series_id.
     Returns (date, value) or None if unavailable.
+
+    We request multiple observations then pick the first non-missing value,
+    because sometimes the latest observation can be ".".
     """
-    # FRED API:
-    # https://api.stlouisfed.org/fred/series/observations?series_id=...&api_key=...&file_type=json&sort_order=desc&limit=1
     base = "https://api.stlouisfed.org/fred/series/observations"
-    params = f"?series_id={series_id}&file_type=json&sort_order=desc&limit=1"
+    params = f"?series_id={series_id}&file_type=json&sort_order=desc&limit=10"
     if api_key:
         params += f"&api_key={api_key}"
     url = base + params
+
     try:
         data = json.loads(http_get_text(url))
         obs = data.get("observations", [])
         if not obs:
             return None
-        o = obs[0]
-        v = o.get("value", ".")
-        if v in (".", "", None):
-            return None
-        return (o.get("date", ""), float(v))
+
+        for o in obs:
+            v = o.get("value", ".")
+            if v in (".", "", None):
+                continue
+            return (o.get("date", ""), float(v))
+
+        return None
     except Exception:
         return None
 
@@ -156,50 +159,43 @@ def status_from_band(value: float, good_max: float, warn_max: float, higher_is_w
         return "DELAYED"
 
 
-def dial_from_minmax(value: float, min_v: float, max_v: float) -> float:
-    if max_v == min_v:
-        return 50.0
-    pct = (value - min_v) / (max_v - min_v) * 100.0
-    return clamp(pct, 0.0, 100.0)
-
-
 def make_cards() -> Dict:
     as_of = utc_now_iso()
     fred_key = os.environ.get("FRED_API_KEY", "").strip() or None
 
     cards = []
 
-    # 1) VIX (Stooq)
-    try:
-        vix = stooq_daily_closes("^vix")
-        vix_last = vix[-1].close
+    # 1) VIX (FRED: VIXCLS)  ✅ replaces Stooq because Stooq often returns "No data"
+    vix = fred_latest("VIXCLS", fred_key)
+    if vix:
+        _, vix_val = vix
         cards.append({
             "id": "vix",
             "type": "gauge",
             "title": "VOLATILITY (VIX)",
-            "status": status_from_band(vix_last, good_max=18, warn_max=28, higher_is_worse=True),
-            "value": round(vix_last, 1),
+            "status": status_from_band(vix_val, good_max=18, warn_max=28, higher_is_worse=True),
+            "value": round(vix_val, 1),
             "unit": "",
             "min": 10,
             "max": 40,
             "minLabel": "10",
             "midLabel": "20",
             "maxLabel": "40",
-            "tooltip": "VIX level (proxy for risk aversion / vol regime). Higher = riskier.",
+            "tooltip": "CBOE VIX close from FRED (VIXCLS). Higher = riskier.",
             "updatedAt": as_of
         })
-    except Exception as e:
+    else:
         cards.append({
             "id": "vix",
             "type": "gauge",
             "title": "VOLATILITY (VIX)",
             "status": "DELAYED",
-            "valueText": "—",
+            "valueText": "FRED key?",
             "pct": 50,
             "minLabel": "10",
             "midLabel": "20",
             "maxLabel": "40",
-            "tooltip": f"VIX fetch failed: {e}",
+            "tooltip": "Could not fetch FRED series VIXCLS. Check env var FRED_API_KEY.",
             "updatedAt": as_of
         })
 
@@ -316,9 +312,7 @@ def make_cards() -> Dict:
         dd1m = drawdown_pct(spy, lookback_days=21)
         if dd1m is None:
             raise RuntimeError("not enough SPY data")
-        # drawdown is negative or 0
         dd1m = float(dd1m)
-        # Status: bigger drawdown = worse
         status = "GOOD"
         if dd1m <= -6:
             status = "WARN"
@@ -327,7 +321,7 @@ def make_cards() -> Dict:
         cards.append({
             "id": "spy_dd_1m",
             "type": "gauge",
-            "title": "EQUITY DRAWdown (SPY, 1M)",
+            "title": "EQUITY DRAWDOWN (SPY, 1M)",
             "status": status,
             "value": round(dd1m, 1),
             "unit": "%",
@@ -396,7 +390,6 @@ def make_cards() -> Dict:
             "updatedAt": as_of
         })
 
-    # Build payload
     return {
         "asOf": as_of,
         "cards": cards
