@@ -1,5 +1,5 @@
 {
-  "asOf": "2026-02-01T07:08:54Z",
+  "asOf": "2026-02-01T18:33:15Z",
   "cards": [
     {
       "id": "vix",
@@ -14,7 +14,7 @@
       "midLabel": "20",
       "maxLabel": "40",
       "tooltip": "CBOE VIX close from FRED (VIXCLS). Higher = riskier.",
-      "updatedAt": "2026-02-01T07:08:54Z"
+      "updatedAt": "2026-02-01T18:33:15Z"
     },
     {
       "id": "hy_oas",
@@ -29,7 +29,7 @@
       "midLabel": "500",
       "maxLabel": "800",
       "tooltip": "HY OAS from FRED (ICE BofA). Higher = tighter financial conditions / more stress.",
-      "updatedAt": "2026-02-01T07:08:54Z"
+      "updatedAt": "2026-02-01T18:33:15Z"
     },
     {
       "id": "ig_oas",
@@ -44,7 +44,7 @@
       "midLabel": "180",
       "maxLabel": "300",
       "tooltip": "IG OAS from FRED (ICE BofA). Higher = tighter conditions / credit stress.",
-      "updatedAt": "2026-02-01T07:08:54Z"
+      "updatedAt": "2026-02-01T18:33:15Z"
     },
     {
       "id": "curve_10y2y",
@@ -59,7 +59,7 @@
       "midLabel": "0",
       "maxLabel": "200",
       "tooltip": "10Y\u20132Y spread from FRED. More negative (inversion) = growth risk signal.",
-      "updatedAt": "2026-02-01T07:08:54Z"
+      "updatedAt": "2026-02-01T18:33:15Z"
     },
     {
       "id": "spy_dd_1m",
@@ -74,7 +74,7 @@
       "midLabel": "-10%",
       "maxLabel": "0%",
       "tooltip": "SPY drawdown from 1M peak (21 trading days). More negative = risk-off.",
-      "updatedAt": "2026-02-01T07:08:54Z"
+      "updatedAt": "2026-02-01T18:33:15Z"
     },
     {
       "id": "kre_dd_3m",
@@ -89,7 +89,7 @@
       "midLabel": "-15%",
       "maxLabel": "0%",
       "tooltip": "KRE drawdown from 3M peak (63 trading days). More negative = bank stress proxy.",
-      "updatedAt": "2026-02-01T07:08:54Z"
+      "updatedAt": "2026-02-01T18:33:15Z"
     },
     {
       "id": "recession_risk",
@@ -104,7 +104,36 @@
       "midLabel": "Elevated",
       "maxLabel": "High",
       "tooltip": "Composite recession risk dial (0\u2013100). Blend: inverted curve stress (T10Y3M), Sahm Rule realtime, and smoothed recession probability. Curve is capped when labour/coincident confirmation is low.",
-      "updatedAt": "2026-02-01T07:08:54Z"
+      "details": {
+        "raw": 33.94226439232409,
+        "smoothed": 33.98845287846482,
+        "prev": 34.0,
+        "components": {
+          "curve": {
+            "series": "T10Y3M",
+            "latest": 2.02,
+            "score": 46.508528784648185,
+            "score_used": 46.508528784648185
+          },
+          "sahm": {
+            "series": "SAHMREALTIME",
+            "latest": 0.35,
+            "score": 35.0
+          },
+          "coin": {
+            "series": "RECPROUSM156N",
+            "latest": 0.94,
+            "score": 0.94
+          },
+          "weights": {
+            "curve": 0.5,
+            "sahm": 0.3,
+            "coin": 0.2
+          },
+          "cap_applied": false
+        }
+      },
+      "updatedAt": "2026-02-01T18:33:15Z"
     },
     {
       "id": "credit_stress",
@@ -119,7 +148,57 @@
       "midLabel": "Tightening",
       "maxLabel": "Crisis",
       "tooltip": "Composite credit stress dial (0\u2013100, percentile-based). Blend of HY/BBB spreads, HY\u2013IG repricing, CPFF funding stress, STLFSI4 and NFCIRISK. Adds a small kicker when HY spreads widen rapidly.",
-      "updatedAt": "2026-02-01T07:08:54Z"
+      "details": {
+        "raw": 34.88056484688916,
+        "smoothed": 34.97611296937783,
+        "prev": 35.0,
+        "components": {
+          "hy_oas": {
+            "series": "BAMLH0A0HYM2",
+            "latest": 3.85,
+            "score": 31.707939749808528
+          },
+          "bbb_oas": {
+            "series": "BAMLC0A4CBBB",
+            "latest": 1.56,
+            "score": 33.62267041102885
+          },
+          "hy_ig": {
+            "series": "BAMLH0A0HYM2-BAMLC0A0CM",
+            "latest": 2.63,
+            "score": 27.061526678580545
+          },
+          "cpff": {
+            "series": "CPFF",
+            "latest": 0.24,
+            "score": 77.91644058600109
+          },
+          "stlfsi4": {
+            "series": "STLFSI4",
+            "latest": -0.7123,
+            "score": 13.282247765006385
+          },
+          "nfcirisk": {
+            "series": "NFCIRISK",
+            "latest": -0.69029,
+            "score": 11.494252873563218
+          },
+          "weights": {
+            "hy_oas": 0.3,
+            "bbb_oas": 0.1,
+            "hy_ig": 0.1,
+            "cpff": 0.2,
+            "stlfsi4": 0.15,
+            "nfcirisk": 0.15
+          },
+          "momentum": {
+            "chg_1m": -0.3400000000000003,
+            "pct_rank": 26.891405043746786,
+            "kicker_applied": false
+          }
+        }
+      },
+      "updatedAt": "2026-02-01T18:33:15Z"
     }
   ]
 }

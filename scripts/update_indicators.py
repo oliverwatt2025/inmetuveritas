@@ -19,6 +19,10 @@ Notes:
 - Stooq is used for price series because it's simple and free.
 - Composite dials are percentile-based and smoothed using yesterday's indicators.json
   (no database required).
+
+NEW:
+- Writes public/history_weekly.ndjson (one row per week) for sparklines/charts.
+- Adds "details" to composite dials so you can see what they updated WITH.
 """
 
 from __future__ import annotations
@@ -28,7 +32,7 @@ import csv
 import json
 import os
 from dataclasses import dataclass
-from datetime import datetime, timezone, date
+from datetime import datetime, timezone, date, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -37,6 +41,13 @@ import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTFILE = ROOT / "public" / "indicators.json"
+
+# History (weekly snapshots for sparklines / charts)
+HISTORY_WEEKLY = ROOT / "public" / "history_weekly.ndjson"
+# History (daily snapshots for sparklines / charts)
+HISTORY_DAILY = ROOT / "public" / "history_daily.ndjson"
+MAX_DAYS_DAILY = 420  # ~14 months
+
 
 
 # ----------------------------
@@ -77,6 +88,58 @@ def prev_card_value(prev_payload: Dict, card_id: str) -> Optional[float]:
     return None
 
 
+def parse_iso_date(iso_ts: str) -> date:
+    """Parse an ISO timestamp (with optional trailing 'Z') into a UTC date."""
+    s = iso_ts.strip()
+    if s.endswith("Z"):
+        s = s[:-1] + "+00:00"
+    try:
+        dt = datetime.fromisoformat(s)
+    except Exception:
+        # Fallback: just take YYYY-MM-DD prefix
+        return _to_date(s[:10])
+    return dt.astimezone(timezone.utc).date()
+
+
+def week_monday(d: date) -> date:
+    """Return the Monday date for the week containing d."""
+    return d - timedelta(days=d.weekday())
+
+
+def load_weekly_history() -> List[Dict]:
+    """Load NDJSON weekly history file if present."""
+    if not HISTORY_WEEKLY.exists():
+        return []
+    rows: List[Dict] = []
+    try:
+        for line in HISTORY_WEEKLY.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                rows.append(json.loads(line))
+            except Exception:
+                continue
+    except Exception:
+        return []
+    return rows
+
+
+def upsert_weekly_history(week_key: str, row: Dict, keep_last: int = 80) -> None:
+    """Insert/replace the row for week_key, keep last N weeks, and write NDJSON."""
+    rows = load_weekly_history()
+    rows = [r for r in rows if r.get("week") != week_key]
+    rows.append({"week": week_key, **row})
+    rows.sort(key=lambda r: r.get("week", ""))
+    if keep_last and len(rows) > keep_last:
+        rows = rows[-keep_last:]
+
+    HISTORY_WEEKLY.parent.mkdir(parents=True, exist_ok=True)
+    with HISTORY_WEEKLY.open("w", encoding="utf-8") as f:
+        for r in rows:
+            f.write(json.dumps(r, separators=(",", ":")) + "\n")
+
+
 # ----------------------------
 # Stooq (prices) helpers
 # ----------------------------
@@ -85,6 +148,37 @@ def prev_card_value(prev_payload: Dict, card_id: str) -> Optional[float]:
 class PriceBar:
     date: str
     close: float
+
+
+def load_daily_history() -> List[Dict]:
+    """Load NDJSON daily history rows from HISTORY_DAILY."""
+    rows: List[Dict] = []
+    try:
+        if not HISTORY_DAILY.exists():
+            return []
+        for line in HISTORY_DAILY.read_text(encoding="utf-8").splitlines():
+            s = line.strip()
+            if not s:
+                continue
+            try:
+                rows.append(json.loads(s))
+            except Exception:
+                continue
+    except Exception:
+        return []
+    return rows
+
+
+def upsert_daily_history(date_key: str, row: Dict, keep_last: int = MAX_DAYS_DAILY) -> None:
+    """Insert/replace the row for date_key (YYYY-MM-DD). Keeps only the most recent keep_last rows."""
+    rows = [r for r in load_daily_history() if r.get("date") != date_key]
+    rows.append({"date": date_key, **row})
+    rows.sort(key=lambda r: r.get("date", ""))
+    rows = rows[-keep_last:]
+    HISTORY_DAILY.parent.mkdir(parents=True, exist_ok=True)
+    with HISTORY_DAILY.open("w", encoding="utf-8") as f:
+        for r in rows:
+            f.write(json.dumps(r, separators=(",", ":")) + "\n")
 
 
 def stooq_daily_closes(symbol: str) -> List[PriceBar]:
@@ -269,9 +363,9 @@ def align_by_date(a: List[Tuple[str, float]], b: List[Tuple[str, float]]) -> Lis
 # Composite dial builders
 # ----------------------------
 
-def build_recession_dial(fred_key: Optional[str]) -> Tuple[Optional[float], str, List[str]]:
+def build_recession_dial(fred_key: Optional[str]) -> Tuple[Optional[float], str, List[str], Dict]:
     """
-    Returns (score_0_100, tooltip, warnings)
+    Returns (score_0_100, tooltip, warnings, details)
 
     Practical composite:
       - Curve stress: inverted percentile of 10y-3m (T10Y3M) [leading]
@@ -283,6 +377,11 @@ def build_recession_dial(fred_key: Optional[str]) -> Tuple[Optional[float], str,
     """
     warnings: List[str] = []
 
+    # Track raw inputs for audit/debug
+    curve_now: Optional[float] = None
+    sahm_now: Optional[float] = None
+    recp_now: Optional[float] = None
+
     # 1) Curve: 10y-3m
     curve_score: Optional[float]
     try:
@@ -291,6 +390,7 @@ def build_recession_dial(fred_key: Optional[str]) -> Tuple[Optional[float], str,
             raise RuntimeError("empty series")
         curve_vals = [v for _, v in curve_series]
         _, curve_now = curve_series[-1]
+        curve_now = float(curve_now)
         curve_score = percentile_score(curve_now, curve_vals, invert=True)
     except Exception as e:
         curve_score = None
@@ -303,6 +403,7 @@ def build_recession_dial(fred_key: Optional[str]) -> Tuple[Optional[float], str,
         if not sahm_series:
             raise RuntimeError("empty series")
         _, sahm_now = sahm_series[-1]
+        sahm_now = float(sahm_now)
         sahm_score = clamp((sahm_now / 1.0) * 100.0, 0.0, 100.0)
     except Exception as e:
         sahm_score = None
@@ -315,6 +416,7 @@ def build_recession_dial(fred_key: Optional[str]) -> Tuple[Optional[float], str,
         if not recp_series:
             raise RuntimeError("empty series")
         _, recp_now = recp_series[-1]
+        recp_now = float(recp_now)
         coin_score = clamp(recp_now, 0.0, 100.0)
     except Exception as e:
         coin_score = None
@@ -327,7 +429,7 @@ def build_recession_dial(fred_key: Optional[str]) -> Tuple[Optional[float], str,
     ]
     available = [(name, val, w) for (name, val, w) in components if val is not None]
     if not available:
-        return None, "Recession dial unavailable (all components missing).", warnings
+        return None, "Recession dial unavailable (all components missing).", warnings, {"missing": True, "warnings": warnings}
 
     wsum = sum(w for _, _, w in available)
     norm = [(name, float(val), w / wsum) for (name, val, w) in available]
@@ -354,10 +456,18 @@ def build_recession_dial(fred_key: Optional[str]) -> Tuple[Optional[float], str,
     if warnings:
         tooltip += " Warnings: " + " | ".join(warnings)
 
-    return clamp(score, 0.0, 100.0), tooltip, warnings
+    cap_applied = (curve_score is not None and curve_effective is not None and curve_effective != curve_score)
+    details = {
+        "curve": {"series": "T10Y3M", "latest": curve_now, "score": curve_score, "score_used": curve_effective},
+        "sahm": {"series": "SAHMREALTIME", "latest": sahm_now, "score": sahm_score},
+        "coin": {"series": "RECPROUSM156N", "latest": recp_now, "score": coin_score},
+        "weights": {"curve": 0.50, "sahm": 0.30, "coin": 0.20},
+        "cap_applied": cap_applied,
+    }
+    return clamp(score, 0.0, 100.0), tooltip, warnings, details
 
 
-def build_credit_stress_dial(fred_key: Optional[str]) -> Tuple[Optional[float], str, List[str]]:
+def build_credit_stress_dial(fred_key: Optional[str]) -> Tuple[Optional[float], str, List[str], Dict]:
     """
     Composite 0-100 credit stress using percentiles over ~15y history:
       - HY OAS (BAMLH0A0HYM2)       30%
@@ -372,23 +482,25 @@ def build_credit_stress_dial(fred_key: Optional[str]) -> Tuple[Optional[float], 
     """
     warnings: List[str] = []
 
-    def get_pct_score(series_id: str, years: int = 15) -> Optional[float]:
+    def get_pct_score(series_id: str, years: int = 15) -> Tuple[Optional[float], Optional[float]]:
         try:
             s = tail_since(fred_series(series_id, fred_key, limit=6000), years=years)
             if not s:
-                return None
+                return None, None
             vals = [v for _, v in s]
             _, now = s[-1]
-            return percentile_score(now, vals, invert=False)
+            now = float(now)
+            return percentile_score(now, vals, invert=False), now
         except Exception as e:
             warnings.append(f"{series_id} unavailable: {e}")
-            return None
+            return None, None
 
-    hy_score = get_pct_score("BAMLH0A0HYM2", years=15)
-    bbb_score = get_pct_score("BAMLC0A4CBBB", years=15)
+    hy_score, hy_now = get_pct_score("BAMLH0A0HYM2", years=15)
+    bbb_score, bbb_now = get_pct_score("BAMLC0A4CBBB", years=15)
 
     # HY-IG differential
     hy_ig_score: Optional[float] = None
+    hy_ig_now: Optional[float] = None
     try:
         hy_s = tail_since(fred_series("BAMLH0A0HYM2", fred_key, limit=6000), years=15)
         ig_s = tail_since(fred_series("BAMLC0A0CM", fred_key, limit=6000), years=15)
@@ -397,13 +509,14 @@ def build_credit_stress_dial(fred_key: Optional[str]) -> Tuple[Optional[float], 
         if diffs:
             vals = [v for _, v in diffs]
             _, now = diffs[-1]
+            hy_ig_now = float(now)
             hy_ig_score = percentile_score(now, vals, invert=False)
     except Exception as e:
         warnings.append(f"HY-IG diff unavailable: {e}")
 
-    cpff_score = get_pct_score("CPFF", years=15)
-    stlfsi_score = get_pct_score("STLFSI4", years=15)
-    nfci_risk_score = get_pct_score("NFCIRISK", years=15)
+    cpff_score, cpff_now = get_pct_score("CPFF", years=15)
+    stlfsi_score, stlfsi_now = get_pct_score("STLFSI4", years=15)
+    nfci_risk_score, nfci_risk_now = get_pct_score("NFCIRISK", years=15)
 
     weights = [
         ("HY OAS", hy_score, 0.30),
@@ -415,10 +528,12 @@ def build_credit_stress_dial(fred_key: Optional[str]) -> Tuple[Optional[float], 
     ]
     available = [(n, v, w) for (n, v, w) in weights if v is not None]
     if not available:
-        return None, "Credit stress dial unavailable (all components missing).", warnings
+        return None, "Credit stress dial unavailable (all components missing).", warnings, {"missing": True, "warnings": warnings}
 
     wsum = sum(w for _, _, w in available)
     score = sum((w / wsum) * float(v) for _, v, w in available)
+
+    mom_details: Dict = {}
 
     # Momentum kicker: HY OAS widening over ~1 month
     try:
@@ -431,8 +546,12 @@ def build_credit_stress_dial(fred_key: Optional[str]) -> Tuple[Optional[float], 
             for i in range(31, len(hy_s)):
                 chgs.append(hy_s[i][1] - hy_s[i - 31][1])
             pct = percentile_score(chg, chgs, invert=False)
+            mom_details = {"chg_1m": float(chg), "pct_rank": float(pct)}
             if pct >= 90.0:
                 score += 5.0
+                mom_details["kicker_applied"] = True
+            else:
+                mom_details["kicker_applied"] = False
     except Exception as e:
         warnings.append(f"HY momentum kicker unavailable: {e}")
 
@@ -446,7 +565,17 @@ def build_credit_stress_dial(fred_key: Optional[str]) -> Tuple[Optional[float], 
     if warnings:
         tooltip += " Warnings: " + " | ".join(warnings)
 
-    return score, tooltip, warnings
+    details = {
+        "hy_oas": {"series": "BAMLH0A0HYM2", "latest": hy_now, "score": hy_score},
+        "bbb_oas": {"series": "BAMLC0A4CBBB", "latest": bbb_now, "score": bbb_score},
+        "hy_ig": {"series": "BAMLH0A0HYM2-BAMLC0A0CM", "latest": hy_ig_now, "score": hy_ig_score},
+        "cpff": {"series": "CPFF", "latest": cpff_now, "score": cpff_score},
+        "stlfsi4": {"series": "STLFSI4", "latest": stlfsi_now, "score": stlfsi_score},
+        "nfcirisk": {"series": "NFCIRISK", "latest": nfci_risk_now, "score": nfci_risk_score},
+        "weights": {"hy_oas": 0.30, "bbb_oas": 0.10, "hy_ig": 0.10, "cpff": 0.20, "stlfsi4": 0.15, "nfcirisk": 0.15},
+        "momentum": mom_details,
+    }
+    return score, tooltip, warnings, details
 
 
 # ----------------------------
@@ -460,7 +589,7 @@ def make_cards() -> Dict:
 
     cards = []
 
-    # 1) VIX (FRED: VIXCLS)  ✅ replaces Stooq because Stooq often returns "No data"
+    # 1) VIX (FRED: VIXCLS)
     vix = fred_latest("VIXCLS", fred_key)
     if vix:
         _, vix_val = vix
@@ -495,10 +624,10 @@ def make_cards() -> Dict:
         })
 
     # 2) HY OAS (FRED)
-    hy = fred_latest("BAMLH0A0HYM2", fred_key)  # ICE BofA US High Yield OAS
+    hy = fred_latest("BAMLH0A0HYM2", fred_key)
     if hy:
         _, hy_val = hy
-        hy_bp = hy_val * 100.0  # percent -> bp
+        hy_bp = hy_val * 100.0
         cards.append({
             "id": "hy_oas",
             "type": "gauge",
@@ -530,7 +659,7 @@ def make_cards() -> Dict:
         })
 
     # 3) IG OAS (FRED)
-    ig = fred_latest("BAMLC0A0CM", fred_key)  # ICE BofA US Corporate OAS
+    ig = fred_latest("BAMLC0A0CM", fred_key)
     if ig:
         _, ig_val = ig
         ig_bp = ig_val * 100.0
@@ -565,11 +694,10 @@ def make_cards() -> Dict:
         })
 
     # 4) 10Y-2Y curve (FRED)
-    curve = fred_latest("T10Y2Y", fred_key)  # 10-Year Treasury Constant Maturity Minus 2-Year
+    curve = fred_latest("T10Y2Y", fred_key)
     if curve:
         _, c_val = curve
-        c_bp = c_val * 100.0  # percent -> bp
-        # Here, more negative is worse; we treat "higher is better"
+        c_bp = c_val * 100.0
         status = status_from_band(c_bp, good_max=0, warn_max=-50, higher_is_worse=False)
         cards.append({
             "id": "curve_10y2y",
@@ -687,11 +815,24 @@ def make_cards() -> Dict:
 
     # 7) RECESSION RISK (Composite 0–100)
     try:
-        rec_score, rec_tooltip, _ = build_recession_dial(fred_key)
+        rec_score, rec_tooltip, _, rec_details = build_recession_dial(fred_key)
         if rec_score is None:
             raise RuntimeError("missing components")
         prev = prev_card_value(prev_payload, "recession_risk")
         rec_sm = smooth_with_previous(rec_score, prev, alpha=0.20)
+        try:
+            c = rec_details.get('curve', {})
+            s = rec_details.get('sahm', {})
+            co = rec_details.get('coin', {})
+            print(
+                "RECESSION dial: "
+                f"curve_now={c.get('latest')} curve_score={c.get('score_used', c.get('score'))} "
+                f"sahm_now={s.get('latest')} sahm_score={s.get('score')} "
+                f"coin_now={co.get('latest')} coin_score={co.get('score')} "
+                f"raw={rec_score:.1f} smoothed={rec_sm:.1f} cap={rec_details.get('cap_applied')}"
+            )
+        except Exception:
+            pass
 
         cards.append({
             "id": "recession_risk",
@@ -706,6 +847,12 @@ def make_cards() -> Dict:
             "midLabel": "Elevated",
             "maxLabel": "High",
             "tooltip": rec_tooltip,
+            "details": {
+                "raw": float(rec_score),
+                "smoothed": float(rec_sm),
+                "prev": float(prev) if prev is not None else None,
+                "components": rec_details,
+            },
             "updatedAt": as_of
         })
     except Exception as e:
@@ -725,11 +872,22 @@ def make_cards() -> Dict:
 
     # 8) CREDIT STRESS (Composite 0–100)
     try:
-        cs_score, cs_tooltip, _ = build_credit_stress_dial(fred_key)
+        cs_score, cs_tooltip, _, cs_details = build_credit_stress_dial(fred_key)
         if cs_score is None:
             raise RuntimeError("missing components")
         prev = prev_card_value(prev_payload, "credit_stress")
         cs_sm = smooth_with_previous(cs_score, prev, alpha=0.20)
+        try:
+            m = cs_details.get('momentum', {})
+            print(
+                "CREDIT dial: "
+                f"raw={cs_score:.1f} smoothed={cs_sm:.1f} "
+                f"hy={cs_details.get('hy_oas', {}).get('latest')} hy_pct={cs_details.get('hy_oas', {}).get('score')} "
+                f"cpff={cs_details.get('cpff', {}).get('latest')} cpff_pct={cs_details.get('cpff', {}).get('score')} "
+                f"mom_chg_1m={m.get('chg_1m')} mom_pct={m.get('pct_rank')} kicker={m.get('kicker_applied')}"
+            )
+        except Exception:
+            pass
 
         cards.append({
             "id": "credit_stress",
@@ -744,6 +902,12 @@ def make_cards() -> Dict:
             "midLabel": "Tightening",
             "maxLabel": "Crisis",
             "tooltip": cs_tooltip,
+            "details": {
+                "raw": float(cs_score),
+                "smoothed": float(cs_sm),
+                "prev": float(prev) if prev is not None else None,
+                "components": cs_details,
+            },
             "updatedAt": as_of
         })
     except Exception as e:
@@ -769,6 +933,51 @@ def make_cards() -> Dict:
 
 def main() -> int:
     payload = make_cards()
+    # Update weekly history for sparklines/charts (one row per week)
+    try:
+        d = parse_iso_date(payload.get('asOf', utc_now_iso()))
+        wk = week_monday(d).isoformat()
+        # pull numeric values from cards by id
+        id_to_val = {c.get('id'): c.get('value') for c in payload.get('cards', []) if isinstance(c.get('value'), (int, float))}
+        row = {
+            'vix': id_to_val.get('vix'),
+            'hy_oas': id_to_val.get('hy_oas'),
+            'ig_oas': id_to_val.get('ig_oas'),
+            'curve_10y2y': id_to_val.get('curve_10y2y'),
+            'spy_dd_1m': id_to_val.get('spy_dd_1m'),
+            'kre_dd_3m': id_to_val.get('kre_dd_3m'),
+            'recession_risk': id_to_val.get('recession_risk'),
+            'credit_stress': id_to_val.get('credit_stress'),
+        }
+        # drop Nones to keep file tidy
+        row = {k: v for k, v in row.items() if v is not None}
+        upsert_weekly_history(wk, row, keep_last=80)
+        print(f"Weekly history updated: {HISTORY_WEEKLY} (week={wk})")
+    except Exception as e:
+        print(f"Weekly history update skipped: {e}")
+
+    # Update daily history for sparklines/charts (one row per day)
+    try:
+        d = parse_iso_date(payload.get('asOf', utc_now_iso()))
+        day = d.isoformat()
+        id_to_val = {c.get('id'): c.get('value') for c in payload.get('cards', []) if isinstance(c.get('value'), (int, float))}
+        row = {
+            'vix': id_to_val.get('vix'),
+            'hy_oas': id_to_val.get('hy_oas'),
+            'ig_oas': id_to_val.get('ig_oas'),
+            'curve_10y2y': id_to_val.get('curve_10y2y'),
+            'spy_dd_1m': id_to_val.get('spy_dd_1m'),
+            'kre_dd_3m': id_to_val.get('kre_dd_3m'),
+            'recession_risk': id_to_val.get('recession_risk'),
+            'credit_stress': id_to_val.get('credit_stress'),
+        }
+        row = {k: v for k, v in row.items() if v is not None}
+        upsert_daily_history(day, row, keep_last=MAX_DAYS_DAILY)
+        print(f"Daily history updated: {HISTORY_DAILY} (date={day})")
+    except Exception as e:
+        print(f"Daily history update skipped: {e}")
+
+
     OUTFILE.parent.mkdir(parents=True, exist_ok=True)
     OUTFILE.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     print(f"Wrote {OUTFILE} with asOf={payload['asOf']} and {len(payload['cards'])} cards.")

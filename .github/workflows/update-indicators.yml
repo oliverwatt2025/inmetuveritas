@@ -38,7 +38,7 @@ jobs:
           git config user.name "inmetuveritas-bot"
           git config user.email "actions@users.noreply.github.com"
 
-          git add public/indicators.json
+          git add public/indicators.json public/history_weekly.ndjson
 
           # If nothing changed, exit cleanly
           if git diff --cached --quiet; then

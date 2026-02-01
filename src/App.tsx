@@ -68,6 +68,16 @@ type IndicatorsPayload = {
   cards?: RawCard[];
 };
 
+// NDJSON rows: {"week":"YYYY-MM-DD", ...metric fields...}
+type HistoryRow = {
+  week: string;
+  [k: string]: unknown;
+};
+
+type HistoryPoint = { week: string; value: number };
+
+type HistoryMap = Record<string, HistoryPoint[]>;
+
 // --- Your current placeholders (used as initial state + fallback) ---
 const defaultGauges: Gauge[] = [
   {
@@ -281,7 +291,185 @@ function toGauge(c: RawCard): Gauge | null {
   };
 }
 
-function GaugeCard({ g, fallbackAsOf }: { g: Gauge; fallbackAsOf?: string | null }) {
+// ---- Sparkline helpers ----
+
+function clamp(n: number, lo: number, hi: number) {
+  return Math.max(lo, Math.min(hi, n));
+}
+
+function buildSparkPolyline(points: number[], w: number, h: number, pad = 6) {
+  const n = points.length;
+  if (n < 2) return "";
+
+  let minV = Infinity;
+  let maxV = -Infinity;
+  for (const v of points) {
+    if (v < minV) minV = v;
+    if (v > maxV) maxV = v;
+  }
+  if (!Number.isFinite(minV) || !Number.isFinite(maxV)) return "";
+  if (maxV - minV < 1e-9) {
+    // flat line
+    const y = pad + (h - 2 * pad) * 0.5;
+    return Array.from({ length: n }, (_, i) => {
+      const x = pad + ((w - 2 * pad) * i) / (n - 1);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(" ");
+  }
+
+  const pts: string[] = [];
+  for (let i = 0; i < n; i++) {
+    const x = pad + ((w - 2 * pad) * i) / (n - 1);
+    const t = (points[i] - minV) / (maxV - minV); // 0..1
+    const y = h - pad - (h - 2 * pad) * t;
+    pts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+  }
+  return pts.join(" ");
+}
+
+function Sparkline({
+  series,
+  status,
+}: {
+  series: HistoryPoint[] | undefined;
+  status: Status;
+}) {
+  // Keep it tiny and fast
+  const w = 150;
+  const h = 54;
+
+  if (!series || series.length < 2) {
+    return (
+      <div
+        style={{
+          width: w,
+          height: h,
+          borderRadius: 12,
+          background: "rgba(0,0,0,0.25)",
+          border: "1px solid rgba(255,255,255,0.10)",
+        }}
+        title="No history yet"
+      />
+    );
+  }
+
+  // Use last ~60 points max for readability (still covers >1y if weekly)
+  const tail = series.slice(-60);
+  const values = tail.map((p) => p.value);
+
+  const poly = buildSparkPolyline(values, w, h, 7);
+  const last = tail[tail.length - 1];
+
+  // Colour by status (subtle)
+  const stroke =
+    status === "GOOD"
+      ? "rgba(90, 235, 170, 0.90)"
+      : status === "WARN"
+        ? "rgba(255, 205, 120, 0.90)"
+        : "rgba(255, 120, 120, 0.90)";
+
+  return (
+    <div
+      style={{
+        width: w,
+        height: h,
+        borderRadius: 12,
+        background: "rgba(0,0,0,0.30)",
+        border: "1px solid rgba(255,255,255,0.10)",
+        padding: 0,
+        position: "relative",
+        overflow: "hidden",
+      }}
+      title={`Weekly history (last ${tail.length} points). Latest: ${last.week} = ${last.value}`}
+    >
+      <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden="true">
+        {/* faint baseline grid */}
+        <line x1="0" y1={h - 1} x2={w} y2={h - 1} stroke="rgba(255,255,255,0.06)" />
+        <polyline
+          points={poly}
+          fill="none"
+          stroke={stroke}
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        {/* last point dot */}
+        <circle
+          cx={w - 7}
+          cy={(() => {
+            // approximate last y by rebuilding quickly from last value using local min/max
+            let minV = Math.min(...values);
+            let maxV = Math.max(...values);
+            if (maxV - minV < 1e-9) return h / 2;
+            const t = (values[values.length - 1] - minV) / (maxV - minV);
+            return h - 7 - (h - 14) * t;
+          })()}
+          r="3.2"
+          fill={stroke}
+        />
+        {/* tiny axis labels */}
+        <text x="7" y={h - 6} fontSize="10" fill="rgba(255,255,255,0.55)">
+          1y
+        </text>
+        <text x={w - 26} y={h - 6} fontSize="10" fill="rgba(255,255,255,0.55)">
+          now
+        </text>
+      </svg>
+    </div>
+  );
+}
+
+// ---- NDJSON fetch + parsing ----
+
+function parseNdjson(text: string): HistoryRow[] {
+  const rows: HistoryRow[] = [];
+  for (const line of text.split("\n")) {
+    const s = line.trim();
+    if (!s) continue;
+    try {
+      rows.push(JSON.parse(s));
+    } catch {
+      // ignore
+    }
+  }
+  return rows;
+}
+
+function buildHistoryMap(rows: HistoryRow[]): HistoryMap {
+  // Keys in your weekly history file match your indicator ids:
+  // vix, hy_oas, ig_oas, curve_10y2y, spy_dd_1m, kre_dd_3m, recession_risk, credit_stress
+  const map: HistoryMap = {};
+
+  for (const r of rows) {
+    const wk = typeof r.week === "string" ? r.week : "";
+    if (!wk) continue;
+
+    for (const [k, v] of Object.entries(r)) {
+      if (k === "week") continue;
+      if (typeof v !== "number" || !Number.isFinite(v)) continue;
+
+      if (!map[k]) map[k] = [];
+      map[k].push({ week: wk, value: v });
+    }
+  }
+
+  // Ensure sorted by week
+  for (const k of Object.keys(map)) {
+    map[k].sort((a, b) => (a.week < b.week ? -1 : a.week > b.week ? 1 : 0));
+  }
+
+  return map;
+}
+
+function GaugeCard({
+  g,
+  fallbackAsOf,
+  history,
+}: {
+  g: Gauge;
+  fallbackAsOf?: string | null;
+  history?: HistoryPoint[];
+}) {
   const rot = needleRotationFromPct(g.pct);
 
   // Prefer per-card updatedAt, otherwise use global asOf, otherwise use existing updatedText
@@ -295,8 +483,16 @@ function GaugeCard({ g, fallbackAsOf }: { g: Gauge; fallbackAsOf?: string | null
         <div className={statusClass(g.status)}>{g.status}</div>
       </div>
 
-      <div className="cardBody">
-        <div className="gaugeWrap">
+      <div
+        className="cardBody"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 14,
+          justifyContent: "space-between",
+        }}
+      >
+        <div className="gaugeWrap" style={{ flex: "0 0 auto" }}>
           <div className="gauge">
             {/* arc */}
             <svg className="arc" viewBox="0 0 200 140" aria-hidden="true">
@@ -349,9 +545,14 @@ function GaugeCard({ g, fallbackAsOf }: { g: Gauge; fallbackAsOf?: string | null
           </div>
         </div>
 
-        <div className="readout">
+        <div className="readout" style={{ flex: "1 1 auto", minWidth: 0 }}>
           <div className="value">{g.valueText}</div>
           <div className="updated">Updated • {updatedLine}</div>
+        </div>
+
+        {/* Sparkline sits on the right */}
+        <div style={{ flex: "0 0 auto" }}>
+          <Sparkline series={history} status={g.status} />
         </div>
       </div>
     </div>
@@ -361,6 +562,8 @@ function GaugeCard({ g, fallbackAsOf }: { g: Gauge; fallbackAsOf?: string | null
 export default function App() {
   const [gauges, setGauges] = useState<Gauge[]>(defaultGauges);
   const [asOf, setAsOf] = useState<string | null>(null);
+
+  const [historyMap, setHistoryMap] = useState<HistoryMap>({});
 
   // Keep the "Updated • x ago" text fresh even if data hasn't changed
   const [, forceTick] = useState(0);
@@ -372,7 +575,7 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
 
-    async function load() {
+    async function loadIndicators() {
       const res = await fetch(`/indicators.json?cb=${Date.now()}`, { cache: "no-store" });
       if (!res.ok) throw new Error(`Fetch indicators.json failed: ${res.status}`);
 
@@ -387,17 +590,36 @@ export default function App() {
       if (typeof data.asOf === "string") setAsOf(data.asOf);
     }
 
-    // initial load
-    load().catch((e) => console.warn(e));
+    async function loadHistory() {
+      // history_weekly.ndjson is optional early on — fail silently
+      const res = await fetch(`/history_weekly.ndjson?cb=${Date.now()}`, { cache: "no-store" });
+      if (!res.ok) return;
 
-    // refresh every 5 minutes
-    const t = setInterval(() => {
-      load().catch((e) => console.warn(e));
+      const text = await res.text();
+      if (cancelled) return;
+
+      const rows = parseNdjson(text);
+      const map = buildHistoryMap(rows);
+      setHistoryMap(map);
+    }
+
+    // initial load
+    loadIndicators().catch((e) => console.warn(e));
+    loadHistory().catch((e) => console.warn(e));
+
+    // refresh every 5 minutes (indicators), and every 30 minutes (history)
+    const t1 = setInterval(() => {
+      loadIndicators().catch((e) => console.warn(e));
     }, 5 * 60 * 1000);
+
+    const t2 = setInterval(() => {
+      loadHistory().catch((e) => console.warn(e));
+    }, 30 * 60 * 1000);
 
     return () => {
       cancelled = true;
-      clearInterval(t);
+      clearInterval(t1);
+      clearInterval(t2);
     };
   }, []);
 
@@ -417,7 +639,12 @@ export default function App() {
 
       <main className="grid">
         {gauges.map((g) => (
-          <GaugeCard key={g.key} g={g} fallbackAsOf={asOf} />
+          <GaugeCard
+            key={g.key}
+            g={g}
+            fallbackAsOf={asOf}
+            history={historyMap[g.key] ?? historyMap[g.key.toLowerCase()]}
+          />
         ))}
       </main>
     </div>
