@@ -321,7 +321,7 @@ function buildSparkPolyline(points: number[], w: number, h: number, pad = 6) {
   for (let i = 0; i < n; i++) {
     const x = pad + ((w - 2 * pad) * i) / (n - 1);
     const t = (points[i] - minV) / (maxV - minV); // 0..1
-    const y = h - pad - (h - 2 * pad) * t;
+    const y = clamp(h - pad - (h - 2 * pad) * t, pad, h - pad);
     pts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
   }
   return pts.join(" ");
