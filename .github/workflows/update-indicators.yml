@@ -38,7 +38,8 @@ jobs:
           git config user.name "inmetuveritas-bot"
           git config user.email "actions@users.noreply.github.com"
 
-          git add public/indicators.json public/history_weekly.ndjson
+          # ✅ Add daily history file so it gets published to live
+          git add public/indicators.json public/history_weekly.ndjson public/history_daily.ndjson
 
           # If nothing changed, exit cleanly
           if git diff --cached --quiet; then
