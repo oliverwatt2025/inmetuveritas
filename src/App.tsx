@@ -1,3 +1,5 @@
+import { DefconMeter } from "./components/DefconMeter";
+import type { DefconLevel } from "./components/DefconMeter";
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 
@@ -628,8 +630,51 @@ export default function App() {
     return "";
   }, []);
 
+  // ✅ STEP 3: compute DEFCON from gauges (inserted here)
+  const defcon = useMemo<DefconLevel>(() => {
+    const byKey = new Map(gauges.map((g) => [g.key.toLowerCase(), g]));
+
+    // Adjust these keys if your gauge keys differ.
+    const hy = byKey.get("hy_oas") ?? byKey.get("high_yield") ?? byKey.get("hy");
+    const ig = byKey.get("ig_oas") ?? byKey.get("investment_grade") ?? byKey.get("ig");
+    const vix = byKey.get("vix") ?? byKey.get("volatility") ?? byKey.get("vol");
+    const cmbs = byKey.get("cmbs") ?? byKey.get("trepp") ?? byKey.get("cre");
+    const liq = byKey.get("liq") ?? byKey.get("liquidity") ?? byKey.get("mmf");
+    const banks = byKey.get("banks") ?? byKey.get("regional_banks") ?? byKey.get("regional banks");
+
+    const isWarn = (g?: { status: Status }) => g?.status === "WARN";
+    const isGood = (g?: { status: Status }) => g?.status === "GOOD";
+
+    // DEFCON 1: IG + HY both warning (systemic-ish)
+    if (isWarn(ig) && isWarn(hy)) return 1;
+
+    // DEFCON 2: IG warning (your “action needed” trigger)
+    if (isWarn(ig)) return 2;
+
+    // DEFCON 3: HY warning OR VIX warning (markets shouting)
+    if (isWarn(hy) || isWarn(vix)) return 3;
+
+    // DEFCON 4: structural stress (CRE/banks/liquidity warning) while credit calm
+    if ((isWarn(cmbs) || isWarn(banks) || isWarn(liq)) && isGood(hy) && isGood(ig)) return 4;
+
+    // DEFCON 5: default calm
+    return 5;
+  }, [gauges]);
+
   return (
-    <div className="page">
+    <div className="page" style={{ position: "relative" }}>
+      <DefconMeter
+        level={defcon}
+        corner="top-right"
+        note={
+          defcon === 5 ? "All clear." :
+          defcon === 4 ? "Structural stress building; credit calm." :
+          defcon === 3 ? "Risk repricing: watch closely." :
+          defcon === 2 ? "System stress: consider action plan." :
+          "Confirmation: defensive posture."
+        }
+      />
+
       <header className="hero">
         <div className="brand">
           <div className="brandTitle">IN METU VERITAS</div>
@@ -652,3 +697,4 @@ export default function App() {
 }
 
 // deploy tick Sun  1 Feb 2026 22:01:34 UTC
+
