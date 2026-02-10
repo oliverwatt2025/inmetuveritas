@@ -1,12 +1,12 @@
 {
-  "asOf": "2026-02-09T07:36:08Z",
+  "asOf": "2026-02-10T07:35:29Z",
   "cards": [
     {
       "id": "vix",
       "type": "gauge",
       "title": "VOLATILITY (VIX)",
-      "status": "WARN",
-      "value": 21.8,
+      "status": "GOOD",
+      "value": 17.8,
       "unit": "",
       "min": 10,
       "max": 40,
@@ -14,14 +14,14 @@
       "midLabel": "20",
       "maxLabel": "40",
       "tooltip": "CBOE VIX close from FRED (VIXCLS). Higher = riskier.",
-      "updatedAt": "2026-02-09T07:36:08Z"
+      "updatedAt": "2026-02-10T07:35:29Z"
     },
     {
       "id": "hy_oas",
       "type": "gauge",
       "title": "HIGH YIELD SPREAD (OAS)",
       "status": "GOOD",
-      "value": 297.0,
+      "value": 287.0,
       "unit": " bp",
       "min": 250,
       "max": 800,
@@ -29,7 +29,7 @@
       "midLabel": "500",
       "maxLabel": "800",
       "tooltip": "HY OAS from FRED (ICE BofA). Higher = tighter financial conditions / more stress.",
-      "updatedAt": "2026-02-09T07:36:08Z"
+      "updatedAt": "2026-02-10T07:35:29Z"
     },
     {
       "id": "ig_oas",
@@ -44,14 +44,14 @@
       "midLabel": "180",
       "maxLabel": "300",
       "tooltip": "IG OAS from FRED (ICE BofA). Higher = tighter conditions / credit stress.",
-      "updatedAt": "2026-02-09T07:36:08Z"
+      "updatedAt": "2026-02-10T07:35:29Z"
     },
     {
       "id": "curve_10y2y",
       "type": "gauge",
       "title": "YIELD CURVE (10Y\u20132Y)",
       "status": "GOOD",
-      "value": 72.0,
+      "value": 74.0,
       "unit": " bp",
       "min": -200,
       "max": 200,
@@ -59,14 +59,14 @@
       "midLabel": "0",
       "maxLabel": "200",
       "tooltip": "10Y\u20132Y spread from FRED. More negative (inversion) = growth risk signal.",
-      "updatedAt": "2026-02-09T07:36:08Z"
+      "updatedAt": "2026-02-10T07:35:29Z"
     },
     {
       "id": "spy_dd_1m",
       "type": "gauge",
       "title": "EQUITY DRAWDOWN (SPY, 1M)",
       "status": "GOOD",
-      "value": -0.7,
+      "value": -0.2,
       "unit": "%",
       "min": -20,
       "max": 0,
@@ -74,14 +74,14 @@
       "midLabel": "-10%",
       "maxLabel": "0%",
       "tooltip": "SPY drawdown from 1M peak (21 trading days). More negative = risk-off.",
-      "updatedAt": "2026-02-09T07:36:08Z"
+      "updatedAt": "2026-02-10T07:35:29Z"
     },
     {
       "id": "kre_dd_3m",
       "type": "gauge",
       "title": "REGIONAL BANKS DRAWDOWN (KRE, 3M)",
       "status": "GOOD",
-      "value": 0.0,
+      "value": -0.3,
       "unit": "%",
       "min": -30,
       "max": 0,
@@ -89,7 +89,7 @@
       "midLabel": "-15%",
       "maxLabel": "0%",
       "tooltip": "KRE drawdown from 3M peak (63 trading days). More negative = bank stress proxy.",
-      "updatedAt": "2026-02-09T07:36:08Z"
+      "updatedAt": "2026-02-10T07:35:29Z"
     },
     {
       "id": "recession_risk",
@@ -133,7 +133,7 @@
           "cap_applied": false
         }
       },
-      "updatedAt": "2026-02-09T07:36:08Z"
+      "updatedAt": "2026-02-10T07:35:29Z"
     },
     {
       "id": "credit_stress",
@@ -198,7 +198,7 @@
           }
         }
       },
-      "updatedAt": "2026-02-09T07:36:08Z"
+      "updatedAt": "2026-02-10T07:35:29Z"
     }
   ]
 }
