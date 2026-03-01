@@ -26,3 +26,4 @@
 {"date":"2026-02-26","vix":19.6,"hy_oas":297.0,"ig_oas":81.0,"curve_10y2y":60.0,"spy_dd_1m":-0.3,"kre_dd_3m":-5.1,"recession_risk":34.0,"credit_stress":37.0}
 {"date":"2026-02-27","vix":17.9,"hy_oas":294.0,"ig_oas":80.0,"curve_10y2y":60.0,"spy_dd_1m":-0.9,"kre_dd_3m":-4.4,"recession_risk":34.0,"credit_stress":37.0}
 {"date":"2026-02-28","vix":18.6,"hy_oas":298.0,"ig_oas":82.0,"curve_10y2y":59.0,"spy_dd_1m":-1.4,"kre_dd_3m":-9.3,"recession_risk":34.0,"credit_stress":37.0}
+{"date":"2026-03-01","vix":18.6,"hy_oas":298.0,"ig_oas":82.0,"curve_10y2y":59.0,"recession_risk":34.0,"credit_stress":37.0}
