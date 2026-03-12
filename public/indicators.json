@@ -1,12 +1,12 @@
 {
-  "asOf": "2026-03-11T07:14:08Z",
+  "asOf": "2026-03-12T07:26:32Z",
   "cards": [
     {
       "id": "vix",
       "type": "gauge",
       "title": "VOLATILITY (VIX)",
       "status": "WARN",
-      "value": 25.5,
+      "value": 24.9,
       "unit": "",
       "min": 10,
       "max": 40,
@@ -14,14 +14,14 @@
       "midLabel": "20",
       "maxLabel": "40",
       "tooltip": "CBOE VIX close from FRED (VIXCLS). Higher = riskier.",
-      "updatedAt": "2026-03-11T07:14:08Z"
+      "updatedAt": "2026-03-12T07:26:32Z"
     },
     {
       "id": "hy_oas",
       "type": "gauge",
       "title": "HIGH YIELD SPREAD (OAS)",
       "status": "GOOD",
-      "value": 319.0,
+      "value": 306.0,
       "unit": " bp",
       "min": 250,
       "max": 800,
@@ -29,14 +29,14 @@
       "midLabel": "500",
       "maxLabel": "800",
       "tooltip": "HY OAS from FRED (ICE BofA). Higher = tighter financial conditions / more stress.",
-      "updatedAt": "2026-03-11T07:14:08Z"
+      "updatedAt": "2026-03-12T07:26:32Z"
     },
     {
       "id": "ig_oas",
       "type": "gauge",
       "title": "INVESTMENT GRADE SPREAD (OAS)",
       "status": "GOOD",
-      "value": 85.0,
+      "value": 84.0,
       "unit": " bp",
       "min": 80,
       "max": 300,
@@ -44,14 +44,14 @@
       "midLabel": "180",
       "maxLabel": "300",
       "tooltip": "IG OAS from FRED (ICE BofA). Higher = tighter conditions / credit stress.",
-      "updatedAt": "2026-03-11T07:14:08Z"
+      "updatedAt": "2026-03-12T07:26:32Z"
     },
     {
       "id": "curve_10y2y",
       "type": "gauge",
       "title": "YIELD CURVE (10Y\u20132Y)",
       "status": "GOOD",
-      "value": 58.0,
+      "value": 57.0,
       "unit": " bp",
       "min": -200,
       "max": 200,
@@ -59,7 +59,7 @@
       "midLabel": "0",
       "maxLabel": "200",
       "tooltip": "10Y\u20132Y spread from FRED. More negative (inversion) = growth risk signal.",
-      "updatedAt": "2026-03-11T07:14:08Z"
+      "updatedAt": "2026-03-12T07:26:32Z"
     },
     {
       "id": "spy_dd_1m",
@@ -74,14 +74,14 @@
       "midLabel": "-10%",
       "maxLabel": "0%",
       "tooltip": "SPY drawdown from 1M peak (21 trading days). More negative = risk-off.",
-      "updatedAt": "2026-03-11T07:14:08Z"
+      "updatedAt": "2026-03-12T07:26:32Z"
     },
     {
       "id": "kre_dd_3m",
       "type": "gauge",
       "title": "REGIONAL BANKS DRAWDOWN (KRE, 3M)",
       "status": "WARN",
-      "value": -12.1,
+      "value": -13.1,
       "unit": "%",
       "min": -30,
       "max": 0,
@@ -89,7 +89,7 @@
       "midLabel": "-15%",
       "maxLabel": "0%",
       "tooltip": "KRE drawdown from 3M peak (63 trading days). More negative = bank stress proxy.",
-      "updatedAt": "2026-03-11T07:14:08Z"
+      "updatedAt": "2026-03-12T07:26:32Z"
     },
     {
       "id": "recession_risk",
@@ -133,14 +133,14 @@
           "cap_applied": false
         }
       },
-      "updatedAt": "2026-03-11T07:14:08Z"
+      "updatedAt": "2026-03-12T07:26:32Z"
     },
     {
       "id": "credit_stress",
       "type": "gauge",
       "title": "CREDIT STRESS",
       "status": "WARN",
-      "value": 40.0,
+      "value": 41.0,
       "unit": "",
       "min": 0,
       "max": 100,
@@ -149,8 +149,8 @@
       "maxLabel": "Crisis",
       "tooltip": "Composite credit stress dial (0\u2013100, percentile-based). Blend of HY/BBB spreads, HY\u2013IG repricing, CPFF funding stress, STLFSI4 and NFCIRISK. Adds a small kicker when HY spreads widen rapidly.",
       "details": {
-        "raw": 42.27520086221483,
-        "smoothed": 40.45504017244296,
+        "raw": 43.29052653271291,
+        "smoothed": 40.65810530654258,
         "prev": 40.0,
         "components": {
           "hy_oas": {
@@ -175,13 +175,13 @@
           },
           "stlfsi4": {
             "series": "STLFSI4",
-            "latest": -0.4436,
-            "score": 43.29501915708812
+            "latest": -0.4279,
+            "score": 44.44444444444444
           },
           "nfcirisk": {
             "series": "NFCIRISK",
-            "latest": -0.61447,
-            "score": 30.779054916985952
+            "latest": -0.59384,
+            "score": 36.39846743295019
           },
           "weights": {
             "hy_oas": 0.3,
@@ -198,7 +198,7 @@
           }
         }
       },
-      "updatedAt": "2026-03-11T07:14:08Z"
+      "updatedAt": "2026-03-12T07:26:32Z"
     }
   ]
 }
