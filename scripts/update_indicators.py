@@ -771,6 +771,62 @@ def make_cards() -> Dict:
             "updatedAt": as_of
         })
 
+    # ---5.5 MARKET BREADTH (RSP vs SPY, 20-day return) ---
+    try:
+        spy = stooq_daily_closes("spy.us")
+        rsp = stooq_daily_closes("rsp.us")
+
+        def pct_return(bars, lookback):
+            if len(bars) < lookback + 1:
+                return None
+            start = bars[-lookback - 1].close
+            end = bars[-1].close
+            return (end / start - 1.0) * 100.0
+
+        spy_ret = pct_return(spy, 20)
+        rsp_ret = pct_return(rsp, 20)
+
+        if spy_ret is None or rsp_ret is None:
+            raise RuntimeError("not enough SPY/RSP data")
+
+        breadth_val = rsp_ret - spy_ret
+
+        # Simple status logic
+        if breadth_val > 2:
+            breadth_status = "GOOD"
+        elif breadth_val > -2:
+            breadth_status = "WARN"
+        else:
+            breadth_status = "WARN"
+
+        cards.append({
+            "id": "breadth",
+            "type": "gauge",
+            "title": "MARKET BREADTH",
+            "status": breadth_status,
+            "value": round(breadth_val, 1),
+            "unit": "%",
+            "min": -10,
+            "max": 10,
+            "minLabel": "Narrow",
+            "midLabel": "Neutral",
+            "maxLabel": "Broad",
+            "tooltip": "Equal-weight S&P (RSP) minus S&P 500 (SPY) 20-day return. Negative = narrow rally.",
+            "updatedAt": as_of
+        })
+
+    except Exception as e:
+        cards.append({
+            "id": "breadth",
+            "type": "gauge",
+            "title": "MARKET BREADTH",
+            "status": "DELAYED",
+            "valueText": "—",
+            "pct": 50,
+            "tooltip": f"Breadth calc failed: {e}",
+            "updatedAt": as_of
+        })
+
     # 6) KRE 3M drawdown (Stooq, 63 trading days)
     try:
         kre = stooq_daily_closes("kre.us")
@@ -940,15 +996,16 @@ def main() -> int:
         # pull numeric values from cards by id
         id_to_val = {c.get('id'): c.get('value') for c in payload.get('cards', []) if isinstance(c.get('value'), (int, float))}
         row = {
-            'vix': id_to_val.get('vix'),
-            'hy_oas': id_to_val.get('hy_oas'),
-            'ig_oas': id_to_val.get('ig_oas'),
-            'curve_10y2y': id_to_val.get('curve_10y2y'),
-            'spy_dd_1m': id_to_val.get('spy_dd_1m'),
-            'kre_dd_3m': id_to_val.get('kre_dd_3m'),
-            'recession_risk': id_to_val.get('recession_risk'),
-            'credit_stress': id_to_val.get('credit_stress'),
-        }
+    'vix': id_to_val.get('vix'),
+    'hy_oas': id_to_val.get('hy_oas'),
+    'ig_oas': id_to_val.get('ig_oas'),
+    'curve_10y2y': id_to_val.get('curve_10y2y'),
+    'spy_dd_1m': id_to_val.get('spy_dd_1m'),
+    'kre_dd_3m': id_to_val.get('kre_dd_3m'),
+    'recession_risk': id_to_val.get('recession_risk'),
+    'credit_stress': id_to_val.get('credit_stress'),
+    'breadth': id_to_val.get('breadth'),
+}
         # drop Nones to keep file tidy
         row = {k: v for k, v in row.items() if v is not None}
         upsert_weekly_history(wk, row, keep_last=80)
@@ -962,15 +1019,16 @@ def main() -> int:
         day = d.isoformat()
         id_to_val = {c.get('id'): c.get('value') for c in payload.get('cards', []) if isinstance(c.get('value'), (int, float))}
         row = {
-            'vix': id_to_val.get('vix'),
-            'hy_oas': id_to_val.get('hy_oas'),
-            'ig_oas': id_to_val.get('ig_oas'),
-            'curve_10y2y': id_to_val.get('curve_10y2y'),
-            'spy_dd_1m': id_to_val.get('spy_dd_1m'),
-            'kre_dd_3m': id_to_val.get('kre_dd_3m'),
-            'recession_risk': id_to_val.get('recession_risk'),
-            'credit_stress': id_to_val.get('credit_stress'),
-        }
+    'vix': id_to_val.get('vix'),
+    'hy_oas': id_to_val.get('hy_oas'),
+    'ig_oas': id_to_val.get('ig_oas'),
+    'curve_10y2y': id_to_val.get('curve_10y2y'),
+    'spy_dd_1m': id_to_val.get('spy_dd_1m'),
+    'kre_dd_3m': id_to_val.get('kre_dd_3m'),
+    'recession_risk': id_to_val.get('recession_risk'),
+    'credit_stress': id_to_val.get('credit_stress'),
+    'breadth': id_to_val.get('breadth'),
+}
         row = {k: v for k, v in row.items() if v is not None}
         upsert_daily_history(day, row, keep_last=MAX_DAYS_DAILY)
         print(f"Daily history updated: {HISTORY_DAILY} (date={day})")
