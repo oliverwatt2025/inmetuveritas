@@ -1,6 +1,7 @@
 import { DefconMeter } from "./components/DefconMeter";
 import type { DefconLevel } from "./components/DefconMeter";
 import { useEffect, useMemo, useState } from "react";
+const MINER_URL = "/miner-status.json";
 import "./App.css";
 
 type Status = "GOOD" | "WARN" | "DELAYED";
@@ -561,11 +562,31 @@ function GaugeCard({
   );
 }
 
+function recoveryTimeAgo(iso?: string): string {
+  if (!iso) return "never";
+
+  const then = new Date(iso).getTime();
+  if (Number.isNaN(then)) return iso;
+
+  const diffMs = Date.now() - then;
+  const diffMin = Math.floor(diffMs / 60000);
+
+  if (diffMin < 1) return "just now";
+  if (diffMin < 60) return `${diffMin}m ago`;
+
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}h ago`;
+
+  const diffDay = Math.floor(diffHr / 24);
+  return `${diffDay}d ago`;
+}
+
 export default function App() {
   const [gauges, setGauges] = useState<Gauge[]>(defaultGauges);
   const [asOf, setAsOf] = useState<string | null>(null);
 
   const [historyMap, setHistoryMap] = useState<HistoryMap>({});
+  const [miner, setMiner] = useState<any>(null);
 
   // Keep the "Updated • x ago" text fresh even if data hasn't changed
   const [, forceTick] = useState(0);
@@ -573,6 +594,22 @@ export default function App() {
     const t = setInterval(() => forceTick((x) => x + 1), 60_000); // every minute
     return () => clearInterval(t);
   }, []);
+  useEffect(() => {
+  async function fetchMiner() {
+    try {
+      const res = await fetch(MINER_URL);
+      const data = await res.json();
+      setMiner(data);
+    } catch (e) {
+      setMiner(null);
+    }
+  }
+
+  fetchMiner();
+  const interval = setInterval(fetchMiner, 10_000);
+
+  return () => clearInterval(interval);
+}, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -584,10 +621,13 @@ export default function App() {
       const data = (await res.json()) as IndicatorsPayload;
       if (cancelled) return;
 
-      if (Array.isArray(data.cards) && data.cards.length) {
-        const mapped = data.cards.map(toGauge).filter(Boolean) as Gauge[];
-        if (mapped.length) setGauges(mapped);
-      }
+if (Array.isArray(data.cards) && data.cards.length) {
+  const mapped = data.cards.map(toGauge).filter(Boolean) as Gauge[];
+
+
+
+  if (mapped.length) setGauges(mapped);
+}
 
       if (typeof data.asOf === "string") setAsOf(data.asOf);
     }
@@ -623,13 +663,44 @@ export default function App() {
       clearInterval(t1);
       clearInterval(t2);
     };
-  }, []);
+  }, [miner]);
 
   const subtitle = useMemo(() => {
     // optional: show something useful later; leaving blank keeps your design clean.
     return "";
   }, []);
+  const displayGauges = useMemo(() => {
+    const base = [...gauges];
 
+    if (miner) {
+      const minerStatus: Status =
+        miner.status === "UP"
+          ? "GOOD"
+          : miner.status === "DOWN"
+          ? "DELAYED"
+          : "WARN";
+
+      const minerUpdatedText =
+        typeof miner.lastRecovery === "string" && miner.lastRecovery
+          ? `Recovered: ${recoveryTimeAgo(miner.lastRecovery)}`
+          : "Recovered: never";
+
+      base.push({
+        key: "wingbits-miner",
+        title: "Wingbits Miner",
+        status: minerStatus,
+        valueText: miner.status === "UP" ? "Online" : "Offline",
+        updatedAt: miner.lastCheck || undefined,
+        updatedText: minerUpdatedText,
+        pct: miner.status === "UP" ? 82 : 8,
+        minLabel: "Down",
+        midLabel: "Recover",
+        maxLabel: "Healthy",
+      } as Gauge);
+    }
+
+    return base;
+  }, [gauges, miner]);
   // ✅ STEP 3: compute DEFCON from gauges (inserted here)
   const defcon = useMemo<DefconLevel>(() => {
     const byKey = new Map(gauges.map((g) => [g.key.toLowerCase(), g]));
@@ -683,7 +754,7 @@ export default function App() {
       </header>
 
       <main className="grid">
-        {gauges.map((g) => (
+        {displayGauges.map((g) => (
           <GaugeCard
             key={g.key}
             g={g}
