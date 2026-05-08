@@ -1,5 +1,5 @@
 {
-  "asOf": "2026-05-07T09:08:12Z",
+  "asOf": "2026-05-08T08:02:51Z",
   "cards": [
     {
       "id": "vix",
@@ -14,14 +14,14 @@
       "midLabel": "20",
       "maxLabel": "40",
       "tooltip": "CBOE VIX close from FRED (VIXCLS). Higher = riskier.",
-      "updatedAt": "2026-05-07T09:08:12Z"
+      "updatedAt": "2026-05-08T08:02:51Z"
     },
     {
       "id": "hy_oas",
       "type": "gauge",
       "title": "HIGH YIELD SPREAD (OAS)",
       "status": "GOOD",
-      "value": 277.0,
+      "value": 275.0,
       "unit": " bp",
       "min": 250,
       "max": 800,
@@ -29,14 +29,14 @@
       "midLabel": "500",
       "maxLabel": "800",
       "tooltip": "HY OAS from FRED (ICE BofA). Higher = tighter financial conditions / more stress.",
-      "updatedAt": "2026-05-07T09:08:12Z"
+      "updatedAt": "2026-05-08T08:02:51Z"
     },
     {
       "id": "ig_oas",
       "type": "gauge",
       "title": "INVESTMENT GRADE SPREAD (OAS)",
       "status": "GOOD",
-      "value": 79.0,
+      "value": 78.0,
       "unit": " bp",
       "min": 80,
       "max": 300,
@@ -44,7 +44,7 @@
       "midLabel": "180",
       "maxLabel": "300",
       "tooltip": "IG OAS from FRED (ICE BofA). Higher = tighter conditions / credit stress.",
-      "updatedAt": "2026-05-07T09:08:12Z"
+      "updatedAt": "2026-05-08T08:02:51Z"
     },
     {
       "id": "curve_10y2y",
@@ -59,7 +59,7 @@
       "midLabel": "0",
       "maxLabel": "200",
       "tooltip": "10Y\u20132Y spread from FRED. More negative (inversion) = growth risk signal.",
-      "updatedAt": "2026-05-07T09:08:12Z"
+      "updatedAt": "2026-05-08T08:02:51Z"
     },
     {
       "id": "spy_dd_1m",
@@ -72,7 +72,7 @@
       "midLabel": "-10%",
       "maxLabel": "0%",
       "tooltip": "SPY fetch failed: not enough SPY data",
-      "updatedAt": "2026-05-07T09:08:12Z"
+      "updatedAt": "2026-05-08T08:02:51Z"
     },
     {
       "id": "breadth",
@@ -82,7 +82,7 @@
       "valueText": "\u2014",
       "pct": 50,
       "tooltip": "Breadth calc failed: not enough SPY/RSP data",
-      "updatedAt": "2026-05-07T09:08:12Z"
+      "updatedAt": "2026-05-08T08:02:51Z"
     },
     {
       "id": "kre_dd_3m",
@@ -95,7 +95,7 @@
       "midLabel": "-15%",
       "maxLabel": "0%",
       "tooltip": "KRE fetch failed: not enough KRE data",
-      "updatedAt": "2026-05-07T09:08:12Z"
+      "updatedAt": "2026-05-08T08:02:51Z"
     },
     {
       "id": "recession_risk",
@@ -139,14 +139,14 @@
           "cap_applied": false
         }
       },
-      "updatedAt": "2026-05-07T09:08:12Z"
+      "updatedAt": "2026-05-08T08:02:51Z"
     },
     {
       "id": "credit_stress",
       "type": "gauge",
       "title": "CREDIT STRESS",
       "status": "GOOD",
-      "value": 33.0,
+      "value": 32.0,
       "unit": "",
       "min": 0,
       "max": 100,
@@ -155,24 +155,24 @@
       "maxLabel": "Crisis",
       "tooltip": "Composite credit stress dial (0\u2013100, percentile-based). Blend of HY/BBB spreads, HY\u2013IG repricing, CPFF funding stress, STLFSI4 and NFCIRISK. Adds a small kicker when HY spreads widen rapidly.",
       "details": {
-        "raw": 29.52923962907373,
-        "smoothed": 33.10584792581475,
-        "prev": 34.0,
+        "raw": 29.11465583474499,
+        "smoothed": 32.222931166949,
+        "prev": 33.0,
         "components": {
           "hy_oas": {
             "series": "BAMLH0A0HYM2",
-            "latest": 2.77,
-            "score": 11.464968152866243
+            "latest": 2.75,
+            "score": 10.432569974554708
           },
           "bbb_oas": {
             "series": "BAMLC0A4CBBB",
             "latest": 0.99,
-            "score": 11.337579617834395
+            "score": 11.450381679389313
           },
           "hy_ig": {
             "series": "BAMLH0A0HYM2-BAMLC0A0CM",
-            "latest": 1.98,
-            "score": 11.73469387755102
+            "latest": 1.97,
+            "score": 10.573248407643312
           },
           "cpff": {
             "series": "CPFF",
@@ -199,12 +199,12 @@
           },
           "momentum": {
             "chg_1m": -0.41999999999999993,
-            "pct_rank": 13.395225464190982,
+            "pct_rank": 13.509933774834437,
             "kicker_applied": false
           }
         }
       },
-      "updatedAt": "2026-05-07T09:08:12Z"
+      "updatedAt": "2026-05-08T08:02:51Z"
     }
   ]
 }
