@@ -1,12 +1,12 @@
 {
-  "asOf": "2026-05-20T09:57:15Z",
+  "asOf": "2026-05-21T10:07:05Z",
   "cards": [
     {
       "id": "vix",
       "type": "gauge",
       "title": "VOLATILITY (VIX)",
-      "status": "GOOD",
-      "value": 17.8,
+      "status": "WARN",
+      "value": 18.1,
       "unit": "",
       "min": 10,
       "max": 40,
@@ -14,14 +14,14 @@
       "midLabel": "20",
       "maxLabel": "40",
       "tooltip": "CBOE VIX close from FRED (VIXCLS). Higher = riskier.",
-      "updatedAt": "2026-05-20T09:57:15Z"
+      "updatedAt": "2026-05-21T10:07:05Z"
     },
     {
       "id": "hy_oas",
       "type": "gauge",
       "title": "HIGH YIELD SPREAD (OAS)",
       "status": "GOOD",
-      "value": 283.0,
+      "value": 286.0,
       "unit": " bp",
       "min": 250,
       "max": 800,
@@ -29,14 +29,14 @@
       "midLabel": "500",
       "maxLabel": "800",
       "tooltip": "HY OAS from FRED (ICE BofA). Higher = tighter financial conditions / more stress.",
-      "updatedAt": "2026-05-20T09:57:15Z"
+      "updatedAt": "2026-05-21T10:07:05Z"
     },
     {
       "id": "ig_oas",
       "type": "gauge",
       "title": "INVESTMENT GRADE SPREAD (OAS)",
       "status": "GOOD",
-      "value": 75.0,
+      "value": 76.0,
       "unit": " bp",
       "min": 80,
       "max": 300,
@@ -44,14 +44,14 @@
       "midLabel": "180",
       "maxLabel": "300",
       "tooltip": "IG OAS from FRED (ICE BofA). Higher = tighter conditions / credit stress.",
-      "updatedAt": "2026-05-20T09:57:15Z"
+      "updatedAt": "2026-05-21T10:07:05Z"
     },
     {
       "id": "curve_10y2y",
       "type": "gauge",
       "title": "YIELD CURVE (10Y\u20132Y)",
       "status": "GOOD",
-      "value": 54.0,
+      "value": 53.0,
       "unit": " bp",
       "min": -200,
       "max": 200,
@@ -59,7 +59,7 @@
       "midLabel": "0",
       "maxLabel": "200",
       "tooltip": "10Y\u20132Y spread from FRED. More negative (inversion) = growth risk signal.",
-      "updatedAt": "2026-05-20T09:57:15Z"
+      "updatedAt": "2026-05-21T10:07:05Z"
     },
     {
       "id": "spy_dd_1m",
@@ -72,7 +72,7 @@
       "midLabel": "-10%",
       "maxLabel": "0%",
       "tooltip": "SPY fetch failed: not enough SPY data",
-      "updatedAt": "2026-05-20T09:57:15Z"
+      "updatedAt": "2026-05-21T10:07:05Z"
     },
     {
       "id": "breadth",
@@ -82,7 +82,7 @@
       "valueText": "\u2014",
       "pct": 50,
       "tooltip": "Breadth calc failed: not enough SPY/RSP data",
-      "updatedAt": "2026-05-20T09:57:15Z"
+      "updatedAt": "2026-05-21T10:07:05Z"
     },
     {
       "id": "kre_dd_3m",
@@ -95,7 +95,7 @@
       "midLabel": "-15%",
       "maxLabel": "0%",
       "tooltip": "KRE fetch failed: not enough KRE data",
-      "updatedAt": "2026-05-20T09:57:15Z"
+      "updatedAt": "2026-05-21T10:07:05Z"
     },
     {
       "id": "recession_risk",
@@ -139,14 +139,14 @@
           "cap_applied": true
         }
       },
-      "updatedAt": "2026-05-20T09:57:15Z"
+      "updatedAt": "2026-05-21T10:07:05Z"
     },
     {
       "id": "credit_stress",
       "type": "gauge",
       "title": "CREDIT STRESS",
       "status": "GOOD",
-      "value": 28.0,
+      "value": 29.0,
       "unit": "",
       "min": 0,
       "max": 100,
@@ -155,24 +155,24 @@
       "maxLabel": "Crisis",
       "tooltip": "Composite credit stress dial (0\u2013100, percentile-based). Blend of HY/BBB spreads, HY\u2013IG repricing, CPFF funding stress, STLFSI4 and NFCIRISK. Adds a small kicker when HY spreads widen rapidly.",
       "details": {
-        "raw": 29.637276570819214,
-        "smoothed": 28.327455314163846,
+        "raw": 31.53127878941903,
+        "smoothed": 28.70625575788381,
         "prev": 28.0,
         "components": {
           "hy_oas": {
             "series": "BAMLH0A0HYM2",
-            "latest": 2.83,
-            "score": 18.367346938775512
+            "latest": 2.86,
+            "score": 23.694267515923567
           },
           "bbb_oas": {
             "series": "BAMLC0A4CBBB",
-            "latest": 0.94,
-            "score": 2.1683673469387754
+            "latest": 0.95,
+            "score": 3.56687898089172
           },
           "hy_ig": {
             "series": "BAMLH0A0HYM2-BAMLC0A0CM",
-            "latest": 2.08,
-            "score": 26.181353767560665
+            "latest": 2.0999999999999996,
+            "score": 27.933673469387756
           },
           "cpff": {
             "series": "CPFF",
@@ -181,13 +181,13 @@
           },
           "stlfsi4": {
             "series": "STLFSI4",
-            "latest": -0.7621,
-            "score": 8.173690932311622
+            "latest": -0.7404,
+            "score": 10.344827586206897
           },
           "nfcirisk": {
             "series": "NFCIRISK",
-            "latest": -0.616,
-            "score": 29.88505747126437
+            "latest": -0.622,
+            "score": 27.586206896551722
           },
           "weights": {
             "hy_oas": 0.3,
@@ -198,13 +198,13 @@
             "nfcirisk": 0.15
           },
           "momentum": {
-            "chg_1m": -0.21999999999999975,
-            "pct_rank": 33.731739707835324,
+            "chg_1m": -0.26000000000000023,
+            "pct_rank": 27.851458885941643,
             "kicker_applied": false
           }
         }
       },
-      "updatedAt": "2026-05-20T09:57:15Z"
+      "updatedAt": "2026-05-21T10:07:05Z"
     }
   ]
 }
