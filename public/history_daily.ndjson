@@ -185,3 +185,4 @@
 {"date":"2026-08-05","vix":15.9,"hy_oas":278.0,"ig_oas":78.0,"curve_10y2y":43.0,"recession_risk":22.0,"credit_stress":31.0}
 {"date":"2026-08-06","vix":16.5,"hy_oas":273.0,"ig_oas":78.0,"curve_10y2y":45.0,"recession_risk":22.0,"credit_stress":31.0}
 {"date":"2026-08-07","vix":15.8,"hy_oas":275.0,"ig_oas":78.0,"curve_10y2y":44.0,"recession_risk":22.0,"credit_stress":32.0}
+{"date":"2026-08-08","vix":15.2,"hy_oas":271.0,"ig_oas":78.0,"curve_10y2y":46.0,"recession_risk":21.0,"credit_stress":32.0}
