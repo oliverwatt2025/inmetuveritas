@@ -236,3 +236,4 @@
 {"date":"2026-09-25","vix":14.2,"hy_oas":273.0,"ig_oas":77.0,"recession_risk":16.0,"credit_stress":26.0}
 {"date":"2026-09-26","vix":14.2,"hy_oas":280.0,"ig_oas":79.0,"curve_10y2y":36.0,"recession_risk":16.0,"credit_stress":27.0}
 {"date":"2026-09-27","vix":14.2,"hy_oas":280.0,"ig_oas":79.0,"curve_10y2y":36.0,"recession_risk":16.0,"credit_stress":28.0}
+{"date":"2026-09-28","vix":14.2,"hy_oas":293.0,"ig_oas":81.0,"curve_10y2y":36.0,"recession_risk":16.0,"credit_stress":30.0}
