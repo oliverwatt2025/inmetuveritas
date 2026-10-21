@@ -1,5 +1,5 @@
 {
-  "asOf": "2026-10-21T19:50:26Z",
+  "asOf": "2026-10-21T20:01:56Z",
   "cards": [
     {
       "id": "vix",
@@ -66,7 +66,7 @@
       "type": "gauge",
       "title": "EQUITY DRAWDOWN (SPY, 1M)",
       "status": "GOOD",
-      "value": -0.7,
+      "value": -0.8,
       "unit": "%",
       "min": -20,
       "max": 0,
@@ -74,7 +74,7 @@
       "midLabel": "-10%",
       "maxLabel": "0%",
       "tooltip": "SPY drawdown from 1M peak (21 trading days). More negative = risk-off.",
-      "updatedAt": "2026-10-21T19:50:26Z"
+      "updatedAt": "2026-10-21T20:01:56Z"
     },
     {
       "id": "breadth",
@@ -89,14 +89,14 @@
       "midLabel": "Neutral",
       "maxLabel": "Broad",
       "tooltip": "Equal-weight S&P (RSP) minus S&P 500 (SPY) 20-day return. Negative = narrow rally.",
-      "updatedAt": "2026-10-21T19:50:26Z"
+      "updatedAt": "2026-10-21T20:01:56Z"
     },
     {
       "id": "kre_dd_3m",
       "type": "gauge",
       "title": "REGIONAL BANKS DRAWDOWN (KRE, 3M)",
       "status": "WARN",
-      "value": -9.5,
+      "value": -9.4,
       "unit": "%",
       "min": -30,
       "max": 0,
@@ -104,7 +104,7 @@
       "midLabel": "-15%",
       "maxLabel": "0%",
       "tooltip": "KRE drawdown from 3M peak (63 trading days). More negative = bank stress proxy.",
-      "updatedAt": "2026-10-21T19:50:26Z"
+      "updatedAt": "2026-10-21T20:01:56Z"
     },
     {
       "id": "recession_risk",
