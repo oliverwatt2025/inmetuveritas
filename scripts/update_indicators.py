@@ -128,8 +128,9 @@ def load_weekly_history() -> List[Dict]:
 def upsert_weekly_history(week_key: str, row: Dict, keep_last: int = 80) -> None:
     """Insert/replace the row for week_key, keep last N weeks, and write NDJSON."""
     rows = load_weekly_history()
+    previous = next((r for r in rows if r.get("week") == week_key), {})
     rows = [r for r in rows if r.get("week") != week_key]
-    rows.append({"week": week_key, **row})
+    rows.append({**previous, "week": week_key, **row})
     rows.sort(key=lambda r: r.get("week", ""))
     if keep_last and len(rows) > keep_last:
         rows = rows[-keep_last:]
@@ -171,8 +172,10 @@ def load_daily_history() -> List[Dict]:
 
 def upsert_daily_history(date_key: str, row: Dict, keep_last: int = MAX_DAYS_DAILY) -> None:
     """Insert/replace the row for date_key (YYYY-MM-DD). Keeps only the most recent keep_last rows."""
-    rows = [r for r in load_daily_history() if r.get("date") != date_key]
-    rows.append({"date": date_key, **row})
+    rows = load_daily_history()
+    previous = next((r for r in rows if r.get("date") == date_key), {})
+    rows = [r for r in rows if r.get("date") != date_key]
+    rows.append({**previous, "date": date_key, **row})
     rows.sort(key=lambda r: r.get("date", ""))
     rows = rows[-keep_last:]
     HISTORY_DAILY.parent.mkdir(parents=True, exist_ok=True)
@@ -1026,6 +1029,19 @@ def make_cards() -> Dict:
             "tooltip": f"Credit stress dial build failed: {e}",
             "updatedAt": as_of
         })
+
+    # When a provider fails, retain its last verified value but mark it stale.
+    prior_cards = {p.get("id"): p for p in prev_payload.get("cards", [])}
+    for idx, card in enumerate(cards):
+        if isinstance(card.get("value"), (int, float)):
+            continue
+        old = prior_cards.get(card.get("id"), {})
+        if isinstance(old.get("value"), (int, float)):
+            retained = dict(old)
+            retained["status"] = "DELAYED"
+            retained["tooltip"] = "Last known reading (not current). " + str(card.get("tooltip", ""))
+            retained["updatedAt"] = old.get("updatedAt", prev_payload.get("asOf", as_of))
+            cards[idx] = retained
 
     return {
         "asOf": as_of,
