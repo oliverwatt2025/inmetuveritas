@@ -299,7 +299,13 @@ def fred_latest(series_id: str, api_key: Optional[str]) -> Optional[Tuple[str, f
             return (o.get("date", ""), float(v))
 
         return None
-    except Exception:
+    except Exception as exc:
+        # Never print the request URL: it contains the FRED API key.
+        import urllib.error
+        if isinstance(exc, urllib.error.HTTPError):
+            print(f"FRED {series_id}: HTTP {exc.code} (request unsuccessful)")
+        else:
+            print(f"FRED {series_id}: {type(exc).__name__} (request unsuccessful)")
         return None
 
 
@@ -314,7 +320,15 @@ def fred_series(series_id: str, api_key: Optional[str], limit: int = 6000, sort_
         params += f"&api_key={api_key}"
     url = base + params
 
-    data = json.loads(http_get_text(url))
+    try:
+        data = json.loads(http_get_text(url))
+    except Exception as exc:
+        import urllib.error
+        if isinstance(exc, urllib.error.HTTPError):
+            print(f"FRED {series_id}: HTTP {exc.code} (request unsuccessful)")
+        else:
+            print(f"FRED {series_id}: {type(exc).__name__} (request unsuccessful)")
+        raise RuntimeError(f"FRED {series_id} request unsuccessful") from None
     out: List[Tuple[str, float]] = []
     for o in data.get("observations", []):
         v = o.get("value", ".")
