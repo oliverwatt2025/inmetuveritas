@@ -1030,6 +1030,20 @@ def make_cards() -> Dict:
             "updatedAt": as_of
         })
 
+    # Preserve last verified numerical reading if a provider temporarily fails.
+    # Keep original updatedAt so old readings are never presented as fresh.
+    prior_cards = {p.get("id"): p for p in prev_payload.get("cards", [])}
+    for idx, card in enumerate(cards):
+        if isinstance(card.get("value"), (int, float)):
+            continue
+        old = prior_cards.get(card.get("id"), {})
+        if isinstance(old.get("value"), (int, float)):
+            retained = dict(old)
+            retained["status"] = "DELAYED"
+            retained["tooltip"] = "Last known reading (not current). " + str(card.get("tooltip", ""))
+            retained["updatedAt"] = old.get("updatedAt", prev_payload.get("asOf", as_of))
+            cards[idx] = retained
+
     return {
         "asOf": as_of,
         "cards": cards
