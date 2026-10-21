@@ -7,8 +7,8 @@ Dials included (v1):
 2) US HY OAS spread (BAMLH0A0HYM2)                -> FRED
 3) US IG OAS spread (BAMLC0A0CM)                  -> FRED
 4) 10Y-2Y yield curve spread (T10Y2Y)             -> FRED
-5) SPY 1M drawdown (21 trading days)              -> Stooq
-6) KRE 3M drawdown (63 trading days)              -> Stooq
+5) SPY 1M drawdown (21 trading days)              -> Yahoo / Stooq fallback
+6) KRE 3M drawdown (63 trading days)              -> Yahoo / Stooq fallback
 
 Added (v2):
 7) RECESSION RISK (0–100 composite)               -> FRED (T10Y3M, SAHMREALTIME, RECPROUSM156N)
@@ -16,7 +16,7 @@ Added (v2):
 
 Notes:
 - FRED requires an API key. Set env var FRED_API_KEY (your GitHub Action already does).
-- Stooq is used for price series because it's simple and free.
+- Daily ETF closes use Yahoo chart data, falling back to Stooq; failures remain visible.
 - Composite dials are percentile-based and smoothed using yesterday's indicators.json
   (no database required).
 
@@ -201,6 +201,52 @@ def stooq_daily_closes(symbol: str) -> List[PriceBar]:
     bars.sort(key=lambda b: b.date)
     return bars
 
+
+# Yahoo's public chart endpoint is an alternative to Stooq, whose CSV
+# downloads may require an API key. This is a best-effort, unofficial
+# source and can also be rate-limited. Never manufacture missing prices.
+_PRICE_CACHE: Dict[str, List[PriceBar]] = {}
+
+def yahoo_daily_closes(symbol: str) -> List[PriceBar]:
+    """Fetch approximately 6 months of daily closes from Yahoo's chart feed."""
+    yahoo_symbol = symbol.replace(".us", "").upper()
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{yahoo_symbol}?range=6mo&interval=1d"
+    data = json.loads(http_get_text(url))
+    chart = data.get("chart", {})
+    results = chart.get("result") or []
+    if not results:
+        raise RuntimeError(f"Yahoo chart unavailable for {yahoo_symbol}: {chart.get('error')}")
+    series = results[0]
+    timestamps = series.get("timestamp") or []
+    quotes = (series.get("indicators", {}).get("quote") or [{}])[0]
+    closes = quotes.get("close") or []
+    bars = []
+    for ts, close in zip(timestamps, closes):
+        if isinstance(close, (int, float)) and close > 0:
+            day = datetime.fromtimestamp(ts, timezone.utc).date().isoformat()
+            bars.append(PriceBar(date=day, close=float(close)))
+    bars.sort(key=lambda bar: bar.date)
+    return bars
+
+def market_daily_closes(symbol: str) -> List[PriceBar]:
+    """Try independent price feeds; reject missing or stale data."""
+    if symbol in _PRICE_CACHE:
+        return _PRICE_CACHE[symbol]
+    problems = []
+    for provider in (yahoo_daily_closes, stooq_daily_closes):
+        try:
+            bars = provider(symbol)
+            if len(bars) < 63:
+                raise RuntimeError(f"only {len(bars)} daily prices")
+            most_recent = date.fromisoformat(bars[-1].date)
+            if (datetime.now(timezone.utc).date() - most_recent).days > 7:
+                raise RuntimeError(f"stale last price ({bars[-1].date})")
+            _PRICE_CACHE[symbol] = bars
+            print(f"{symbol}: loaded {len(bars)} closes from {provider.__name__}, through {bars[-1].date}")
+            return bars
+        except Exception as exc:
+            problems.append(f"{provider.__name__}: {exc}")
+    raise RuntimeError("; ".join(problems))
 
 def drawdown_pct(bars: List[PriceBar], lookback_days: int) -> Optional[float]:
     """
@@ -731,7 +777,7 @@ def make_cards() -> Dict:
 
     # 5) SPY 1M drawdown (Stooq, 21 trading days)
     try:
-        spy = stooq_daily_closes("spy.us")
+        spy = market_daily_closes("spy.us")
         dd1m = drawdown_pct(spy, lookback_days=21)
         if dd1m is None:
             raise RuntimeError("not enough SPY data")
@@ -773,8 +819,8 @@ def make_cards() -> Dict:
 
     # ---5.5 MARKET BREADTH (RSP vs SPY, 20-day return) ---
     try:
-        spy = stooq_daily_closes("spy.us")
-        rsp = stooq_daily_closes("rsp.us")
+        spy = market_daily_closes("spy.us")
+        rsp = market_daily_closes("rsp.us")
 
         def pct_return(bars, lookback):
             if len(bars) < lookback + 1:
@@ -829,7 +875,7 @@ def make_cards() -> Dict:
 
     # 6) KRE 3M drawdown (Stooq, 63 trading days)
     try:
-        kre = stooq_daily_closes("kre.us")
+        kre = market_daily_closes("kre.us")
         dd3m = drawdown_pct(kre, lookback_days=63)
         if dd3m is None:
             raise RuntimeError("not enough KRE data")
