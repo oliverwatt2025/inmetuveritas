@@ -1,5 +1,5 @@
 {
-  "asOf": "2026-10-21T20:01:56Z",
+  "asOf": "2026-10-21T20:04:32Z",
   "cards": [
     {
       "id": "vix",
@@ -74,7 +74,7 @@
       "midLabel": "-10%",
       "maxLabel": "0%",
       "tooltip": "SPY drawdown from 1M peak (21 trading days). More negative = risk-off.",
-      "updatedAt": "2026-10-21T20:01:56Z"
+      "updatedAt": "2026-10-21T20:04:32Z"
     },
     {
       "id": "breadth",
@@ -89,7 +89,7 @@
       "midLabel": "Neutral",
       "maxLabel": "Broad",
       "tooltip": "Equal-weight S&P (RSP) minus S&P 500 (SPY) 20-day return. Negative = narrow rally.",
-      "updatedAt": "2026-10-21T20:01:56Z"
+      "updatedAt": "2026-10-21T20:04:32Z"
     },
     {
       "id": "kre_dd_3m",
@@ -104,7 +104,7 @@
       "midLabel": "-15%",
       "maxLabel": "0%",
       "tooltip": "KRE drawdown from 3M peak (63 trading days). More negative = bank stress proxy.",
-      "updatedAt": "2026-10-21T20:01:56Z"
+      "updatedAt": "2026-10-21T20:04:32Z"
     },
     {
       "id": "recession_risk",
