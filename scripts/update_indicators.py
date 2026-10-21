@@ -282,10 +282,19 @@ def fred_json_response(url: str, series_id: str) -> Dict:
         raw = response.read()
         status = response.status
         media_type = response.headers.get("Content-Type", "unknown").split(";")[0]
+        # Report only the final host, not the URL or query containing api_key.
+        from urllib.parse import urlsplit
+        final_host = urlsplit(response.geturl()).hostname or "unknown"
     try:
         return json.loads(raw)
     except json.JSONDecodeError:
-        print(f"FRED {series_id}: invalid JSON; HTTP {status}; content-type={media_type}; bytes={len(raw)}")
+        import re
+        import hashlib
+        title_match = re.search(rb"<title[^>]*>([^<]{0,120})</title>", raw, re.IGNORECASE)
+        title = title_match.group(1).decode("utf-8", errors="replace").strip() if title_match else "(none)"
+        # Don't print the response body or any URL/query parameters.
+        fingerprint = hashlib.sha256(raw).hexdigest()[:12]
+        print(f"FRED {series_id}: invalid JSON; HTTP {status}; content-type={media_type}; bytes={len(raw)}; host={final_host}; page-title={title!r}; fingerprint={fingerprint}")
         raise RuntimeError(f"FRED {series_id} returned invalid JSON") from None
 
 
