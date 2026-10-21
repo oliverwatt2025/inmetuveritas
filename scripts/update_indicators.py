@@ -272,6 +272,23 @@ def drawdown_pct(bars: List[PriceBar], lookback_days: int) -> Optional[float]:
 # FRED helpers
 # ----------------------------
 
+def fred_json_response(url: str, series_id: str) -> Dict:
+    """FRED JSON with safe response diagnostics (never log URL or body)."""
+    req = urllib.request.Request(url, headers={
+        "User-Agent": "inmetuveritas/1.0",
+        "Accept": "application/json",
+    })
+    with urllib.request.urlopen(req, timeout=20) as response:
+        raw = response.read()
+        status = response.status
+        media_type = response.headers.get("Content-Type", "unknown").split(";")[0]
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        print(f"FRED {series_id}: invalid JSON; HTTP {status}; content-type={media_type}; bytes={len(raw)}")
+        raise RuntimeError(f"FRED {series_id} returned invalid JSON") from None
+
+
 def fred_latest(series_id: str, api_key: Optional[str]) -> Optional[Tuple[str, float]]:
     """
     Fetch latest *valid* observation for a FRED series_id.
@@ -287,7 +304,7 @@ def fred_latest(series_id: str, api_key: Optional[str]) -> Optional[Tuple[str, f
     url = base + params
 
     try:
-        data = json.loads(http_get_text(url))
+        data = fred_json_response(url, series_id)
         obs = data.get("observations", [])
         if not obs:
             return None
@@ -321,7 +338,7 @@ def fred_series(series_id: str, api_key: Optional[str], limit: int = 6000, sort_
     url = base + params
 
     try:
-        data = json.loads(http_get_text(url))
+        data = fred_json_response(url, series_id)
     except Exception as exc:
         import urllib.error
         if isinstance(exc, urllib.error.HTTPError):
