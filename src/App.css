@@ -13,10 +13,12 @@
 }
 
 .brandTitle {
+  font-family: Georgia, "Times New Roman", serif;
   font-size: 33px;
-  letter-spacing: 0.22em;
-  font-weight: 700;
-  opacity: 0.65;
+  letter-spacing: 0.13em;
+  font-weight: 600;
+  color: #d8bc80;
+  opacity: 1;
 }
 
 .brandSub {
