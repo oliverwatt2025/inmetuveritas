@@ -128,8 +128,9 @@ def load_weekly_history() -> List[Dict]:
 def upsert_weekly_history(week_key: str, row: Dict, keep_last: int = 80) -> None:
     """Insert/replace the row for week_key, keep last N weeks, and write NDJSON."""
     rows = load_weekly_history()
+    previous = next((r for r in rows if r.get("week") == week_key), {})
     rows = [r for r in rows if r.get("week") != week_key]
-    rows.append({"week": week_key, **row})
+    rows.append({**previous, "week": week_key, **row})
     rows.sort(key=lambda r: r.get("week", ""))
     if keep_last and len(rows) > keep_last:
         rows = rows[-keep_last:]
@@ -171,8 +172,10 @@ def load_daily_history() -> List[Dict]:
 
 def upsert_daily_history(date_key: str, row: Dict, keep_last: int = MAX_DAYS_DAILY) -> None:
     """Insert/replace the row for date_key (YYYY-MM-DD). Keeps only the most recent keep_last rows."""
-    rows = [r for r in load_daily_history() if r.get("date") != date_key]
-    rows.append({"date": date_key, **row})
+    rows = load_daily_history()
+    previous = next((r for r in rows if r.get("date") == date_key), {})
+    rows = [r for r in rows if r.get("date") != date_key]
+    rows.append({**previous, "date": date_key, **row})
     rows.sort(key=lambda r: r.get("date", ""))
     rows = rows[-keep_last:]
     HISTORY_DAILY.parent.mkdir(parents=True, exist_ok=True)
@@ -201,6 +204,52 @@ def stooq_daily_closes(symbol: str) -> List[PriceBar]:
     bars.sort(key=lambda b: b.date)
     return bars
 
+
+# Yahoo's public chart endpoint is an alternative to Stooq, whose CSV
+# downloads may require an API key. This is a best-effort, unofficial
+# source and can also be rate-limited. Never manufacture missing prices.
+_PRICE_CACHE: Dict[str, List[PriceBar]] = {}
+
+def yahoo_daily_closes(symbol: str) -> List[PriceBar]:
+    """Fetch approximately 6 months of daily closes from Yahoo's chart feed."""
+    yahoo_symbol = symbol.replace(".us", "").upper()
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{yahoo_symbol}?range=6mo&interval=1d"
+    data = json.loads(http_get_text(url))
+    chart = data.get("chart", {})
+    results = chart.get("result") or []
+    if not results:
+        raise RuntimeError(f"Yahoo chart unavailable for {yahoo_symbol}: {chart.get('error')}")
+    series = results[0]
+    timestamps = series.get("timestamp") or []
+    quotes = (series.get("indicators", {}).get("quote") or [{}])[0]
+    closes = quotes.get("close") or []
+    bars = []
+    for ts, close in zip(timestamps, closes):
+        if isinstance(close, (int, float)) and close > 0:
+            day = datetime.fromtimestamp(ts, timezone.utc).date().isoformat()
+            bars.append(PriceBar(date=day, close=float(close)))
+    bars.sort(key=lambda bar: bar.date)
+    return bars
+
+def market_daily_closes(symbol: str) -> List[PriceBar]:
+    """Try independent price feeds; reject missing or stale data."""
+    if symbol in _PRICE_CACHE:
+        return _PRICE_CACHE[symbol]
+    problems = []
+    for provider in (yahoo_daily_closes, stooq_daily_closes):
+        try:
+            bars = provider(symbol)
+            if len(bars) < 63:
+                raise RuntimeError(f"only {len(bars)} daily prices")
+            most_recent = date.fromisoformat(bars[-1].date)
+            if (datetime.now(timezone.utc).date() - most_recent).days > 7:
+                raise RuntimeError(f"stale last price ({bars[-1].date})")
+            _PRICE_CACHE[symbol] = bars
+            print(f"{symbol}: loaded {len(bars)} closes from {provider.__name__}, through {bars[-1].date}")
+            return bars
+        except Exception as exc:
+            problems.append(f"{provider.__name__}: {exc}")
+    raise RuntimeError("; ".join(problems))
 
 def drawdown_pct(bars: List[PriceBar], lookback_days: int) -> Optional[float]:
     """
@@ -731,7 +780,7 @@ def make_cards() -> Dict:
 
     # 5) SPY 1M drawdown (Stooq, 21 trading days)
     try:
-        spy = stooq_daily_closes("spy.us")
+        spy = market_daily_closes("spy.us")
         dd1m = drawdown_pct(spy, lookback_days=21)
         if dd1m is None:
             raise RuntimeError("not enough SPY data")
@@ -773,8 +822,8 @@ def make_cards() -> Dict:
 
     # ---5.5 MARKET BREADTH (RSP vs SPY, 20-day return) ---
     try:
-        spy = stooq_daily_closes("spy.us")
-        rsp = stooq_daily_closes("rsp.us")
+        spy = market_daily_closes("spy.us")
+        rsp = market_daily_closes("rsp.us")
 
         def pct_return(bars, lookback):
             if len(bars) < lookback + 1:
@@ -829,7 +878,7 @@ def make_cards() -> Dict:
 
     # 6) KRE 3M drawdown (Stooq, 63 trading days)
     try:
-        kre = stooq_daily_closes("kre.us")
+        kre = market_daily_closes("kre.us")
         dd3m = drawdown_pct(kre, lookback_days=63)
         if dd3m is None:
             raise RuntimeError("not enough KRE data")
@@ -980,6 +1029,20 @@ def make_cards() -> Dict:
             "tooltip": f"Credit stress dial build failed: {e}",
             "updatedAt": as_of
         })
+
+    # Preserve last verified numerical reading if a provider temporarily fails.
+    # Keep original updatedAt so old readings are never presented as fresh.
+    prior_cards = {p.get("id"): p for p in prev_payload.get("cards", [])}
+    for idx, card in enumerate(cards):
+        if isinstance(card.get("value"), (int, float)):
+            continue
+        old = prior_cards.get(card.get("id"), {})
+        if isinstance(old.get("value"), (int, float)):
+            retained = dict(old)
+            retained["status"] = "DELAYED"
+            retained["tooltip"] = "Last known reading (not current). " + str(card.get("tooltip", ""))
+            retained["updatedAt"] = old.get("updatedAt", prev_payload.get("asOf", as_of))
+            cards[idx] = retained
 
     return {
         "asOf": as_of,
