@@ -248,3 +248,72 @@
   .gaugeLabels { width: 92px; font-size: 9px; }
   .sparklineSlot { grid-column: 1 / -1; justify-self: center; }
 }
+
+
+/* Daily intelligence: progressive-disclosure panels, separate from the live gauges. */
+.intelligenceSection { margin-top: 26px; }
+.intelligenceBanner {
+  display: flex; gap: 28px; align-items: center; justify-content: space-between;
+  padding: 23px 26px; border: 1px solid rgba(216,188,128,.42);
+  border-radius: 18px; background: rgba(7,12,18,.89);
+  box-shadow: 0 10px 35px rgba(0,0,0,.36);
+}
+.intelligenceEyebrow { color: #d8bc80; letter-spacing: .22em; font-size: 11px; font-weight: 700; }
+.intelligenceBanner h2 { color: #f2e0b9; font-family: Georgia, serif; margin: 10px 0 8px; font-size: clamp(21px,2.2vw,31px); }
+.intelligenceBanner p { margin: 0; font-size: 14px; line-height: 1.6; color: rgba(255,255,255,.82); max-width: 750px; }
+.intelligenceDate { flex: 0 0 210px; text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; font-size: 12px; }
+.intelligenceDate small { color: rgba(255,255,255,.55); }
+.intelligenceTag { color: #72dbad; border: 1px solid rgba(114,219,173,.4); border-radius: 50px; padding: 5px 9px; letter-spacing: .11em; font-size: 10px; }
+.intelligenceTagStale { color: #f5c579; border-color: rgba(245,197,121,.4); }
+.intelligenceColumns { margin-top: 14px; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; }
+.intelligencePanel { min-width: 0; padding: 20px 22px; background: rgba(0,5,11,.87); border: 1px solid rgba(216,188,128,.24); border-radius: 17px; backdrop-filter: blur(8px); }
+.intelligencePanel h3 { margin: 0 0 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(216,188,128,.2); display: flex; gap: 9px; align-items: center; color: #d8bc80; font-size: 12px; letter-spacing: .11em; }
+.intelligenceIcon { display: inline-flex; width: 23px; height: 23px; align-items: center; justify-content: center; border-radius: 50%; background: rgba(216,188,128,.15); font-size: 10px; }
+.intelligenceFindings { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; counter-reset: findings; }
+.intelligenceFindings li { position: relative; padding-left: 25px; counter-increment: findings; line-height: 1.4; }
+.intelligenceFindings li:before { content: counter(findings); position: absolute; left:0; top:1px; color:#d8bc80; font-weight:700; }
+.intelligenceFindings strong { display:block; font-size:13px; }
+.intelligenceFindingDetail { display:block; margin-top:4px; color:rgba(255,255,255,.68); font-size:12px; line-height:1.5; }
+.intelligenceExplanation { font-size:13px; line-height:1.55; color:rgba(255,255,255,.85); margin:0 0 14px; }
+.intelligenceEvidence { display:grid; gap:10px; }
+.intelligenceEvidenceRow { display:flex; gap:10px; align-items:flex-start; font-size:12px; }
+.intelligenceEvidenceRow strong { display:block; font-size:10px; letter-spacing:.09em; color:#d8bc80; }
+.intelligenceEvidenceRow span:not(.intelligenceDot) { display:block; margin-top:3px; color:rgba(255,255,255,.75); line-height:1.5; }
+.intelligenceDot { flex:0 0 8px; width:8px; height:8px; border-radius:50%; margin-top:4px; background:#68d6a1; }
+.intelligenceDotWarn { background:#f1be6e; }
+.intelligenceWatch { margin:0; padding-left:18px; display:grid; gap:14px; font-size:13px; line-height:1.55; }
+.intelligenceWatch li::marker { color:#d8bc80; }
+.intelligenceDisclaimer { border-top:1px solid rgba(216,188,128,.2); margin-top:17px; padding-top:12px; color:rgba(255,255,255,.48); font-size:11px; line-height:1.5; }
+.intelligenceEmpty { margin-top:25px; padding:20px; text-align:center; color:rgba(255,255,255,.75); background:rgba(0,0,0,.65); border-radius:15px; }
+@media (max-width: 1100px) { .intelligenceColumns { grid-template-columns:1fr; } }
+@media (max-width: 650px) { .intelligenceBanner { flex-direction:column; align-items:flex-start; padding:20px; } .intelligenceDate { align-items:flex-start; text-align:left; flex:auto; } .intelligencePanel { padding:18px; } }
+
+
+/* Dated market movement context in the evidence panel. */
+.intelligenceChangeNote {
+  margin: 4px 0 18px; padding: 12px 14px;
+  border-left: 2px solid #d8bc80;
+  background: rgba(216,188,128,.08);
+  border-radius: 0 9px 9px 0;
+}
+.intelligenceChangeNote strong {
+  font-size: 10px; letter-spacing: .12em; color: #d8bc80;
+}
+.intelligenceChangeNote p {
+  margin: 6px 0 0; font-size: 12px; line-height: 1.6;
+  color: rgba(255,255,255,.82); overflow-wrap: anywhere;
+}
+
+
+.intelligenceHistory { margin: 0 0 16px; padding: 12px 13px; border:1px solid rgba(216,188,128,.22);border-radius:9px;background:rgba(216,188,128,.05); }
+.intelligenceHistory > strong { color:#d8bc80;letter-spacing:.12em;font-size:10px;display:block;margin-bottom:10px; }
+.intelligenceHistoryItem { display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 12px;padding:7px 0;border-top:1px solid rgba(255,255,255,.08);font-size:11px; }
+.intelligenceHistoryItem b { color:#d8bc80;font-weight:600; }
+.intelligenceHistoryItem small { grid-column:1/-1;color:rgba(255,255,255,.58); }
+.intelligenceHistory > small { display:block;color:rgba(255,255,255,.55);font-size:10px;line-height:1.5;margin-top:10px; }
+
+
+.intelligenceHistoricalInsights, .intelligenceDivergences { padding:12px 13px; margin-bottom:15px; border-radius:9px; background:rgba(216,188,128,.055); border:1px solid rgba(216,188,128,.20); }
+.intelligenceHistoricalInsights > strong, .intelligenceDivergences > strong { color:#d8bc80; font-size:10px; letter-spacing:.12em; }
+.intelligenceHistoricalInsights p, .intelligenceDivergences p { margin:9px 0 0; font-size:12px; line-height:1.55; color:rgba(255,255,255,.83); }
+.intelligenceDivergences { border-color:rgba(241,190,110,.35); background:rgba(241,190,110,.065); }

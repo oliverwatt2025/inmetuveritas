@@ -33,13 +33,29 @@ jobs:
         run: |
           python3 scripts/update_indicators.py
 
+      - name: Validate intelligence engine
+        run: python3 -m unittest discover -s tests -p 'test_intelligence.py' -v
+
+      - name: Refresh dated five-year observations (preserve existing data on feed failures)
+        continue-on-error: true
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python3 scripts/backfill_history_5y.py
+
+      - name: Generate daily market intelligence
+        run: python3 scripts/generate_intelligence.py
+
+      - name: Validate generated report
+        run: python3 -m json.tool public/market_intelligence.json > /dev/null
+
       - name: Commit & push indicators.json (if changed)
         run: |
           git config user.name "inmetuveritas-bot"
           git config user.email "actions@users.noreply.github.com"
 
           # ✅ Add daily history file so it gets published to live
-          git add public/indicators.json public/history_weekly.ndjson public/history_daily.ndjson
+          git add public/indicators.json public/history_weekly.ndjson public/history_daily.ndjson public/market_intelligence.json
+          if test -f public/history_5y.ndjson; then git add public/history_5y.ndjson; fi
 
           # If nothing changed, exit cleanly
           if git diff --cached --quiet; then
