@@ -61,5 +61,21 @@ class TestIntelligence(unittest.TestCase):
                               {"date":"2026-10-22","breadth":2.0}])
         self.assertEqual(r["historicalContext"],[])
 
+    def test_five_year_samples_take_priority_over_short_snapshot_history(self):
+        from datetime import timedelta
+        p={"asOf":"2026-10-22T12:00:00Z","cards":[card("vix",24),card("hy_oas",400)]}
+        start=datetime(2022,1,3,tzinfo=timezone.utc)
+        samples=[]
+        for i in range(1300):
+            day=start+timedelta(days=i)
+            if day.weekday()<5:
+                samples.append({"date":day.date().isoformat(),"vix":10.0+i/200})
+        report=build_report(p,NOW,history=[{"date":"2026-10-21","vix":24}],
+                            historical_samples=samples)
+        hist=next(x for x in report["historicalContext"] if x["indicator"]=="vix")
+        self.assertGreater(hist["observationCount"],600)
+        self.assertTrue(hist["fromDate"].startswith("2022"))
+        self.assertFalse(any(x["indicator"]=="hy_oas" for x in report["historicalContext"]))
+
 if __name__=="__main__":
     unittest.main()
