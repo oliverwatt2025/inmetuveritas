@@ -42,5 +42,24 @@ class TestIntelligence(unittest.TestCase):
         r=build_report(p,NOW,[{"date":"2026-10-21","hy_oas":300}])
         self.assertEqual(r["notableChanges"],[])
 
+    def test_historical_percentile_requires_real_sample(self):
+        from datetime import timedelta
+        p={"asOf":"2026-10-22T12:00:00Z","cards":[card("vix",30),card("breadth",2)]}
+        start=datetime(2026,6,1,tzinfo=timezone.utc)
+        history=[{"date":(start+timedelta(days=i)).date().isoformat(),"vix":10+i/10}
+                 for i in range(120)]
+        r=build_report(p,NOW,history)
+        entry=next(x for x in r["historicalContext"] if x["indicator"]=="vix")
+        self.assertEqual(entry["observationCount"],120)
+        self.assertEqual(entry["percentile"],100.0)
+        self.assertEqual(entry["fromDate"],"2026-06-01")
+        self.assertNotIn("five-year percentile",entry["window"])
+        self.assertFalse(any(x["indicator"]=="breadth" for x in r["historicalContext"]))
+    def test_no_percentile_for_two_recent_points(self):
+        p={"asOf":"2026-10-22T12:00:00Z","cards":[card("breadth",2.0)]}
+        r=build_report(p,NOW,[{"date":"2026-10-21","breadth":1.0},
+                              {"date":"2026-10-22","breadth":2.0}])
+        self.assertEqual(r["historicalContext"],[])
+
 if __name__=="__main__":
     unittest.main()
