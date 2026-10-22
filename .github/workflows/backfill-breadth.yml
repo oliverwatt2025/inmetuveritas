@@ -1,0 +1,24 @@
+name: Backfill breadth history (manual only)
+on:
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Backfill breadth only
+        run: python3 scripts/backfill_breadth.py
+      - name: Commit history on selected branch
+        run: |
+          git config user.name "inmetuveritas-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add public/history_daily.ndjson public/history_weekly.ndjson
+          if ! git diff --cached --quiet; then
+            git commit -m "Backfill genuine RSP versus SPY breadth history"
+            git push
+          fi

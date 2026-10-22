@@ -351,7 +351,7 @@ function Sparkline({
           background: "rgba(0,0,0,0.25)",
           border: "1px solid rgba(255,255,255,0.10)",
         }}
-        title="No history yet"
+        title="Building history — more observations needed"
       />
     );
   }
@@ -486,16 +486,8 @@ function GaugeCard({
         <div className={statusClass(g.status)}>{g.status}</div>
       </div>
 
-      <div
-        className="cardBody"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 14,
-          justifyContent: "space-between",
-        }}
-      >
-        <div className="gaugeWrap" style={{ flex: "0 0 auto" }}>
+      <div className="cardBody">
+        <div className="gaugeWrap">
           <div className="gauge">
             {/* arc */}
             <svg className="arc" viewBox="0 0 200 140" aria-hidden="true">
@@ -533,10 +525,12 @@ function GaugeCard({
               />
             </svg>
 
-            {/* labels */}
-            <div className="lbl lblMin">{g.minLabel ?? "0"}</div>
-            <div className="lbl lblMid">{g.midLabel ?? "50"}</div>
-            <div className="lbl lblMax">{g.maxLabel ?? "100"}</div>
+            {/* Extremes shown below the dial to avoid colliding with the readout.
+                The midpoint remains available in the card tooltip. */}
+            <div className="gaugeLabels" title={`Midpoint: ${g.midLabel ?? "50"}`}>
+              <span>{g.minLabel ?? "0"}</span>
+              <span>{g.maxLabel ?? "100"}</span>
+            </div>
 
             {/* needle */}
             <div className="needleBase">
@@ -548,13 +542,13 @@ function GaugeCard({
           </div>
         </div>
 
-        <div className="readout" style={{ flex: "1 1 auto", minWidth: 0 }}>
+        <div className="readout">
           <div className="value">{g.valueText}</div>
           <div className="updated">Updated • {updatedLine}</div>
         </div>
 
         {/* Sparkline sits on the right */}
-        <div style={{ flex: "0 0 auto" }}>
+        <div className="sparklineSlot">
           <Sparkline series={history} status={g.status} />
         </div>
       </div>
@@ -642,7 +636,20 @@ if (Array.isArray(data.cards) && data.cards.length) {
 
       const rows = parseNdjson(text);
       const map = buildHistoryMap(rows);
-      setHistoryMap(map);
+
+      // ETF charts use daily observations when available; older macro
+      // indicators continue using the original weekly history untouched.
+      const dailyRes = await fetch(`/history_daily.ndjson?cb=${Date.now()}`, { cache: "no-store" });
+      if (dailyRes.ok) {
+        const dailyRows = parseNdjson(await dailyRes.text());
+        for (const key of ["breadth", "spy_dd_1m", "kre_dd_3m"]) {
+          const series = dailyRows
+            .filter((row) => typeof row.date === "string" && typeof row[key] === "number")
+            .map((row) => ({ week: String(row.date), value: Number(row[key]) }));
+          if (series.length >= 2) map[key] = series;
+        }
+      }
+      if (!cancelled) setHistoryMap(map);
     }
 
     // initial load
