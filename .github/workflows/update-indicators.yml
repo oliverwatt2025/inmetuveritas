@@ -33,6 +33,10 @@ jobs:
         run: |
           python3 scripts/update_indicators.py
 
+      # Temporary preview-branch backfill; remove after successful one-time run.
+      - name: Backfill SPY/RSP market breadth history
+        run: python3 scripts/backfill_breadth.py
+
       - name: Commit & push indicators.json (if changed)
         run: |
           git config user.name "inmetuveritas-bot"
