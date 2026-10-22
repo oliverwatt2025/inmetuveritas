@@ -1302,4 +1302,4 @@
 {"date":"2026-10-19","vix":18.44,"hy_oas":329.0,"ig_oas":87.0,"curve_10y2y":38.0,"spy_dd_1m":-1.62,"kre_dd_3m":-11.13,"breadth":1.25}
 {"date":"2026-10-20","vix":17.31,"hy_oas":333.0,"ig_oas":87.0,"curve_10y2y":33.0,"spy_dd_1m":-1.29,"kre_dd_3m":-9.38,"breadth":2.0}
 {"date":"2026-10-21","vix":16.68,"hy_oas":327.0,"ig_oas":88.0,"curve_10y2y":32.0,"spy_dd_1m":-0.77,"kre_dd_3m":-9.38,"breadth":1.83}
-{"date":"2026-10-22","spy_dd_1m":-1.94,"kre_dd_3m":-7.08,"breadth":4.21}
+{"date":"2026-10-22","spy_dd_1m":-1.94,"kre_dd_3m":-7.08,"breadth":4.21,"curve_10y2y":31.0}
