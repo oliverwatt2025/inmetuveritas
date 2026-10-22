@@ -14,8 +14,9 @@ ROOT = Path(__file__).resolve().parents[1]
 INPUT = ROOT / "public" / "indicators.json"
 OUTPUT = ROOT / "public" / "market_intelligence.json"
 HISTORY = ROOT / "public" / "history_daily.ndjson"
+HISTORY_5Y = ROOT / "public" / "history_5y.ndjson"
 
-def build_report(payload: dict, now: datetime | None = None, history: list[dict] | None = None) -> dict:
+def build_report(payload: dict, now: datetime | None = None, history: list[dict] | None = None, historical_samples: list[dict] | None = None) -> dict:
     now = now or datetime.now(timezone.utc)
     cards = {c.get("id"): c for c in payload.get("cards", []) if isinstance(c, dict)}
     asof = payload.get("asOf")
@@ -138,13 +139,13 @@ def build_report(payload: dict, now: datetime | None = None, history: list[dict]
     # the underlying five-year observations really exist.
     historical_context = []
     source_day = source_time.date()
-    if history and not stale_snapshot:
+    if (historical_samples is not None or history) and not stale_snapshot:
         for key in ("vix", "hy_oas", "ig_oas", "breadth", "curve_10y2y", "kre_dd_3m"):
             current = numeric(key)
             if current is None:
                 continue
             samples = {}
-            for row in history:
+            for row in (historical_samples if historical_samples is not None else history):
                 try:
                     day = date.fromisoformat(row.get("date", ""))
                 except (TypeError, ValueError):
@@ -198,7 +199,15 @@ def main():
                 history.append(json.loads(line))
             except json.JSONDecodeError:
                 continue
-    report = build_report(payload, history=history)
+    historical_samples = None
+    if HISTORY_5Y.exists():
+        historical_samples = []
+        for line in HISTORY_5Y.read_text(encoding="utf-8").splitlines():
+            try:
+                historical_samples.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    report = build_report(payload, history=history, historical_samples=historical_samples)
     OUTPUT.write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
     print(report["regime"], "from", report["sourceAsOf"], "quality:", report["dataQuality"])
 
