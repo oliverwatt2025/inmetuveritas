@@ -87,6 +87,7 @@ type IntelligenceReport = {
   sourceAsOf: string; generatedAt: string; dataQuality: "CURRENT" | "STALE";
   regime: string; summary: string; keyFindings: IntelligenceFinding[];
   changeSummary?: string; notableChanges?: Array<{indicator:string; delta:number; previousDate:string}>;
+  historicalContext?: Array<{indicator:string;percentile:number;observationCount:number;fromDate:string;toDate:string;interpretation:string}>;
   whatWouldChangeTheView: string[]; methodology?: string;
 };
 
@@ -128,6 +129,15 @@ function IntelligencePanels({ report }: { report: IntelligenceReport | null }) {
           <h3><span className="intelligenceIcon">02</span> WHY THIS CONCLUSION</h3>
           <p className="intelligenceExplanation">{report.summary}</p>
           {report.changeSummary && <div className="intelligenceChangeNote"><strong>WHAT HAS CHANGED</strong><p>{report.changeSummary}</p></div>}
+          {(report.historicalContext?.length ?? 0) > 0 && <div className="intelligenceHistory">
+            <strong>HISTORICAL POSITION</strong>
+            {report.historicalContext!.slice(0, 4).map(h => <div key={h.indicator} className="intelligenceHistoryItem">
+              <span>{h.indicator.replaceAll("_", " ").toUpperCase()}</span>
+              <b>{h.percentile.toFixed(0)}th percentile</b>
+              <small>{h.observationCount} observations · {h.fromDate} to {h.toDate}</small>
+            </div>)}
+            <small>Percentiles use available observations, not an assumed five-year history.</small>
+          </div>}
           <div className="intelligenceEvidence">
             {findings.slice(0, 4).map(f => (
               <div className="intelligenceEvidenceRow" key={f.id}>
