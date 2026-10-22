@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "sourceAsOf": "2026-10-22T20:04:15Z",
+  "generatedAt": "2026-10-22T20:04:22.457692Z",
+  "dataAgeHours": 0.0,
+  "dataQuality": "CURRENT",
+  "regime": "NO BROAD STRESS CONFIRMATION",
+  "summary": "The monitored signals do not currently show broad stress; this is not a forecast or assurance.",
+  "keyFindings": [
+    {
+      "id": "broad_participation",
+      "family": "equities",
+      "severity": "supportive",
+      "headline": "Equal-weight participation is supportive",
+      "explanation": "Equal-weight equities have outperformed the cap-weighted benchmark over the measurement window.",
+      "evidence": [
+        {
+          "indicator": "breadth",
+          "value": 4.2,
+          "unit": "%",
+          "observedAt": "2026-10-22T20:04:15Z"
+        }
+      ]
+    },
+    {
+      "id": "credit_contained",
+      "family": "credit",
+      "severity": "supportive",
+      "headline": "Corporate credit spreads remain contained",
+      "explanation": "Both investment-grade and high-yield spreads are below the defined watch thresholds.",
+      "evidence": [
+        {
+          "indicator": "hy_oas",
+          "value": 327.0,
+          "unit": " bp",
+          "observedAt": "2026-10-22T20:04:15Z"
+        },
+        {
+          "indicator": "ig_oas",
+          "value": 88.0,
+          "unit": " bp",
+          "observedAt": "2026-10-22T20:04:15Z"
+        }
+      ]
+    },
+    {
+      "id": "volatility_calm",
+      "family": "volatility",
+      "severity": "supportive",
+      "headline": "Options markets imply relatively calm conditions",
+      "explanation": "VIX is below the defined watch threshold.",
+      "evidence": [
+        {
+          "indicator": "vix",
+          "value": 16.7,
+          "unit": "",
+          "observedAt": "2026-10-22T20:04:15Z"
+        }
+      ]
+    }
+  ],
+  "whatWouldChangeTheView": [
+    "Watch for sustained high-yield spread widening, not just a one-day move.",
+    "Watch whether a sustained VIX increase confirms weakness elsewhere.",
+    "Compare equal-weight participation with headline index moves and credit pricing."
+  ],
+  "methodology": "Transparent illustrative rules, not a calibrated prediction or investment advice.",
+  "limitations": [
+    "Scores and thresholds are provisional and require historical validation.",
+    "Credit-stress and recession composite scores are excluded from independent evidence counts.",
+    "No conclusions about causality are inferred from coincident indicator movements.",
+    "Input card values are snapshot-level, not necessarily underlying observation publication dates."
+  ]
+}
