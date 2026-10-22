@@ -25,5 +25,22 @@ class TestIntelligence(unittest.TestCase):
         p={"asOf":"2026-10-22T12:00:00Z","cards":[card("vix",50,"DELAYED"),card("hy_oas",330),card("ig_oas",90)]}
         ids=[x["id"] for x in build_report(p,NOW)["keyFindings"]]
         self.assertNotIn("volatility_elevated",ids)
+    def test_dated_changes_and_thresholds(self):
+        p={"asOf":"2026-10-22T12:00:00Z","cards":[card("breadth",2.5),card("spy_dd_1m",-1),
+           card("hy_oas",330),card("ig_oas",90),card("vix",19)]}
+        history=[{"date":"2026-10-21","breadth":0.5,"hy_oas":305,"ig_oas":88,"vix":18}]
+        r=build_report(p,NOW,history)
+        self.assertEqual({x["indicator"] for x in r["notableChanges"]},{"breadth","hy_oas"})
+        self.assertIn("Notable changes",r["changeSummary"])
+    def test_stale_snapshot_suppresses_change_commentary(self):
+        p={"asOf":"2026-10-18T12:00:00Z","cards":[card("breadth",5),card("vix",35)]}
+        r=build_report(p,NOW,[{"date":"2026-10-17","breadth":-5,"vix":10}])
+        self.assertEqual(r["notableChanges"],[])
+        self.assertIn("stale",r["changeSummary"])
+    def test_missing_prior_values_not_invented(self):
+        p={"asOf":"2026-10-22T12:00:00Z","cards":[card("breadth",4),card("vix",19)]}
+        r=build_report(p,NOW,[{"date":"2026-10-21","hy_oas":300}])
+        self.assertEqual(r["notableChanges"],[])
+
 if __name__=="__main__":
     unittest.main()
