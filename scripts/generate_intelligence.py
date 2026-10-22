@@ -7,14 +7,15 @@ Run: python3 scripts/generate_intelligence.py
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 INPUT = ROOT / "public" / "indicators.json"
 OUTPUT = ROOT / "public" / "market_intelligence.json"
+HISTORY = ROOT / "public" / "history_daily.ndjson"
 
-def build_report(payload: dict, now: datetime | None = None) -> dict:
+def build_report(payload: dict, now: datetime | None = None, history: list[dict] | None = None) -> dict:
     now = now or datetime.now(timezone.utc)
     cards = {c.get("id"): c for c in payload.get("cards", []) if isinstance(c, dict)}
     asof = payload.get("asOf")
@@ -99,10 +100,44 @@ def build_report(payload: dict, now: datetime | None = None) -> dict:
     if vix is not None and vix < 25: watch.append("Watch whether a sustained VIX increase confirms weakness elsewhere.")
     if breadth is not None: watch.append("Compare equal-weight participation with headline index moves and credit pricing.")
 
+    # Compare independent observation dates, not adjacent rows (weekends can
+    # repeat values). Never label a stale/historical row as 'yesterday'.
+    changes = []
+    if not stale_snapshot and history:
+        source_day = source_time.date()
+        previous = [row for row in history
+                    if isinstance(row.get("date"), str)
+                    and row["date"] < source_day.isoformat()
+                    and (source_day - date.fromisoformat(row["date"])).days <= 7]
+        if previous:
+            prev = max(previous, key=lambda row: row["date"])
+            thresholds = {"breadth": 1.0, "vix": 2.0, "hy_oas": 15.0,
+                          "ig_oas": 8.0, "kre_dd_3m": 3.0, "spy_dd_1m": 2.0}
+            for key, threshold in thresholds.items():
+                current_value, prior_value = numeric(key), prev.get(key)
+                if current_value is None or type(prior_value) not in (float, int):
+                    continue
+                delta = round(current_value - float(prior_value), 2)
+                if abs(delta) >= threshold:
+                    changes.append({"indicator": key, "current": current_value,
+                                    "previous": prior_value, "delta": delta,
+                                    "previousDate": prev["date"],
+                                    "direction": "higher" if delta > 0 else "lower"})
+    changes.sort(key=lambda item: abs(item["delta"]), reverse=True)
+    if stale_snapshot:
+        change_summary = "Current market movement cannot be assessed from a stale snapshot."
+    elif changes:
+        change_summary = ("Notable changes since the last comparable dated observation: " +
+                          "; ".join(f'{c["indicator"].replace("_", " ")} {c["delta"]:+g}'
+                                    for c in changes[:3]) + ".")
+    else:
+        change_summary = "No large changes met the provisional monitoring thresholds in the available daily comparison."
+
     report = {
         "schemaVersion":1, "sourceAsOf":asof, "generatedAt":now.isoformat().replace("+00:00","Z"),
         "dataAgeHours":round(age_hours,1), "dataQuality":"STALE" if stale_snapshot else "CURRENT",
         "regime":regime, "summary":summary,
+        "changeSummary":change_summary, "notableChanges":changes[:6],
         "keyFindings":(attention+supportive)[:5],
         "whatWouldChangeTheView":watch[:3],
         "methodology":"Transparent illustrative rules, not a calibrated prediction or investment advice.",
@@ -115,7 +150,14 @@ def build_report(payload: dict, now: datetime | None = None) -> dict:
 
 def main():
     payload = json.loads(INPUT.read_text(encoding="utf-8"))
-    report = build_report(payload)
+    history = []
+    if HISTORY.exists():
+        for line in HISTORY.read_text(encoding="utf-8").splitlines():
+            try:
+                history.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    report = build_report(payload, history=history)
     OUTPUT.write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
     print(report["regime"], "from", report["sourceAsOf"], "quality:", report["dataQuality"])
 
