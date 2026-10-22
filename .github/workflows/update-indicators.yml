@@ -36,6 +36,12 @@ jobs:
       - name: Validate intelligence engine
         run: python3 -m unittest discover -s tests -p 'test_intelligence.py' -v
 
+      - name: Refresh dated five-year observations (preserve existing data on feed failures)
+        continue-on-error: true
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python3 scripts/backfill_history_5y.py
+
       - name: Generate daily market intelligence
         run: python3 scripts/generate_intelligence.py
 
@@ -49,6 +55,7 @@ jobs:
 
           # ✅ Add daily history file so it gets published to live
           git add public/indicators.json public/history_weekly.ndjson public/history_daily.ndjson public/market_intelligence.json
+          if test -f public/history_5y.ndjson; then git add public/history_5y.ndjson; fi
 
           # If nothing changed, exit cleanly
           if git diff --cached --quiet; then
