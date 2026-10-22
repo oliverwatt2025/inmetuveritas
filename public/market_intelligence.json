@@ -1,11 +1,22 @@
 {
   "schemaVersion": 1,
-  "sourceAsOf": "2026-10-22T20:04:15Z",
-  "generatedAt": "2026-10-22T20:04:22.457692Z",
+  "sourceAsOf": "2026-10-22T20:46:11Z",
+  "generatedAt": "2026-10-22T20:46:17.221837Z",
   "dataAgeHours": 0.0,
   "dataQuality": "CURRENT",
   "regime": "NO BROAD STRESS CONFIRMATION",
   "summary": "The monitored signals do not currently show broad stress; this is not a forecast or assurance.",
+  "changeSummary": "Notable changes since the last comparable dated observation: breadth +2.4.",
+  "notableChanges": [
+    {
+      "indicator": "breadth",
+      "current": 4.2,
+      "previous": 1.8,
+      "delta": 2.4,
+      "previousDate": "2026-10-21",
+      "direction": "higher"
+    }
+  ],
   "keyFindings": [
     {
       "id": "broad_participation",
@@ -18,7 +29,7 @@
           "indicator": "breadth",
           "value": 4.2,
           "unit": "%",
-          "observedAt": "2026-10-22T20:04:15Z"
+          "observedAt": "2026-10-22T20:46:11Z"
         }
       ]
     },
@@ -33,13 +44,13 @@
           "indicator": "hy_oas",
           "value": 327.0,
           "unit": " bp",
-          "observedAt": "2026-10-22T20:04:15Z"
+          "observedAt": "2026-10-22T20:46:11Z"
         },
         {
           "indicator": "ig_oas",
           "value": 88.0,
           "unit": " bp",
-          "observedAt": "2026-10-22T20:04:15Z"
+          "observedAt": "2026-10-22T20:46:11Z"
         }
       ]
     },
@@ -54,7 +65,7 @@
           "indicator": "vix",
           "value": 16.7,
           "unit": "",
-          "observedAt": "2026-10-22T20:04:15Z"
+          "observedAt": "2026-10-22T20:46:11Z"
         }
       ]
     }
