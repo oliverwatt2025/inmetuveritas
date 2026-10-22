@@ -173,12 +173,61 @@ def build_report(payload: dict, now: datetime | None = None, history: list[dict]
                                    else "Within the middle of observed history")
             })
 
+    # Historical significance adds context, not an additional vote in the risk score.
+    # Interpret direction by indicator (high breadth is supportive; high spreads/VIX
+    # can indicate caution). Always state the *actual* observed time span.
+    historical_findings = []
+    labels = {"vix":"VIX","hy_oas":"High-yield credit spread","ig_oas":"Investment-grade credit spread",
+              "breadth":"Equal-weight market breadth","curve_10y2y":"10Y–2Y yield curve",
+              "kre_dd_3m":"Regional-bank drawdown"}
+    for item in historical_context:
+        pct = item["percentile"]
+        if pct < 80 and pct > 20:
+            continue
+        key = item["indicator"]
+        high = pct >= 80
+        if key == "breadth":
+            implication = ("supportive participation relative to its history" if high
+                           else "relatively weak market participation")
+        elif key in ("hy_oas","ig_oas","vix"):
+            implication = ("more caution than the history median" if high
+                           else "relatively subdued stress pricing")
+        elif key == "kre_dd_3m":
+            implication = ("a shallower regional-bank drawdown than usual" if high
+                           else "an unusually deep regional-bank drawdown")
+        else:
+            implication = "an unusually high yield-curve spread" if high else "an unusually low yield-curve spread"
+        historical_findings.append({
+            "indicator":key, "headline":labels[key] + " is historically " + ("elevated" if high else "low"),
+            "explanation":(f'{labels[key]} sits at the {pct:g}th percentile of '
+                           f'{item["observationCount"]} available dated observations '
+                           f'from {item["fromDate"]} to {item["toDate"]}; '
+                           f'this suggests {implication}.'),
+            "percentile":pct, "fromDate":item["fromDate"],
+            "toDate":item["toDate"], "observationCount":item["observationCount"]
+        })
+    # Strong divergences help an investor recognise signals that do not align.
+    divergence = []
+    by_hist = {x["indicator"]:x for x in historical_context}
+    if "hy_oas" in by_hist and hy is not None and hy <= 400 and by_hist["hy_oas"]["percentile"] >= 75:
+        item = by_hist["hy_oas"]
+        divergence.append(
+            f'High-yield spreads remain below the absolute 400 bp watch threshold, '
+            f'but are at the {item["percentile"]:g}th percentile of observations '
+            f'from {item["fromDate"]} to {item["toDate"]}. '
+            "The level looks contained, but its historical position merits monitoring.")
+    if "breadth" in by_hist and breadth is not None and by_hist["breadth"]["percentile"] >= 90:
+        divergence.append(
+            "Broad equal-weight outperformance is unusual in the observed sample; "
+            "this is supportive participation, not evidence by itself of lower future volatility.")
+
     report = {
         "schemaVersion":1, "sourceAsOf":asof, "generatedAt":now.isoformat().replace("+00:00","Z"),
         "dataAgeHours":round(age_hours,1), "dataQuality":"STALE" if stale_snapshot else "CURRENT",
         "regime":regime, "summary":summary,
         "changeSummary":change_summary, "notableChanges":changes[:6],
         "historicalContext":historical_context,
+        "historicalFindings":historical_findings[:5], "divergences":divergence,
         "keyFindings":(attention+supportive)[:5],
         "whatWouldChangeTheView":watch[:3],
         "methodology":"Transparent illustrative rules, not a calibrated prediction or investment advice.",
