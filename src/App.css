@@ -311,3 +311,9 @@
 .intelligenceHistoryItem b { color:#d8bc80;font-weight:600; }
 .intelligenceHistoryItem small { grid-column:1/-1;color:rgba(255,255,255,.58); }
 .intelligenceHistory > small { display:block;color:rgba(255,255,255,.55);font-size:10px;line-height:1.5;margin-top:10px; }
+
+
+.intelligenceHistoricalInsights, .intelligenceDivergences { padding:12px 13px; margin-bottom:15px; border-radius:9px; background:rgba(216,188,128,.055); border:1px solid rgba(216,188,128,.20); }
+.intelligenceHistoricalInsights > strong, .intelligenceDivergences > strong { color:#d8bc80; font-size:10px; letter-spacing:.12em; }
+.intelligenceHistoricalInsights p, .intelligenceDivergences p { margin:9px 0 0; font-size:12px; line-height:1.55; color:rgba(255,255,255,.83); }
+.intelligenceDivergences { border-color:rgba(241,190,110,.35); background:rgba(241,190,110,.065); }
