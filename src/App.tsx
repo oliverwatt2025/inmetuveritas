@@ -88,6 +88,8 @@ type IntelligenceReport = {
   regime: string; summary: string; keyFindings: IntelligenceFinding[];
   changeSummary?: string; notableChanges?: Array<{indicator:string; delta:number; previousDate:string}>;
   historicalContext?: Array<{indicator:string;percentile:number;observationCount:number;fromDate:string;toDate:string;interpretation:string}>;
+  historicalFindings?: Array<{indicator:string; headline:string; explanation:string;percentile:number}>;
+  divergences?: string[];
   whatWouldChangeTheView: string[]; methodology?: string;
 };
 
@@ -137,6 +139,14 @@ function IntelligencePanels({ report }: { report: IntelligenceReport | null }) {
               <small>{h.observationCount} observations · {h.fromDate} to {h.toDate}</small>
             </div>)}
             <small>Percentiles use available observations, not an assumed five-year history.</small>
+          </div>}
+          {!!report.historicalFindings?.length && <div className="intelligenceHistoricalInsights">
+            <strong>WHY HISTORY MATTERS</strong>
+            {report.historicalFindings.slice(0, 3).map(item => <p key={item.indicator}>{item.explanation}</p>)}
+          </div>}
+          {!!report.divergences?.length && <div className="intelligenceDivergences">
+            <strong>WHERE SIGNALS DISAGREE</strong>
+            {report.divergences.map((message, i) => <p key={i}>{message}</p>)}
           </div>}
           <div className="intelligenceEvidence">
             {findings.slice(0, 4).map(f => (
