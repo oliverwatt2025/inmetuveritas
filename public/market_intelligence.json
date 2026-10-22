@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "sourceAsOf": "2026-10-22T20:46:11Z",
-  "generatedAt": "2026-10-22T20:46:17.221837Z",
+  "sourceAsOf": "2026-10-22T20:50:25Z",
+  "generatedAt": "2026-10-22T20:50:32.129293Z",
   "dataAgeHours": 0.0,
   "dataQuality": "CURRENT",
   "regime": "NO BROAD STRESS CONFIRMATION",
@@ -17,6 +17,58 @@
       "direction": "higher"
     }
   ],
+  "historicalContext": [
+    {
+      "indicator": "vix",
+      "value": 16.7,
+      "percentile": 38.4,
+      "observationCount": 263,
+      "fromDate": "2026-02-01",
+      "toDate": "2026-10-22",
+      "window": "available history, up to five years",
+      "interpretation": "Within the middle of observed history"
+    },
+    {
+      "indicator": "hy_oas",
+      "value": 327.0,
+      "percentile": 96.8,
+      "observationCount": 263,
+      "fromDate": "2026-02-01",
+      "toDate": "2026-10-22",
+      "window": "available history, up to five years",
+      "interpretation": "High relative to observed history"
+    },
+    {
+      "indicator": "ig_oas",
+      "value": 88.0,
+      "percentile": 93.6,
+      "observationCount": 258,
+      "fromDate": "2026-02-01",
+      "toDate": "2026-10-22",
+      "window": "available history, up to five years",
+      "interpretation": "High relative to observed history"
+    },
+    {
+      "indicator": "breadth",
+      "value": 4.2,
+      "percentile": 97.2,
+      "observationCount": 108,
+      "fromDate": "2026-05-20",
+      "toDate": "2026-10-22",
+      "window": "available history, up to five years",
+      "interpretation": "High relative to observed history"
+    },
+    {
+      "indicator": "curve_10y2y",
+      "value": 32.0,
+      "percentile": 8.8,
+      "observationCount": 257,
+      "fromDate": "2026-02-01",
+      "toDate": "2026-10-22",
+      "window": "available history, up to five years",
+      "interpretation": "Low relative to observed history"
+    }
+  ],
   "keyFindings": [
     {
       "id": "broad_participation",
@@ -29,7 +81,7 @@
           "indicator": "breadth",
           "value": 4.2,
           "unit": "%",
-          "observedAt": "2026-10-22T20:46:11Z"
+          "observedAt": "2026-10-22T20:50:25Z"
         }
       ]
     },
@@ -44,13 +96,13 @@
           "indicator": "hy_oas",
           "value": 327.0,
           "unit": " bp",
-          "observedAt": "2026-10-22T20:46:11Z"
+          "observedAt": "2026-10-22T20:50:25Z"
         },
         {
           "indicator": "ig_oas",
           "value": 88.0,
           "unit": " bp",
-          "observedAt": "2026-10-22T20:46:11Z"
+          "observedAt": "2026-10-22T20:50:25Z"
         }
       ]
     },
@@ -65,7 +117,7 @@
           "indicator": "vix",
           "value": 16.7,
           "unit": "",
-          "observedAt": "2026-10-22T20:46:11Z"
+          "observedAt": "2026-10-22T20:50:25Z"
         }
       ]
     }
@@ -80,6 +132,7 @@
     "Scores and thresholds are provisional and require historical validation.",
     "Credit-stress and recession composite scores are excluded from independent evidence counts.",
     "No conclusions about causality are inferred from coincident indicator movements.",
-    "Input card values are snapshot-level, not necessarily underlying observation publication dates."
+    "Input card values are snapshot-level, not necessarily underlying observation publication dates.",
+    "Historical percentiles use only the actual stored date range and may be shorter than five years."
   ]
 }
