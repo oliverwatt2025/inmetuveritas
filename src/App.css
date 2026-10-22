@@ -204,3 +204,47 @@
   font-size: 13px;
   opacity: 0.72;
 }
+
+/* Card layout: reserve separate columns for dial, value and sparkline. */
+.cardBody {
+  display: grid;
+  grid-template-columns: 104px minmax(85px, 1fr) 150px;
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+}
+.gaugeWrap {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 104px;
+  min-width: 0;
+  padding-bottom: 22px;
+}
+.gaugeLabels {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  top: 49px;
+  left: 0;
+  width: 104px;
+  font-size: 10px;
+  line-height: 1.25;
+  color: rgba(255,255,255,0.64);
+  white-space: nowrap;
+}
+.readout { min-width: 0; }
+.updated {
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.sparklineSlot { min-width: 0; width: 150px; }
+.cardTop .cardTitle { min-width: 0; flex: 1; }
+.cardTop .pill { flex: 0 0 auto; }
+@media (max-width: 520px) {
+  .cardBody { grid-template-columns: 92px minmax(0, 1fr); gap: 10px; }
+  .gaugeWrap { width: 92px; }
+  .gaugeLabels { width: 92px; font-size: 9px; }
+  .sparklineSlot { grid-column: 1 / -1; justify-self: center; }
+}
