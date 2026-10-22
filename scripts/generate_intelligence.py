@@ -133,18 +133,59 @@ def build_report(payload: dict, now: datetime | None = None, history: list[dict]
     else:
         change_summary = "No large changes met the provisional monitoring thresholds in the available daily comparison."
 
+
+    # Historical position is descriptive, NEVER a five-year percentile unless
+    # the underlying five-year observations really exist.
+    historical_context = []
+    source_day = source_time.date()
+    if history and not stale_snapshot:
+        for key in ("vix", "hy_oas", "ig_oas", "breadth", "curve_10y2y", "kre_dd_3m"):
+            current = numeric(key)
+            if current is None:
+                continue
+            samples = {}
+            for row in history:
+                try:
+                    day = date.fromisoformat(row.get("date", ""))
+                except (TypeError, ValueError):
+                    continue
+                if day > source_day or (source_day - day).days > 5 * 366:
+                    continue
+                value = row.get(key)
+                if type(value) in (int, float):
+                    samples[day] = float(value)
+            # A historical distribution with only a handful of days is misleading.
+            # Daily data needs at least 60 distinct dates and 90 calendar days.
+            if len(samples) < 60 or (max(samples) - min(samples)).days < 90:
+                continue
+            ordered = sorted(samples.values())
+            lower_count = sum(v < current for v in ordered)
+            equal_count = sum(v == current for v in ordered)
+            percentile = round(100 * (lower_count + equal_count / 2) / len(ordered), 1)
+            historical_context.append({
+                "indicator": key, "value": current,
+                "percentile": percentile, "observationCount": len(ordered),
+                "fromDate": min(samples).isoformat(), "toDate": max(samples).isoformat(),
+                "window": "available history, up to five years",
+                "interpretation": ("High relative to observed history" if percentile >= 80
+                                   else "Low relative to observed history" if percentile <= 20
+                                   else "Within the middle of observed history")
+            })
+
     report = {
         "schemaVersion":1, "sourceAsOf":asof, "generatedAt":now.isoformat().replace("+00:00","Z"),
         "dataAgeHours":round(age_hours,1), "dataQuality":"STALE" if stale_snapshot else "CURRENT",
         "regime":regime, "summary":summary,
         "changeSummary":change_summary, "notableChanges":changes[:6],
+        "historicalContext":historical_context,
         "keyFindings":(attention+supportive)[:5],
         "whatWouldChangeTheView":watch[:3],
         "methodology":"Transparent illustrative rules, not a calibrated prediction or investment advice.",
         "limitations":["Scores and thresholds are provisional and require historical validation.",
                        "Credit-stress and recession composite scores are excluded from independent evidence counts.",
                        "No conclusions about causality are inferred from coincident indicator movements.",
-                       "Input card values are snapshot-level, not necessarily underlying observation publication dates."]
+                       "Input card values are snapshot-level, not necessarily underlying observation publication dates.",
+                       "Historical percentiles use only the actual stored date range and may be shorter than five years."]
     }
     return report
 
