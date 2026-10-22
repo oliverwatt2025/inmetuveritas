@@ -56,7 +56,7 @@ def backfill(today=None, load_fred=None, load_yahoo=None):
             if cutoff.isoformat()<=day<=today.isoformat()}
     updates=0
     api_key=os.environ.get("FRED_API_KEY")
-    load_fred=load_fred or (lambda sid:fred_series(sid,api_key,limit=2300))
+    load_fred=load_fred or (lambda sid:fred_series(sid,api_key,limit=2300,sort_order="desc"))
     load_yahoo=load_yahoo or yahoo
     for key,series in FRED.items():
         try:
