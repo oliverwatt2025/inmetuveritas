@@ -77,5 +77,26 @@ class TestIntelligence(unittest.TestCase):
         self.assertTrue(hist["fromDate"].startswith("2022"))
         self.assertFalse(any(x["indicator"]=="hy_oas" for x in report["historicalContext"]))
 
+    def test_historical_significance_describes_window_and_divergence(self):
+        from datetime import timedelta
+        p={"asOf":"2026-10-22T12:00:00Z","cards":[
+            card("hy_oas",330),card("ig_oas",85),card("vix",17),card("breadth",4)]}
+        start=datetime(2023,1,1,tzinfo=timezone.utc)
+        samples=[]
+        for i in range(700):
+            d=start+timedelta(days=i)
+            if d.weekday()<5:
+                samples.append({"date":d.date().isoformat(),
+                                "hy_oas":240+i/10,"breadth":-5+i/100})
+        r=build_report(p,NOW,historical_samples=samples)
+        self.assertTrue(any(x["indicator"]=="hy_oas" for x in r["historicalFindings"]))
+        self.assertTrue(any("330" not in msg and "400 bp" in msg for msg in r["divergences"]))
+        self.assertTrue(all("from 2023-" in x["explanation"] for x in r["historicalFindings"]))
+    def test_no_historical_story_with_insufficient_samples(self):
+        p={"asOf":"2026-10-22T12:00:00Z","cards":[card("hy_oas",330)]}
+        r=build_report(p,NOW,historical_samples=[{"date":"2026-10-21","hy_oas":320}])
+        self.assertEqual(r["historicalFindings"],[])
+        self.assertEqual(r["divergences"],[])
+
 if __name__=="__main__":
     unittest.main()
