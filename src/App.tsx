@@ -486,15 +486,7 @@ function GaugeCard({
         <div className={statusClass(g.status)}>{g.status}</div>
       </div>
 
-      <div
-        className="cardBody"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 14,
-          justifyContent: "space-between",
-        }}
-      >
+      <div className="cardBody">
         <div className="gaugeWrap">
           <div className="gauge">
             {/* arc */}
