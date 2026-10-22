@@ -86,6 +86,7 @@ type IntelligenceFinding = { id: string; family: string; severity: string; headl
 type IntelligenceReport = {
   sourceAsOf: string; generatedAt: string; dataQuality: "CURRENT" | "STALE";
   regime: string; summary: string; keyFindings: IntelligenceFinding[];
+  changeSummary?: string; notableChanges?: Array<{indicator:string; delta:number; previousDate:string}>;
   whatWouldChangeTheView: string[]; methodology?: string;
 };
 
@@ -126,6 +127,7 @@ function IntelligencePanels({ report }: { report: IntelligenceReport | null }) {
         <article className="intelligencePanel">
           <h3><span className="intelligenceIcon">02</span> WHY THIS CONCLUSION</h3>
           <p className="intelligenceExplanation">{report.summary}</p>
+          {report.changeSummary && <div className="intelligenceChangeNote"><strong>WHAT HAS CHANGED</strong><p>{report.changeSummary}</p></div>}
           <div className="intelligenceEvidence">
             {findings.slice(0, 4).map(f => (
               <div className="intelligenceEvidenceRow" key={f.id}>
