@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "sourceAsOf": "2026-10-22T20:50:25Z",
-  "generatedAt": "2026-10-22T20:50:32.129293Z",
+  "sourceAsOf": "2026-10-22T20:58:25Z",
+  "generatedAt": "2026-10-22T20:58:34.048110Z",
   "dataAgeHours": 0.0,
   "dataQuality": "CURRENT",
   "regime": "NO BROAD STRESS CONFIRMATION",
@@ -21,39 +21,39 @@
     {
       "indicator": "vix",
       "value": 16.7,
-      "percentile": 38.4,
-      "observationCount": 263,
-      "fromDate": "2026-02-01",
-      "toDate": "2026-10-22",
+      "percentile": 40.8,
+      "observationCount": 1291,
+      "fromDate": "2021-10-18",
+      "toDate": "2026-10-21",
       "window": "available history, up to five years",
       "interpretation": "Within the middle of observed history"
     },
     {
       "indicator": "hy_oas",
       "value": 327.0,
-      "percentile": 96.8,
-      "observationCount": 263,
-      "fromDate": "2026-02-01",
-      "toDate": "2026-10-22",
+      "percentile": 78.7,
+      "observationCount": 786,
+      "fromDate": "2023-10-23",
+      "toDate": "2026-10-21",
       "window": "available history, up to five years",
-      "interpretation": "High relative to observed history"
+      "interpretation": "Within the middle of observed history"
     },
     {
       "indicator": "ig_oas",
       "value": 88.0,
-      "percentile": 93.6,
-      "observationCount": 258,
-      "fromDate": "2026-02-01",
-      "toDate": "2026-10-22",
+      "percentile": 57.7,
+      "observationCount": 785,
+      "fromDate": "2023-10-23",
+      "toDate": "2026-10-21",
       "window": "available history, up to five years",
-      "interpretation": "High relative to observed history"
+      "interpretation": "Within the middle of observed history"
     },
     {
       "indicator": "breadth",
       "value": 4.2,
-      "percentile": 97.2,
-      "observationCount": 108,
-      "fromDate": "2026-05-20",
+      "percentile": 99.0,
+      "observationCount": 1234,
+      "fromDate": "2021-11-22",
       "toDate": "2026-10-22",
       "window": "available history, up to five years",
       "interpretation": "High relative to observed history"
@@ -61,12 +61,22 @@
     {
       "indicator": "curve_10y2y",
       "value": 32.0,
-      "percentile": 8.8,
-      "observationCount": 257,
-      "fromDate": "2026-02-01",
+      "percentile": 59.8,
+      "observationCount": 1252,
+      "fromDate": "2021-10-18",
+      "toDate": "2026-10-21",
+      "window": "available history, up to five years",
+      "interpretation": "Within the middle of observed history"
+    },
+    {
+      "indicator": "kre_dd_3m",
+      "value": -7.1,
+      "percentile": 51.1,
+      "observationCount": 1192,
+      "fromDate": "2022-01-24",
       "toDate": "2026-10-22",
       "window": "available history, up to five years",
-      "interpretation": "Low relative to observed history"
+      "interpretation": "Within the middle of observed history"
     }
   ],
   "keyFindings": [
@@ -81,7 +91,7 @@
           "indicator": "breadth",
           "value": 4.2,
           "unit": "%",
-          "observedAt": "2026-10-22T20:50:25Z"
+          "observedAt": "2026-10-22T20:58:25Z"
         }
       ]
     },
@@ -96,13 +106,13 @@
           "indicator": "hy_oas",
           "value": 327.0,
           "unit": " bp",
-          "observedAt": "2026-10-22T20:50:25Z"
+          "observedAt": "2026-10-22T20:58:25Z"
         },
         {
           "indicator": "ig_oas",
           "value": 88.0,
           "unit": " bp",
-          "observedAt": "2026-10-22T20:50:25Z"
+          "observedAt": "2026-10-22T20:58:25Z"
         }
       ]
     },
@@ -117,7 +127,7 @@
           "indicator": "vix",
           "value": 16.7,
           "unit": "",
-          "observedAt": "2026-10-22T20:50:25Z"
+          "observedAt": "2026-10-22T20:58:25Z"
         }
       ]
     }
