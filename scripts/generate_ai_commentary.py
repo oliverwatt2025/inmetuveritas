@@ -56,8 +56,8 @@ def choose_with_ai(report, bank, api_key):
              "instructions":instructions,
              "input":json.dumps({"regime":report.get("regime"),
                                   "summary":report.get("summary"),"evidence":bank}),
-             "text":{"format":{"type":"json_object"}},
-             "max_output_tokens":250}
+             "text":{"format":{"type":"json_schema","name":"market_evidence_selection","strict":True,"schema":{"type":"object","properties":{"selected_ids":{"type":"array","items":{"type":"string"}}},"required":["selected_ids"],"additionalProperties":False}}},
+             "max_output_tokens":600}
     req=urllib.request.Request("https://api.openai.com/v1/responses",
           data=json.dumps(payload).encode(),method="POST",
           headers={"Authorization":"Bearer "+api_key,"Content-Type":"application/json"})
@@ -85,7 +85,7 @@ def add_commentary(report, ai_key=None):
             selected=choose_with_ai(report,bank,ai_key)
             mode="AI_CURATED"
         except Exception as exc:
-            print("AI selection unavailable; retaining verified fallback:",str(exc)[:150])
+            print("AI selection unavailable; retaining verified fallback (error type):",type(exc).__name__)
     report["editorialCommentary"]=render_commentary(report,selected,bank,mode)
     return report
 
