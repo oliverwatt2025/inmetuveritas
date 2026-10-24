@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "sourceAsOf": "2026-10-24T17:31:48Z",
-  "generatedAt": "2026-10-24T17:31:55.804558Z",
+  "sourceAsOf": "2026-10-24T17:50:02Z",
+  "generatedAt": "2026-10-24T17:50:12.214353Z",
   "dataAgeHours": 0.0,
   "dataQuality": "CURRENT",
   "regime": "NO BROAD STRESS CONFIRMATION",
@@ -115,7 +115,7 @@
           "indicator": "breadth",
           "value": 4.0,
           "unit": "%",
-          "observedAt": "2026-10-24T17:31:48Z"
+          "observedAt": "2026-10-24T17:50:02Z"
         }
       ]
     },
@@ -130,13 +130,13 @@
           "indicator": "hy_oas",
           "value": 340.0,
           "unit": " bp",
-          "observedAt": "2026-10-24T17:31:48Z"
+          "observedAt": "2026-10-24T17:50:02Z"
         },
         {
           "indicator": "ig_oas",
           "value": 89.0,
           "unit": " bp",
-          "observedAt": "2026-10-24T17:31:48Z"
+          "observedAt": "2026-10-24T17:50:02Z"
         }
       ]
     },
@@ -151,7 +151,7 @@
           "indicator": "vix",
           "value": 19.0,
           "unit": "",
-          "observedAt": "2026-10-24T17:31:48Z"
+          "observedAt": "2026-10-24T17:50:02Z"
         }
       ]
     }
@@ -171,7 +171,7 @@
   ],
   "editorialCommentary": {
     "mode": "RULE_BASED",
-    "sourceAsOf": "2026-10-24T17:31:48Z",
+    "sourceAsOf": "2026-10-24T17:50:02Z",
     "evidenceIds": [
       "finding:broad_participation",
       "finding:credit_contained",
