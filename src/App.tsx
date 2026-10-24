@@ -81,6 +81,102 @@ type HistoryPoint = { week: string; value: number };
 
 type HistoryMap = Record<string, HistoryPoint[]>;
 
+type IntelligenceEvidence = { indicator: string; value: number | null; unit?: string; observedAt?: string };
+type IntelligenceFinding = { id: string; family: string; severity: string; headline: string; explanation: string; evidence: IntelligenceEvidence[] };
+type IntelligenceReport = {
+  sourceAsOf: string; generatedAt: string; dataQuality: "CURRENT" | "STALE";
+  regime: string; summary: string; keyFindings: IntelligenceFinding[];
+  changeSummary?: string; notableChanges?: Array<{indicator:string; delta:number; previousDate:string}>;
+  historicalContext?: Array<{indicator:string;percentile:number;observationCount:number;fromDate:string;toDate:string;interpretation:string}>;
+  historicalFindings?: Array<{indicator:string; headline:string; explanation:string;percentile:number}>;
+  divergences?: string[];
+  editorialCommentary?: {mode:string; sourceAsOf:string; evidenceIds:string[]; paragraphs:string[]; disclaimer:string};
+  whatWouldChangeTheView: string[]; methodology?: string;
+};
+
+function IntelligencePanels({ report }: { report: IntelligenceReport | null }) {
+  if (!report) return (
+    <section className="intelligenceEmpty" aria-live="polite">
+      Daily market intelligence is not yet available. The indicators above remain accessible.
+    </section>
+  );
+  const stale = report.dataQuality !== "CURRENT" ||
+    !Number.isFinite(Date.parse(report.generatedAt)) ||
+    Date.now() - Date.parse(report.generatedAt) > 36 * 3600 * 1000;
+  const findings = report.keyFindings ?? [];
+  return (
+    <section className="intelligenceSection" aria-label="Daily market intelligence">
+      <div className="intelligenceBanner">
+        <div>
+          <span className="intelligenceEyebrow">IN METU VERITAS · DAILY MARKET INTELLIGENCE</span>
+          <h2>{stale ? "Historical assessment — update pending" : report.regime}</h2>
+          <p>{report.summary}</p>
+        </div>
+        <div className="intelligenceDate">
+          <span className={stale ? "intelligenceTag intelligenceTagStale" : "intelligenceTag"}>{stale ? "HISTORICAL" : "LATEST REPORT"}</span>
+          <time dateTime={report.sourceAsOf}>{new Date(report.sourceAsOf).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</time>
+          <small>Provisional rules · not a market forecast</small>
+        </div>
+      </div>
+      <div className="intelligenceColumns">
+        <article className="intelligencePanel">
+          <h3><span className="intelligenceIcon">01</span> WHAT MATTERS TODAY</h3>
+          {findings.length ? <ol className="intelligenceFindings">{findings.slice(0, 4).map(f => (
+            <li key={f.id}>
+              <strong>{f.headline}</strong>
+              <span className="intelligenceFindingDetail">{f.explanation}</span>
+            </li>
+          ))}</ol> : <p>Not enough verified observations for a prioritised interpretation.</p>}
+        </article>
+        <article className="intelligencePanel">
+          <h3><span className="intelligenceIcon">02</span> WHY THIS CONCLUSION</h3>
+          <p className="intelligenceExplanation">{report.summary}</p>
+          {report.changeSummary && <div className="intelligenceChangeNote"><strong>WHAT HAS CHANGED</strong><p>{report.changeSummary}</p></div>}
+          {(report.historicalContext?.length ?? 0) > 0 && <div className="intelligenceHistory">
+            <strong>HISTORICAL POSITION</strong>
+            {report.historicalContext!.slice(0, 4).map(h => <div key={h.indicator} className="intelligenceHistoryItem">
+              <span>{h.indicator.replaceAll("_", " ").toUpperCase()}</span>
+              <b>{h.percentile.toFixed(0)}th percentile</b>
+              <small>{h.observationCount} observations · {h.fromDate} to {h.toDate}</small>
+            </div>)}
+            <small>Percentiles use available observations, not an assumed five-year history.</small>
+          </div>}
+          {!!report.historicalFindings?.length && <div className="intelligenceHistoricalInsights">
+            <strong>WHY HISTORY MATTERS</strong>
+            {report.historicalFindings.slice(0, 3).map(item => <p key={item.indicator}>{item.explanation}</p>)}
+          </div>}
+          {!!report.divergences?.length && <div className="intelligenceDivergences">
+            <strong>WHERE SIGNALS DISAGREE</strong>
+            {report.divergences.map((message, i) => <p key={i}>{message}</p>)}
+          </div>}
+          {!!report.editorialCommentary?.paragraphs?.length && <div className="intelligenceEditorial">
+            <strong>DAILY EVIDENCE BRIEF</strong>
+            <small>{report.editorialCommentary.mode === "AI_CURATED" ? "AI-prioritised verified evidence" : "Rule-based verified evidence"}</small>
+            {report.editorialCommentary.paragraphs.map((paragraph, i) => <p key={report.editorialCommentary!.evidenceIds[i] ?? i}>{paragraph}</p>)}
+          </div>}
+          <div className="intelligenceEvidence">
+            {findings.slice(0, 4).map(f => (
+              <div className="intelligenceEvidenceRow" key={f.id}>
+                <span className={f.severity === "attention" ? "intelligenceDot intelligenceDotWarn" : "intelligenceDot"} />
+                <div><strong>{f.family.toUpperCase()}</strong>
+                  <span>{f.evidence.map(e => e.value === null ? e.indicator + " unavailable" : e.indicator.replaceAll("_", " ").toUpperCase() + ": " + e.value + (e.unit ?? "")).join(" · ")}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+        <article className="intelligencePanel">
+          <h3><span className="intelligenceIcon">03</span> WHAT WOULD CHANGE OUR VIEW</h3>
+          <ul className="intelligenceWatch">
+            {(report.whatWouldChangeTheView ?? []).map((x,i) => <li key={i}>{x}</li>)}
+          </ul>
+          <div className="intelligenceDisclaimer">Interpretations are based on defined thresholds, not AI predictions. Verify source dates before acting.</div>
+        </article>
+      </div>
+    </section>
+  );
+}
+
 // --- Your current placeholders (used as initial state + fallback) ---
 const defaultGauges: Gauge[] = [
   {
@@ -580,6 +676,7 @@ export default function App() {
   const [asOf, setAsOf] = useState<string | null>(null);
 
   const [historyMap, setHistoryMap] = useState<HistoryMap>({});
+  const [intelligence, setIntelligence] = useState<IntelligenceReport | null>(null);
   const [miner, setMiner] = useState<any>(null);
 
   // Keep the "Updated • x ago" text fresh even if data hasn't changed
@@ -652,13 +749,22 @@ if (Array.isArray(data.cards) && data.cards.length) {
       if (!cancelled) setHistoryMap(map);
     }
 
+    async function loadIntelligence() {
+      const res = await fetch(`/market_intelligence.json?cb=${Date.now()}`, { cache: "no-store" });
+      if (!res.ok) return;
+      const report = (await res.json()) as IntelligenceReport;
+      if (!cancelled && report && Array.isArray(report.keyFindings) && typeof report.summary === "string") setIntelligence(report);
+    }
+
     // initial load
+    loadIntelligence().catch((e) => console.warn(e));
     loadIndicators().catch((e) => console.warn(e));
     loadHistory().catch((e) => console.warn(e));
 
     // refresh every 5 minutes (indicators), and every 30 minutes (history)
     const t1 = setInterval(() => {
       loadIndicators().catch((e) => console.warn(e));
+      loadIntelligence().catch((e) => console.warn(e));
     }, 5 * 60 * 1000);
 
     const t2 = setInterval(() => {
@@ -770,6 +876,7 @@ if (Array.isArray(data.cards) && data.cards.length) {
           />
         ))}
       </main>
+      <IntelligencePanels report={intelligence} />
     </div>
   );
 }
