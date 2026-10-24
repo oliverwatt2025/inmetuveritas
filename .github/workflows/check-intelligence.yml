@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Test evidence engine
-        run: python3 -m unittest discover -s tests -p 'test_intelligence.py' -v
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
       - name: Generate sample intelligence report
         run: python3 scripts/generate_intelligence.py
       - name: Validate report JSON
