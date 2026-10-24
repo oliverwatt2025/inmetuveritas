@@ -32,4 +32,23 @@ class CommentaryTests(unittest.TestCase):
         r=add_commentary({**self.report,"dataQuality":"STALE"})
         self.assertEqual(r["editorialCommentary"]["mode"],"UNAVAILABLE")
         self.assertEqual(r["editorialCommentary"]["paragraphs"],[])
+    def test_cloudflare_model_selection_is_strictly_validated(self):
+        from unittest.mock import patch
+        import io
+        from generate_ai_commentary import choose_with_ai
+        class Response(io.BytesIO):
+            def __enter__(self): return self
+            def __exit__(self,*args): self.close()
+        bank=evidence_bank(self.report)
+        good=b'{"success":true,"result":{"response":"{\\\"selected_ids\\\":[\\\"historical:breadth\\\"]}"}}'
+        with patch("generate_ai_commentary.urllib.request.urlopen",return_value=Response(good)) as mocked:
+            ids=choose_with_ai(self.report,bank,"test-token","test-account")
+            self.assertEqual(ids,["historical:breadth"])
+            request=mocked.call_args.args[0]
+            self.assertIn("api.cloudflare.com",request.full_url)
+            self.assertIn("@cf/meta/llama-3.1-8b-instruct",request.full_url)
+        bad=b'{"success":true,"result":{"response":"{\\\"selected_ids\\\":[\\\"invented\\\"]}"}}'
+        with patch("generate_ai_commentary.urllib.request.urlopen",return_value=Response(bad)):
+            with self.assertRaises(ValueError):
+                choose_with_ai(self.report,bank,"test-token","test-account")
 if __name__=="__main__": unittest.main()
