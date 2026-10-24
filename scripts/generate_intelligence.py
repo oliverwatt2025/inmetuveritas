@@ -199,7 +199,7 @@ def build_report(payload: dict, now: datetime | None = None, history: list[dict]
             implication = "an unusually high yield-curve spread" if high else "an unusually low yield-curve spread"
         historical_findings.append({
             "indicator":key, "headline":labels[key] + " is historically " + ("elevated" if high else "low"),
-            "explanation":(f'{labels[key]} sits at the {pct:g}th percentile of '
+            "explanation":(f'{labels[key]} has percentile rank {pct:g} among '
                            f'{item["observationCount"]} available dated observations '
                            f'from {item["fromDate"]} to {item["toDate"]}; '
                            f'this suggests {implication}.'),
@@ -213,7 +213,7 @@ def build_report(payload: dict, now: datetime | None = None, history: list[dict]
         item = by_hist["hy_oas"]
         divergence.append(
             f'High-yield spreads remain below the absolute 400 bp watch threshold, '
-            f'but are at the {item["percentile"]:g}th percentile of observations '
+            f'but have percentile rank {item["percentile"]:g} among observations '
             f'from {item["fromDate"]} to {item["toDate"]}. '
             "The level looks contained, but its historical position merits monitoring.")
     if "breadth" in by_hist and breadth is not None and by_hist["breadth"]["percentile"] >= 90:
