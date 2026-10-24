@@ -51,4 +51,10 @@ class CommentaryTests(unittest.TestCase):
         with patch("generate_ai_commentary.urllib.request.urlopen",return_value=Response(bad)):
             with self.assertRaises(ValueError):
                 choose_with_ai(self.report,bank,"test-token","test-account")
+    def test_duplicate_credit_evidence_is_replaced_by_distinct_theme(self):
+        from generate_ai_commentary import select_diverse
+        bank={"historical:hy_oas":"x","divergence:0":"y","divergence:1":"z",
+              "finding:volatility_calm":"v"}
+        ids=select_diverse(["historical:hy_oas","divergence:0","divergence:1"],bank)
+        self.assertEqual(ids,["historical:hy_oas","divergence:1","finding:volatility_calm"])
 if __name__=="__main__": unittest.main()
