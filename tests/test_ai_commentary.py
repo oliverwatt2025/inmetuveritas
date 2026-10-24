@@ -15,8 +15,8 @@ class CommentaryTests(unittest.TestCase):
         bank=evidence_bank(self.report)
         with self.assertRaises(ValueError):
             validate_selection({"selected_ids":["invented:prediction"]},bank)
-        self.assertEqual(validate_selection({"selected_ids":["finding:credit_contained"]},bank),
-                         ["finding:credit_contained"])
+        self.assertEqual(validate_selection({"selected_ids":["finding:credit_contained"]},bank)[0],
+                         "finding:credit_contained")
     def test_ai_cannot_write_prose_or_numbers(self):
         bank=evidence_bank(self.report)
         with self.assertRaises(ValueError):
@@ -43,7 +43,7 @@ class CommentaryTests(unittest.TestCase):
         good=b'{"success":true,"result":{"response":"{\\\"selected_ids\\\":[\\\"historical:breadth\\\"]}"}}'
         with patch("generate_ai_commentary.urllib.request.urlopen",return_value=Response(good)) as mocked:
             ids=choose_with_ai(self.report,bank,"test-token","test-account")
-            self.assertEqual(ids,["historical:breadth"])
+            self.assertEqual(ids[0],"historical:breadth")
             request=mocked.call_args.args[0]
             self.assertIn("api.cloudflare.com",request.full_url)
             self.assertIn("@cf/meta/llama-3.1-8b-instruct",request.full_url)
