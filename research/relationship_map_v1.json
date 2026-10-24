@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "stage": "proposed explanatory links, not causal assertions",
+  "edges": [
+    {
+      "from": "breadth",
+      "to": "spy_dd_1m",
+      "type": "divergence",
+      "explanation": "Index strength alongside weak breadth suggests narrow leadership; not a prediction of a fall."
+    },
+    {
+      "from": "breadth",
+      "to": "vix",
+      "type": "confirmation",
+      "explanation": "Weak participation plus rising implied volatility reinforces cautious equity assessment."
+    },
+    {
+      "from": "breadth",
+      "to": "hy_oas",
+      "type": "cross-market confirmation",
+      "explanation": "Weak equity breadth unconfirmed by stable credit markets is mixed evidence."
+    },
+    {
+      "from": "vix",
+      "to": "hy_oas",
+      "type": "cross-market confirmation",
+      "explanation": "Equity option fear and credit compensation may jointly indicate risk aversion."
+    },
+    {
+      "from": "hy_oas",
+      "to": "ig_oas",
+      "type": "credit breadth",
+      "explanation": "Compare pressure across risky and higher-quality bonds."
+    },
+    {
+      "from": "hy_oas",
+      "to": "hy_spread_change_20d",
+      "type": "level versus momentum",
+      "explanation": "Trend can deteriorate before the absolute spread reaches a stress threshold."
+    },
+    {
+      "from": "kre_dd_3m",
+      "to": "cpff",
+      "type": "banks versus funding",
+      "explanation": "Bank equity weakness is stronger evidence if short-term funding also tightens."
+    },
+    {
+      "from": "kre_dd_3m",
+      "to": "nfci",
+      "type": "financial conditions",
+      "explanation": "Bank stress signals are more meaningful when financing conditions tighten."
+    },
+    {
+      "from": "curve_10y2y",
+      "to": "curve_10y3m",
+      "type": "term structure",
+      "explanation": "Curve measures offer related but not interchangeable business-cycle perspectives."
+    },
+    {
+      "from": "curve_10y3m",
+      "to": "sahm_rule",
+      "type": "leading versus confirming",
+      "explanation": "Curve inversions can lead by a long time; labour conditions provide nearer confirmation."
+    },
+    {
+      "from": "real_10y_yield",
+      "to": "spy_dd_1m",
+      "type": "valuation channel",
+      "explanation": "Higher real yields can pressure long-duration valuations, conditional on growth outlook."
+    },
+    {
+      "from": "cpi_yoy",
+      "to": "fed_funds",
+      "type": "policy response",
+      "explanation": "Inflation influences policy, but policy decisions respond to multiple objectives."
+    },
+    {
+      "from": "fed_funds",
+      "to": "real_10y_yield",
+      "type": "transmission",
+      "explanation": "Policy expectations influence yields but do not mechanically determine them."
+    },
+    {
+      "from": "oil_price",
+      "to": "cpi_yoy",
+      "type": "price pressure",
+      "explanation": "Energy shocks may transmit to inflation with uncertain magnitude and lag."
+    },
+    {
+      "from": "dollar_index",
+      "to": "hy_oas",
+      "type": "global financial conditions",
+      "explanation": "Dollar strength and credit spreads can jointly reveal tightening conditions."
+    },
+    {
+      "from": "initial_claims",
+      "to": "unemployment_rate",
+      "type": "labour confirmation",
+      "explanation": "Weekly claims may signal changes before slower unemployment releases."
+    },
+    {
+      "from": "advance_decline",
+      "to": "breadth",
+      "type": "equity participation cross-check",
+      "explanation": "Market-wide participation confirms or contradicts ETF relative performance."
+    },
+    {
+      "from": "pct_above_200dma",
+      "to": "breadth",
+      "type": "trend breadth",
+      "explanation": "Compare the number of stocks in uptrends with equal-weight relative performance."
+    },
+    {
+      "from": "vix_term_structure",
+      "to": "vix",
+      "type": "volatility structure",
+      "explanation": "Spot VIX and futures term structure jointly describe protection demand."
+    },
+    {
+      "from": "stlfsi4",
+      "to": "credit_stress",
+      "type": "component relationship",
+      "explanation": "Stress index already enters current composite: do not count as independent confirmation."
+    },
+    {
+      "from": "hy_oas",
+      "to": "credit_stress",
+      "type": "component relationship",
+      "explanation": "HY spread already contributes to current composite: do not count as independent evidence."
+    },
+    {
+      "from": "sahm_rule",
+      "to": "recession_risk",
+      "type": "component relationship",
+      "explanation": "Sahm already contributes to recession-risk composite: avoid double counting."
+    }
+  ]
+}
