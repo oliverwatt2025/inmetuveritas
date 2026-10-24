@@ -1,0 +1,344 @@
+{
+  "version": 1,
+  "stage": "design-only",
+  "asOf": "2026-10-22",
+  "principles": [
+    "Never label monthly/weekly source observations as fresh daily measurements.",
+    "Distinguish market signals, confirmations and composites.",
+    "Daily publication refreshes the analysis, not necessarily every underlying series.",
+    "No uncalibrated probability claims and no invented values.",
+    "Separate observed association from established causation."
+  ],
+  "indicators": [
+    {
+      "id": "breadth",
+      "label": "Equal-weight minus cap-weight S&P 500",
+      "category": "Market participation",
+      "implementation": "existing",
+      "source": "RSP/SPY 20-session relative return",
+      "frequency": "daily",
+      "role": "Confirmation",
+      "interpretation": "Narrow leadership can conceal index fragility."
+    },
+    {
+      "id": "spy_dd_1m",
+      "label": "S&P 500 one-month drawdown",
+      "category": "Market participation",
+      "implementation": "existing",
+      "source": "SPY closing prices",
+      "frequency": "daily",
+      "role": "Context",
+      "interpretation": "Measures index decline from a recent peak."
+    },
+    {
+      "id": "advance_decline",
+      "label": "NYSE advance-decline breadth",
+      "category": "Market participation",
+      "implementation": "planned",
+      "source": "Market breadth vendor / licensed exchange data",
+      "frequency": "daily",
+      "role": "Confirmation",
+      "interpretation": "Shows participation beyond a pair of equity ETFs."
+    },
+    {
+      "id": "pct_above_200dma",
+      "label": "Stocks above 200-day average",
+      "category": "Market participation",
+      "implementation": "planned",
+      "source": "Market breadth vendor / calculated constituent prices",
+      "frequency": "daily",
+      "role": "Leading/context",
+      "interpretation": "Share of stocks in long-term uptrends."
+    },
+    {
+      "id": "vix",
+      "label": "CBOE VIX",
+      "category": "Volatility",
+      "implementation": "existing",
+      "source": "FRED VIXCLS",
+      "frequency": "daily",
+      "role": "Fast confirmation",
+      "interpretation": "Options-implied near-term equity volatility."
+    },
+    {
+      "id": "vix_term_structure",
+      "label": "VIX near/long futures spread",
+      "category": "Volatility",
+      "implementation": "planned",
+      "source": "Cboe or licensed market data",
+      "frequency": "daily",
+      "role": "Fast confirmation",
+      "interpretation": "Backwardation can indicate immediate demand for protection."
+    },
+    {
+      "id": "realized_vol_spy",
+      "label": "S&P 500 realized volatility",
+      "category": "Volatility",
+      "implementation": "planned",
+      "source": "SPY closes (computed)",
+      "frequency": "daily",
+      "role": "Context",
+      "interpretation": "Observed recent price fluctuations; distinct from implied volatility."
+    },
+    {
+      "id": "hy_oas",
+      "label": "US high-yield option-adjusted spread",
+      "category": "Credit",
+      "implementation": "existing",
+      "source": "FRED BAMLH0A0HYM2",
+      "frequency": "business day",
+      "role": "Core confirmation",
+      "interpretation": "Compensation for lower-rated corporate credit risk."
+    },
+    {
+      "id": "ig_oas",
+      "label": "US investment-grade OAS",
+      "category": "Credit",
+      "implementation": "existing",
+      "source": "FRED BAMLC0A0CM",
+      "frequency": "business day",
+      "role": "Core confirmation",
+      "interpretation": "Pricing of investment-grade credit risk."
+    },
+    {
+      "id": "bbb_oas",
+      "label": "US BBB option-adjusted spread",
+      "category": "Credit",
+      "implementation": "component",
+      "source": "FRED BAMLC0A4CBBB",
+      "frequency": "business day",
+      "role": "Core confirmation",
+      "interpretation": "Watch the riskiest major investment-grade cohort."
+    },
+    {
+      "id": "hy_spread_change_20d",
+      "label": "20-day change in HY OAS",
+      "category": "Credit",
+      "implementation": "planned computed",
+      "source": "From existing HY OAS history",
+      "frequency": "daily",
+      "role": "Momentum",
+      "interpretation": "Credit deterioration can matter before absolute levels are extreme."
+    },
+    {
+      "id": "credit_stress",
+      "label": "Credit stress composite",
+      "category": "Credit",
+      "implementation": "existing",
+      "source": "Current dashboard composite",
+      "frequency": "daily",
+      "role": "Synthesis",
+      "interpretation": "Composite must expose constituent contributions and avoid double counting."
+    },
+    {
+      "id": "kre_dd_3m",
+      "label": "Regional bank ETF drawdown",
+      "category": "Banks & funding",
+      "implementation": "existing",
+      "source": "KRE closing prices",
+      "frequency": "daily",
+      "role": "Confirmation",
+      "interpretation": "Equity-market proxy for perceived regional-bank pressure."
+    },
+    {
+      "id": "stlfsi4",
+      "label": "St Louis Financial Stress Index",
+      "category": "Banks & funding",
+      "implementation": "component",
+      "source": "FRED STLFSI4",
+      "frequency": "weekly",
+      "role": "Confirmation",
+      "interpretation": "Broad financial stress gauge; cannot update on nonrelease days."
+    },
+    {
+      "id": "nfci",
+      "label": "Chicago Fed National Financial Conditions Index",
+      "category": "Banks & funding",
+      "implementation": "planned",
+      "source": "FRED NFCI",
+      "frequency": "weekly",
+      "role": "Context",
+      "interpretation": "Aggregate financing conditions across markets."
+    },
+    {
+      "id": "cpff",
+      "label": "Commercial paper–fed funds spread",
+      "category": "Banks & funding",
+      "implementation": "component",
+      "source": "FRED CPFF",
+      "frequency": "business day",
+      "role": "Funding confirmation",
+      "interpretation": "Stress in short-term private funding markets."
+    },
+    {
+      "id": "curve_10y2y",
+      "label": "US 10y minus 2y Treasury spread",
+      "category": "Rates & policy",
+      "implementation": "existing",
+      "source": "FRED T10Y2Y",
+      "frequency": "business day",
+      "role": "Cycle context",
+      "interpretation": "Shape of Treasury curve; regime matters more than a daily wiggle."
+    },
+    {
+      "id": "curve_10y3m",
+      "label": "US 10y minus 3m Treasury spread",
+      "category": "Rates & policy",
+      "implementation": "component",
+      "source": "FRED T10Y3M",
+      "frequency": "business day",
+      "role": "Cycle context",
+      "interpretation": "Term structure input to growth and recession assessment."
+    },
+    {
+      "id": "fed_funds",
+      "label": "Effective federal funds rate",
+      "category": "Rates & policy",
+      "implementation": "planned",
+      "source": "FRED DFF",
+      "frequency": "business day",
+      "role": "Context",
+      "interpretation": "Current short-term policy rate."
+    },
+    {
+      "id": "real_10y_yield",
+      "label": "10-year TIPS real yield",
+      "category": "Rates & policy",
+      "implementation": "planned",
+      "source": "FRED DFII10",
+      "frequency": "business day",
+      "role": "Valuation pressure",
+      "interpretation": "Changes in real yields affect long-duration asset valuations."
+    },
+    {
+      "id": "cpi_yoy",
+      "label": "CPI annual inflation",
+      "category": "Inflation",
+      "implementation": "planned computed",
+      "source": "FRED CPIAUCSL",
+      "frequency": "monthly",
+      "role": "Macro context",
+      "interpretation": "Rolling annual inflation; monthly release not daily measurement."
+    },
+    {
+      "id": "core_pce_yoy",
+      "label": "Core PCE annual inflation",
+      "category": "Inflation",
+      "implementation": "planned computed",
+      "source": "FRED PCEPILFE",
+      "frequency": "monthly",
+      "role": "Macro context",
+      "interpretation": "Underlying consumer inflation measure watched by the Fed."
+    },
+    {
+      "id": "breakeven_10y",
+      "label": "10-year inflation expectations proxy",
+      "category": "Inflation",
+      "implementation": "planned",
+      "source": "FRED T10YIE",
+      "frequency": "business day",
+      "role": "Context",
+      "interpretation": "Market-implied inflation compensation; includes risk premia."
+    },
+    {
+      "id": "ism_manufacturing",
+      "label": "ISM manufacturing PMI",
+      "category": "Growth & labour",
+      "implementation": "planned",
+      "source": "Licensed ISM publication, not assumed freely redistributable",
+      "frequency": "monthly",
+      "role": "Leading/context",
+      "interpretation": "Manufacturing survey; source and redistribution rights to confirm."
+    },
+    {
+      "id": "unemployment_rate",
+      "label": "US unemployment rate",
+      "category": "Growth & labour",
+      "implementation": "planned",
+      "source": "FRED UNRATE",
+      "frequency": "monthly",
+      "role": "Cycle context",
+      "interpretation": "Labour-market slack, with release lag."
+    },
+    {
+      "id": "sahm_rule",
+      "label": "Sahm Rule real-time recession indicator",
+      "category": "Growth & labour",
+      "implementation": "component",
+      "source": "FRED SAHMREALTIME",
+      "frequency": "monthly",
+      "role": "Cycle confirmation",
+      "interpretation": "Unemployment-based recession signal; not a daily forecast."
+    },
+    {
+      "id": "initial_claims",
+      "label": "Initial unemployment claims",
+      "category": "Growth & labour",
+      "implementation": "planned",
+      "source": "FRED ICSA",
+      "frequency": "weekly",
+      "role": "Leading/context",
+      "interpretation": "Higher-frequency labour market deterioration."
+    },
+    {
+      "id": "recession_risk",
+      "label": "Recession-risk composite",
+      "category": "Growth & labour",
+      "implementation": "existing",
+      "source": "Current dashboard composite",
+      "frequency": "daily output, mixed-age inputs",
+      "role": "Synthesis",
+      "interpretation": "A model score, not an empirical probability unless calibrated."
+    },
+    {
+      "id": "money_market_assets",
+      "label": "Money-market mutual fund assets",
+      "category": "Liquidity & positioning",
+      "implementation": "planned",
+      "source": "FRED WRMFNS / relevant release (verify before implementation)",
+      "frequency": "weekly",
+      "role": "Context",
+      "interpretation": "Cash parked in money-market funds is not itself a buy signal."
+    },
+    {
+      "id": "fed_balance_sheet",
+      "label": "Federal Reserve assets",
+      "category": "Liquidity & positioning",
+      "implementation": "planned",
+      "source": "FRED WALCL",
+      "frequency": "weekly",
+      "role": "Context",
+      "interpretation": "Central bank balance-sheet size; not a stand-alone liquidity measure."
+    },
+    {
+      "id": "dollar_index",
+      "label": "Broad trade-weighted US dollar",
+      "category": "FX & commodities",
+      "implementation": "planned",
+      "source": "FRED DTWEXBGS",
+      "frequency": "business day",
+      "role": "Transmission",
+      "interpretation": "A stronger dollar can tighten some global financial conditions."
+    },
+    {
+      "id": "gold_price",
+      "label": "Gold price",
+      "category": "FX & commodities",
+      "implementation": "planned",
+      "source": "Selected market vendor; license/source to verify",
+      "frequency": "daily",
+      "role": "Context",
+      "interpretation": "Safe-haven demand, real yields and FX all influence gold."
+    },
+    {
+      "id": "oil_price",
+      "label": "WTI crude oil price",
+      "category": "FX & commodities",
+      "implementation": "planned",
+      "source": "FRED DCOILWTICO",
+      "frequency": "business day",
+      "role": "Context",
+      "interpretation": "Commodity input into inflation and economic conditions."
+    }
+  ]
+}
