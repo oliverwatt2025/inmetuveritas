@@ -67,9 +67,25 @@ def choose_with_ai(report, bank, token, account_id):
         obj=json.load(resp)
     if not obj.get("success") or not isinstance(obj.get("result"),dict):
         raise ValueError("CLOUDFLARE_RESPONSE_ERROR")
-    raw=obj["result"].get("response")
-    if not isinstance(raw,str):
-        raise ValueError("CLOUDFLARE_NO_TEXT")
+    result=obj["result"]
+    raw=result.get("response")
+    if not isinstance(raw,str) or not raw.strip():
+        # Some Cloudflare models return OpenAI-style chat choices, or
+        # structured response content in a different top-level field.
+        choices=result.get("choices")
+        if isinstance(choices,list) and choices:
+            first=choices[0]
+            if isinstance(first,dict):
+                message=first.get("message")
+                if isinstance(message,dict):
+                    raw=message.get("content")
+                if not isinstance(raw,str):
+                    raw=first.get("text")
+    if not isinstance(raw,str) or not raw.strip():
+        # Do not print model output or secrets. Keys alone reveal the response shape.
+        fields=",".join(sorted(k for k in result if isinstance(k,str) and k in (
+            "response","choices","output","result","usage","prompt","text","messages")))
+        raise ValueError("CLOUDFLARE_NO_TEXT_FIELDS:"+fields)
     # Some smaller models wrap JSON in markdown code fences. Unwrap only
     # fences; the decoded object still must contain ONLY allowlisted IDs.
     clean=raw.strip()
