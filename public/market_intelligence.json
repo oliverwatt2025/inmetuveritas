@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "sourceAsOf": "2026-10-24T17:10:04Z",
-  "generatedAt": "2026-10-24T17:10:12.352656Z",
+  "sourceAsOf": "2026-10-24T17:31:48Z",
+  "generatedAt": "2026-10-24T17:31:55.804558Z",
   "dataAgeHours": 0.0,
   "dataQuality": "CURRENT",
   "regime": "NO BROAD STRESS CONFIRMATION",
@@ -83,7 +83,7 @@
     {
       "indicator": "hy_oas",
       "headline": "High-yield credit spread is historically elevated",
-      "explanation": "High-yield credit spread sits at the 85.3th percentile of 787 available dated observations from 2023-10-23 to 2026-10-22; this suggests more caution than the history median.",
+      "explanation": "High-yield credit spread has percentile rank 85.3 among 787 available dated observations from 2023-10-23 to 2026-10-22; this suggests more caution than the history median.",
       "percentile": 85.3,
       "fromDate": "2023-10-23",
       "toDate": "2026-10-22",
@@ -92,7 +92,7 @@
     {
       "indicator": "breadth",
       "headline": "Equal-weight market breadth is historically elevated",
-      "explanation": "Equal-weight market breadth sits at the 98.6th percentile of 1235 available dated observations from 2021-11-22 to 2026-10-23; this suggests supportive participation relative to its history.",
+      "explanation": "Equal-weight market breadth has percentile rank 98.6 among 1235 available dated observations from 2021-11-22 to 2026-10-23; this suggests supportive participation relative to its history.",
       "percentile": 98.6,
       "fromDate": "2021-11-22",
       "toDate": "2026-10-23",
@@ -100,7 +100,7 @@
     }
   ],
   "divergences": [
-    "High-yield spreads remain below the absolute 400 bp watch threshold, but are at the 85.3th percentile of observations from 2023-10-23 to 2026-10-22. The level looks contained, but its historical position merits monitoring.",
+    "High-yield spreads remain below the absolute 400 bp watch threshold, but have percentile rank 85.3 among observations from 2023-10-23 to 2026-10-22. The level looks contained, but its historical position merits monitoring.",
     "Broad equal-weight outperformance is unusual in the observed sample; this is supportive participation, not evidence by itself of lower future volatility."
   ],
   "keyFindings": [
@@ -115,7 +115,7 @@
           "indicator": "breadth",
           "value": 4.0,
           "unit": "%",
-          "observedAt": "2026-10-24T17:10:04Z"
+          "observedAt": "2026-10-24T17:31:48Z"
         }
       ]
     },
@@ -130,13 +130,13 @@
           "indicator": "hy_oas",
           "value": 340.0,
           "unit": " bp",
-          "observedAt": "2026-10-24T17:10:04Z"
+          "observedAt": "2026-10-24T17:31:48Z"
         },
         {
           "indicator": "ig_oas",
           "value": 89.0,
           "unit": " bp",
-          "observedAt": "2026-10-24T17:10:04Z"
+          "observedAt": "2026-10-24T17:31:48Z"
         }
       ]
     },
@@ -151,7 +151,7 @@
           "indicator": "vix",
           "value": 19.0,
           "unit": "",
-          "observedAt": "2026-10-24T17:10:04Z"
+          "observedAt": "2026-10-24T17:31:48Z"
         }
       ]
     }
@@ -171,7 +171,7 @@
   ],
   "editorialCommentary": {
     "mode": "RULE_BASED",
-    "sourceAsOf": "2026-10-24T17:10:04Z",
+    "sourceAsOf": "2026-10-24T17:31:48Z",
     "evidenceIds": [
       "finding:broad_participation",
       "finding:credit_contained",
