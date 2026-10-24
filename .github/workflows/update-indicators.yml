@@ -34,7 +34,7 @@ jobs:
           python3 scripts/update_indicators.py
 
       - name: Validate intelligence engine
-        run: python3 -m unittest discover -s tests -p 'test_intelligence.py' -v
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
 
       - name: Refresh dated five-year observations (preserve existing data on feed failures)
         continue-on-error: true
