@@ -8,6 +8,7 @@ fallback is deterministic. No API credentials are written to files.
 import json
 import os
 import urllib.request
+import re
 from pathlib import Path
 
 PATH = Path(__file__).resolve().parents[1] / "public" / "market_intelligence.json"
@@ -65,12 +66,23 @@ def choose_with_ai(report, bank, token, account_id):
     with urllib.request.urlopen(req,timeout=35) as resp:
         obj=json.load(resp)
     if not obj.get("success") or not isinstance(obj.get("result"),dict):
-        raise ValueError("Cloudflare AI returned unsuccessful response")
+        raise ValueError("CLOUDFLARE_RESPONSE_ERROR")
     raw=obj["result"].get("response")
     if not isinstance(raw,str):
-        raise ValueError("Cloudflare AI returned no text")
-    # Reject any surrounding prose: only JSON containing the approved IDs passes.
-    return validate_selection(json.loads(raw.strip()),bank)
+        raise ValueError("CLOUDFLARE_NO_TEXT")
+    # Some smaller models wrap JSON in markdown code fences. Unwrap only
+    # fences; the decoded object still must contain ONLY allowlisted IDs.
+    clean=raw.strip()
+    match=re.fullmatch(r"```(?:json)?\\s*(\\{[\\s\\S]*\\})\\s*```",clean,re.IGNORECASE)
+    if match: clean=match.group(1)
+    try:
+        selection=json.loads(clean)
+    except json.JSONDecodeError as exc:
+        raise ValueError("NON_JSON_MODEL_RESPONSE") from exc
+    try:
+        return validate_selection(selection,bank)
+    except ValueError as exc:
+        raise ValueError("INVALID_EVIDENCE_SELECTION") from exc
 
 def add_commentary(report, ai_key=None, account_id=None):
     bank=evidence_bank(report)
@@ -86,7 +98,7 @@ def add_commentary(report, ai_key=None, account_id=None):
             selected=choose_with_ai(report,bank,ai_key,account_id)
             mode="AI_CURATED"
         except Exception as exc:
-            print("AI selection unavailable; retaining verified fallback (error type):",type(exc).__name__)
+            print("AI selection unavailable; retaining verified fallback:",str(exc) if isinstance(exc,ValueError) else type(exc).__name__)
     report["editorialCommentary"]=render_commentary(report,selected,bank,mode)
     return report
 
