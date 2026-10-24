@@ -90,6 +90,7 @@ type IntelligenceReport = {
   historicalContext?: Array<{indicator:string;percentile:number;observationCount:number;fromDate:string;toDate:string;interpretation:string}>;
   historicalFindings?: Array<{indicator:string; headline:string; explanation:string;percentile:number}>;
   divergences?: string[];
+  editorialCommentary?: {mode:string; sourceAsOf:string; evidenceIds:string[]; paragraphs:string[]; disclaimer:string};
   whatWouldChangeTheView: string[]; methodology?: string;
 };
 
@@ -147,6 +148,11 @@ function IntelligencePanels({ report }: { report: IntelligenceReport | null }) {
           {!!report.divergences?.length && <div className="intelligenceDivergences">
             <strong>WHERE SIGNALS DISAGREE</strong>
             {report.divergences.map((message, i) => <p key={i}>{message}</p>)}
+          </div>}
+          {!!report.editorialCommentary?.paragraphs?.length && <div className="intelligenceEditorial">
+            <strong>DAILY EVIDENCE BRIEF</strong>
+            <small>{report.editorialCommentary.mode === "AI_CURATED" ? "AI-prioritised verified evidence" : "Rule-based verified evidence"}</small>
+            {report.editorialCommentary.paragraphs.map((paragraph, i) => <p key={report.editorialCommentary!.evidenceIds[i] ?? i}>{paragraph}</p>)}
           </div>}
           <div className="intelligenceEvidence">
             {findings.slice(0, 4).map(f => (
