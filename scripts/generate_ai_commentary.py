@@ -28,6 +28,34 @@ def evidence_bank(report):
             bank["divergence:"+str(i)]=explanation
     return bank
 
+def evidence_theme(evidence_id):
+    """Related evidence should not occupy several slots in one brief."""
+    if evidence_id in ("historical:hy_oas", "divergence:0", "finding:credit_contained",
+                       "finding:credit_pressure", "historical:ig_oas"):
+        return "credit"
+    if evidence_id in ("historical:breadth", "divergence:1",
+                       "finding:broad_participation", "finding:narrow_leadership"):
+        return "participation"
+    if evidence_id.startswith("finding:volatility") or evidence_id == "historical:vix":
+        return "volatility"
+    if evidence_id == "historical:curve_10y2y": return "rates"
+    if evidence_id == "historical:kre_dd_3m" or evidence_id == "finding:regional_banks_weak":
+        return "banks"
+    return evidence_id
+
+
+def select_diverse(selected, bank, limit=3):
+    chosen=[]
+    themes=set()
+    for evidence_id in list(selected)+list(bank):
+        theme=evidence_theme(evidence_id)
+        if evidence_id in bank and theme not in themes:
+            chosen.append(evidence_id)
+            themes.add(theme)
+            if len(chosen)>=limit: break
+    return chosen
+
+
 def validate_selection(selection, bank):
     if not isinstance(selection,dict) or set(selection)!={"selected_ids"}:
         raise ValueError("Unexpected AI response structure")
@@ -38,7 +66,7 @@ def validate_selection(selection, bank):
         raise ValueError("Unrecognised evidence ID")
     if len(set(selected))!=len(selected):
         raise ValueError("Repeated evidence ID")
-    return selected
+    return select_diverse(selected,bank)
 
 def render_commentary(report, selected, bank, mode):
     # Exact statements come from verified deterministic calculations.
@@ -107,7 +135,7 @@ def add_commentary(report, ai_key=None, account_id=None):
                                        "evidenceIds":[],"paragraphs":[],
                                        "disclaimer":"No current verified evidence for a commentary."}
         return report
-    selected=list(bank)[:3]
+    selected=select_diverse(list(bank),bank)
     mode="RULE_BASED"
     if ai_key and account_id:
         try:
