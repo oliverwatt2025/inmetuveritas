@@ -45,6 +45,11 @@ jobs:
       - name: Generate daily market intelligence
         run: python3 scripts/generate_intelligence.py
 
+      - name: Select evidence-backed daily commentary (AI optional)
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python3 scripts/generate_ai_commentary.py
+
       - name: Validate generated report
         run: python3 -m json.tool public/market_intelligence.json > /dev/null
 
