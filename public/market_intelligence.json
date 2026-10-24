@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "sourceAsOf": "2026-10-24T17:50:02Z",
-  "generatedAt": "2026-10-24T17:50:12.214353Z",
+  "sourceAsOf": "2026-10-24T18:00:01Z",
+  "generatedAt": "2026-10-24T18:00:45.895119Z",
   "dataAgeHours": 0.0,
   "dataQuality": "CURRENT",
   "regime": "NO BROAD STRESS CONFIRMATION",
@@ -115,7 +115,7 @@
           "indicator": "breadth",
           "value": 4.0,
           "unit": "%",
-          "observedAt": "2026-10-24T17:50:02Z"
+          "observedAt": "2026-10-24T18:00:01Z"
         }
       ]
     },
@@ -130,13 +130,13 @@
           "indicator": "hy_oas",
           "value": 340.0,
           "unit": " bp",
-          "observedAt": "2026-10-24T17:50:02Z"
+          "observedAt": "2026-10-24T18:00:01Z"
         },
         {
           "indicator": "ig_oas",
           "value": 89.0,
           "unit": " bp",
-          "observedAt": "2026-10-24T17:50:02Z"
+          "observedAt": "2026-10-24T18:00:01Z"
         }
       ]
     },
@@ -151,7 +151,7 @@
           "indicator": "vix",
           "value": 19.0,
           "unit": "",
-          "observedAt": "2026-10-24T17:50:02Z"
+          "observedAt": "2026-10-24T18:00:01Z"
         }
       ]
     }
@@ -170,17 +170,17 @@
     "Historical percentiles use only the actual stored date range and may be shorter than five years."
   ],
   "editorialCommentary": {
-    "mode": "RULE_BASED",
-    "sourceAsOf": "2026-10-24T17:50:02Z",
+    "mode": "AI_CURATED",
+    "sourceAsOf": "2026-10-24T18:00:01Z",
     "evidenceIds": [
-      "finding:broad_participation",
-      "finding:credit_contained",
-      "finding:volatility_calm"
+      "historical:hy_oas",
+      "divergence:0",
+      "divergence:1"
     ],
     "paragraphs": [
-      "Equal-weight participation is supportive. Equal-weight equities have outperformed the cap-weighted benchmark over the measurement window.",
-      "Corporate credit spreads remain contained. Both investment-grade and high-yield spreads are below the defined watch thresholds.",
-      "Options markets imply relatively calm conditions. VIX is below the defined watch threshold."
+      "High-yield credit spread has percentile rank 85.3 among 787 available dated observations from 2023-10-23 to 2026-10-22; this suggests more caution than the history median.",
+      "High-yield spreads remain below the absolute 400 bp watch threshold, but have percentile rank 85.3 among observations from 2023-10-23 to 2026-10-22. The level looks contained, but its historical position merits monitoring.",
+      "Broad equal-weight outperformance is unusual in the observed sample; this is supportive participation, not evidence by itself of lower future volatility."
     ],
     "disclaimer": "An evidence selection, not a prediction. Interpretations use provisional thresholds."
   }

@@ -1,5 +1,5 @@
 {
-  "asOf": "2026-10-24T17:50:02Z",
+  "asOf": "2026-10-24T18:00:01Z",
   "cards": [
     {
       "id": "vix",
@@ -14,7 +14,7 @@
       "midLabel": "20",
       "maxLabel": "40",
       "tooltip": "CBOE VIX close from FRED (VIXCLS). Higher = riskier.",
-      "updatedAt": "2026-10-24T17:50:02Z"
+      "updatedAt": "2026-10-24T18:00:01Z"
     },
     {
       "id": "hy_oas",
@@ -29,7 +29,7 @@
       "midLabel": "500",
       "maxLabel": "800",
       "tooltip": "HY OAS from FRED (ICE BofA). Higher = tighter financial conditions / more stress.",
-      "updatedAt": "2026-10-24T17:50:02Z"
+      "updatedAt": "2026-10-24T18:00:01Z"
     },
     {
       "id": "ig_oas",
@@ -44,7 +44,7 @@
       "midLabel": "180",
       "maxLabel": "300",
       "tooltip": "IG OAS from FRED (ICE BofA). Higher = tighter conditions / credit stress.",
-      "updatedAt": "2026-10-24T17:50:02Z"
+      "updatedAt": "2026-10-24T18:00:01Z"
     },
     {
       "id": "curve_10y2y",
@@ -59,7 +59,7 @@
       "midLabel": "0",
       "maxLabel": "200",
       "tooltip": "10Y\u20132Y spread from FRED. More negative (inversion) = growth risk signal.",
-      "updatedAt": "2026-10-24T17:50:02Z"
+      "updatedAt": "2026-10-24T18:00:01Z"
     },
     {
       "id": "spy_dd_1m",
@@ -74,7 +74,7 @@
       "midLabel": "-10%",
       "maxLabel": "0%",
       "tooltip": "SPY drawdown from 1M peak (21 trading days). More negative = risk-off.",
-      "updatedAt": "2026-10-24T17:50:02Z"
+      "updatedAt": "2026-10-24T18:00:01Z"
     },
     {
       "id": "breadth",
@@ -89,7 +89,7 @@
       "midLabel": "Neutral",
       "maxLabel": "Broad",
       "tooltip": "Equal-weight S&P (RSP) minus S&P 500 (SPY) 20-day return. Negative = narrow rally.",
-      "updatedAt": "2026-10-24T17:50:02Z"
+      "updatedAt": "2026-10-24T18:00:01Z"
     },
     {
       "id": "kre_dd_3m",
@@ -104,7 +104,7 @@
       "midLabel": "-15%",
       "maxLabel": "0%",
       "tooltip": "KRE drawdown from 3M peak (63 trading days). More negative = bank stress proxy.",
-      "updatedAt": "2026-10-24T17:50:02Z"
+      "updatedAt": "2026-10-24T18:00:01Z"
     },
     {
       "id": "recession_risk",
@@ -148,7 +148,7 @@
           "cap_applied": true
         }
       },
-      "updatedAt": "2026-10-24T17:50:02Z"
+      "updatedAt": "2026-10-24T18:00:01Z"
     },
     {
       "id": "credit_stress",
@@ -165,8 +165,8 @@
       "tooltip": "Composite credit stress dial (0\u2013100, percentile-based). Blend of HY/BBB spreads, HY\u2013IG repricing, CPFF funding stress, STLFSI4 and NFCIRISK. Adds a small kicker when HY spreads widen rapidly.",
       "details": {
         "raw": 72.04124507573981,
-        "smoothed": 69.60824901514796,
-        "prev": 69.0,
+        "smoothed": 70.40824901514796,
+        "prev": 70.0,
         "components": {
           "hy_oas": {
             "series": "BAMLH0A0HYM2",
@@ -213,7 +213,7 @@
           }
         }
       },
-      "updatedAt": "2026-10-24T17:50:02Z"
+      "updatedAt": "2026-10-24T18:00:01Z"
     }
   ]
 }
