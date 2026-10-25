@@ -100,15 +100,15 @@ export function ConfirmationMatrix({ report }: { report: Report | null }) {
           className={`confirmArea confirm-${area.state} ${selected===area.id?"confirmSelected":""}`}>
           <span className="confirmDot" aria-hidden="true"/>
           <span className="confirmAreaText"><strong>{area.title}</strong><small>{area.description}</small></span>
-          <span className="confirmStatus">{LABELS[area.state]}{trendFor(area.id,history,5) && <small className="confirmTrendTiny">{trendFor(area.id,history,5)!.label} · 5 sessions</small>}</span>
+          <span className="confirmStatus"><span className="confirmLevel">Level: {LABELS[area.state]}</span>{trendFor(area.id,history,5) && <small className="confirmTrendTiny">Trend: {trendFor(area.id,history,5)!.label} · 5 sessions</small>}</span>
         </button>)}
       </div>
       <article className="confirmExplanation" aria-live="polite">
-        <div className="confirmDetailTop"><span>SELECTED MARKET AREA</span><strong>{LABELS[current.state]}</strong></div>
+        <div className="confirmDetailTop"><span>SELECTED MARKET AREA</span><strong>Current level: {LABELS[current.state]}</strong></div>
         <h3>{current.title}</h3>
         <p>{current.description}</p>
         {current.id==="credit" && creditMixed && <p className="confirmCaveat">Mixed evidence: HY spreads remain below the absolute watch threshold, but the same report places HY OAS at the {creditHistory!.percentile.toFixed(1)}th percentile among {creditHistory!.observationCount} observations ({creditHistory!.fromDate} to {creditHistory!.toDate}). Relative position is not a crash probability.</p>}
-        <div className="confirmTrends"><strong>DIRECTION OF TRAVEL · HISTORICAL OBSERVATIONS</strong>
+        <div className="confirmTrends"><strong>DIRECTION OF TRAVEL · HISTORICAL OBSERVATIONS</strong><p className="confirmTrendClarifier">Current level and direction of travel are separate assessments. A supportive level can still be deteriorating; trends do not automatically override the level classification.</p>
           {[{title:"5 sessions",trend:five},{title:"20 sessions",trend:twenty}].map(x=><div key={x.title}>
             <span>{x.title}</span><b>{x.trend?x.trend.label:"Insufficient history"}</b>
             <small>{x.trend?`${x.trend.delta>0?"+":""}${x.trend.delta.toFixed(1)} ${x.trend.unit} · ${x.trend.fromDate} → ${x.trend.toDate}`:"No dated comparison"}</small>
