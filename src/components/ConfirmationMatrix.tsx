@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "./ConfirmationMatrix.css";
 
 type Finding = { id: string; family: string; severity: string; headline: string; explanation: string };
-type Historical = {indicator: string; value: number; percentile: number; observationCount: number; fromDate: string; toDate: string};
+type Historical = {indicator: string; value?: number; percentile: number; observationCount: number; fromDate: string; toDate: string};
 type Report = { sourceAsOf: string; dataQuality: string; regime: string; keyFindings: Finding[]; divergences?: string[]; historicalContext?: Historical[] };
 type HistoryPoint = {date:string; [indicator:string]: string|number|undefined};
 type Trend = {label:string; delta:number; fromDate:string; toDate:string; unit:string};
@@ -22,10 +22,8 @@ function evidenceAreas(report: Report | null): Area[] {
     const evidence = verified.filter(item => item.family === group.id);
     const concern = evidence.some(item => item.severity === "attention");
     const supportive = evidence.some(item => item.severity === "supportive");
-    return {
-      ...group, evidence,
-      state: concern && supportive ? "mixed" : concern ? "attention" : supportive ? "supportive" : "unassessed",
-    };
+    const state: Area["state"] = concern && supportive ? "mixed" : concern ? "attention" : supportive ? "supportive" : "unassessed";
+    return { ...group, evidence, state };
   });
 }
 
@@ -56,7 +54,7 @@ export function ConfirmationMatrix({ report }: { report: Report | null }) {
     let cancelled=false;
     fetch("/history_5y.ndjson").then(r=>{if(!r.ok) throw Error("History unavailable");return r.text()})
       .then(raw=>{
-        const rows=raw.trim().split("\\n").flatMap(line=>{try {return [JSON.parse(line) as HistoryPoint]} catch {return []}});
+        const rows=raw.trim().split("\n").flatMap(line=>{try {return [JSON.parse(line) as HistoryPoint]} catch {return []}});
         rows.sort((a,b)=>a.date.localeCompare(b.date));
         if(!cancelled) setHistory(rows);
       }).catch(()=>{if(!cancelled)setHistory([])});
