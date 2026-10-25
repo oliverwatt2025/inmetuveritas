@@ -28,3 +28,13 @@
 .relationshipFooter{font-size:11px;color:#9eabb6;margin-top:15px;line-height:1.5}
 @media(max-width:980px){.relationshipLayout{grid-template-columns:1fr}.relationshipMapHeader{align-items:start}}
 @media(max-width:650px){.relationshipMap{padding:15px}.relationshipMapHeader{flex-direction:column}.relationshipLegend{max-width:none}.relationshipCanvas svg{min-height:210px}.relationshipDetails{padding:15px}}
+
+.relationshipSvgControl{cursor:pointer;outline:none}
+.relationshipSvgControl:focus-visible circle{stroke:#fff1c9;stroke-width:5px}
+.relationshipSvgControl:focus-visible line:last-child{stroke:#fff1c9;stroke-width:5px}
+.relationshipPaired{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:18px 0}
+.relationshipPaired button{border:1px solid #6d654f;border-radius:9px;background:#172531;color:#e9d4aa;text-align:left;cursor:pointer;padding:12px}
+.relationshipPaired strong,.relationshipPaired span{display:block;font-size:11px}
+.relationshipPaired span{color:#bbc8d0;margin-top:7px}
+.relationshipBack{border:1px solid #b69a67;background:#342d22;color:#f0dfbd;border-radius:9px;padding:10px 13px;cursor:pointer;margin-top:6px}
+.relationshipBack:focus-visible,.relationshipPaired button:focus-visible{outline:2px solid #e5c88d;outline-offset:3px}
