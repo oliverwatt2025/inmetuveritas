@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { correlationFor, PROXIES } from "./historicalCorrelation";
+import type { HistoricalRow } from "./historicalCorrelation";
 import "./RelationshipMap.css";
 
 type Finding={id:string;family:string;severity:string;headline:string;explanation:string};
@@ -41,6 +43,17 @@ function relationship(a:Status,b:Status):"agree"|"diverge"|"insufficient"{
 export function RelationshipMap({report}:{report:Report|null}){
  const [focus,setFocus]=useState("credit");
  const [selectedEdge,setSelectedEdge]=useState<string|null>(null);
+ const [history,setHistory]=useState<HistoricalRow[]>([]);
+ const [historyError,setHistoryError]=useState(false);
+ useEffect(()=>{
+  let cancelled=false;
+  fetch("/history_5y.ndjson").then(r=>{if(!r.ok)throw new Error("History unavailable");return r.text()})
+  .then(raw=>{
+   const rows=raw.trim().split("\n").flatMap(line=>{try{return [JSON.parse(line) as HistoricalRow]}catch{return []}});
+   if(!cancelled){setHistory(rows);setHistoryError(false)}
+  }).catch(()=>{if(!cancelled){setHistory([]);setHistoryError(true)}});
+  return ()=>{cancelled=true};
+ },[]);
  const chooseNode=(id:string)=>{setFocus(id);setSelectedEdge(null)};
  const chooseEdge=(id:string)=>setSelectedEdge(id);
  const chosen=NODES.find(n=>n.id===focus)||NODES[1];
@@ -49,6 +62,8 @@ export function RelationshipMap({report}:{report:Report|null}){
  const activeEdge=EDGES.find(e=>e.a+"-"+e.b===selectedEdge);
  const edgeNodes=activeEdge?[NODES.find(n=>n.id===activeEdge.a)!,NODES.find(n=>n.id===activeEdge.b)!]:null;
  const edgeAssessment=activeEdge?relationship(nodeState[activeEdge.a],nodeState[activeEdge.b]):null;
+ const corr60=activeEdge?correlationFor(history,activeEdge.a,activeEdge.b,60):null;
+ const corr252=activeEdge?correlationFor(history,activeEdge.a,activeEdge.b,252):null;
  const finding=(report?.dataQuality==="CURRENT"?report.keyFindings:[])?.filter(f=>f.family===chosen.id)||[];
  const hy=chosen.id==="credit"?report?.historicalContext?.find(x=>x.indicator==="hy_oas"):undefined;
  return <section className="relationshipMap" aria-label="Financial system relationship map">
@@ -108,6 +123,16 @@ export function RelationshipMap({report}:{report:Report|null}){
       <div className="relationshipPaired">
         {edgeNodes.map(n=><button type="button" key={n.id} onClick={()=>chooseNode(n.id)}><strong>{n.name}</strong><span>{LABEL[nodeState[n.id]]}</span></button>)}
       </div>
+      <h4>Observed historical relationship</h4>
+      <div className="relationshipCorrelations">
+       {[{title:"Recent 60 paired changes",value:corr60},{title:"Up to 252 paired changes",value:corr252}].map(item=><div key={item.title}>
+        <span>{item.title}</span>
+        <strong>{item.value?item.value.value.toFixed(2):"Not enough data"}</strong>
+        <small>{item.value?`Pearson r · ${item.value.count} paired daily changes · ${item.value.firstDate} to ${item.value.lastDate}`:"At least 40 valid consecutive paired changes needed"}</small>
+       </div>)}
+      </div>
+      {historyError&&<p className="relationshipCaution">Historical file could not be loaded; no measured relationship is available.</p>}
+      <p className="relationshipProxyNote">Compared: {PROXIES[activeEdge.a].description} versus {PROXIES[activeEdge.b].description}. Values are daily changes in indicators, not correlations between investment returns. Rolling drawdown and breadth proxies overlap across days.</p>
       <h4>Why this connection matters</h4><p>{activeEdge.why}</p>
       <h4>What would strengthen confirmation?</h4>
       <p>{edgeAssessment==="insufficient"?"Independent, current verified observations for both market areas are needed before interpreting their agreement.":edgeAssessment==="diverge"?"Watch for sustained changes that bring both markets into agreement. For credit and volatility, widening spreads together with a persistent VIX increase would offer stronger stress confirmation.":"The current classifications agree, but confirmation should be checked against the next observations and the direction of travel; agreement is not a forecast."}</p>
@@ -133,6 +158,6 @@ export function RelationshipMap({report}:{report:Report|null}){
     </>}
    </aside>
   </div>
-  <footer className="relationshipFooter">Research prototype · Only validated market findings determine node classifications. Links are explanatory hypotheses from the research catalogue, not measured causal dependencies. No composite forecast or probability is calculated.</footer>
+  <footer className="relationshipFooter">Research prototype · Node colours reflect verified present-day classifications, while selected connections show independently calculated historical Pearson correlations. Correlation is not causation, and overlapping rolling proxies can distort readings. No predictive probability is calculated.</footer>
  </section>;
 }
