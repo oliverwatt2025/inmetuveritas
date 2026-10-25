@@ -33,3 +33,12 @@
 .confirmTrends>div{display:grid;grid-template-columns:80px 1fr;gap:3px 12px;padding:8px 0;border-top:1px solid rgba(255,255,255,.09);font-size:12px}
 .confirmTrends>div b{color:#f0dfba}.confirmTrends>div small{grid-column:2;color:rgba(255,255,255,.6)}
 .confirmTrends>small{color:rgba(255,255,255,.5);line-height:1.5;display:block;margin-top:9px}
+
+/* Compact the five market choices without sacrificing accessible targets. */
+.confirmAreas{gap:7px;align-content:start}
+.confirmArea{padding:11px 13px;min-height:72px}
+.confirmAreaText small{margin-top:2px}
+.confirmStatus{text-align:right;line-height:1.45}
+.confirmLevel{display:block;font-weight:600}
+.confirmTrendClarifier{font-size:11px!important;line-height:1.55!important;color:rgba(255,255,255,.67)!important;margin:4px 0 11px!important}
+@media(max-width:570px){.confirmArea{min-height:70px;padding:11px}.confirmStatus{text-align:left}}
