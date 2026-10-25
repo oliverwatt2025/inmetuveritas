@@ -42,7 +42,6 @@ function trendFor(area:string, history:HistoryPoint[], lookback:number): Trend|n
   if(series.length<=lookback) return null;
   const last=series[series.length-1], prior=series[series.length-1-lookback];
   const delta=(last[cfg.field] as number)-(prior[cfg.field] as number);
-  const signed=delta>0?"+":"";
   const riskMove=(cfg.moreIsRisk?1:-1)*delta;
   const label=Math.abs(delta)<(cfg.field==="vix"?0.5:cfg.field==="breadth"?0.5:cfg.field==="kre_dd_3m"?1:3)
     ?"Broadly stable":riskMove>0?"Deteriorating":"Improving";
@@ -66,13 +65,14 @@ export function ConfirmationMatrix({ report }: { report: Report | null }) {
   const [selected,setSelected] = useState("credit");
   const current = areas.find(area => area.id === selected) || areas[0];
   const assessed = areas.filter(x=>x.state!=="unassessed");
-  const concerns = assessed.filter(x=>x.state==="attention").length;
   const five = trendFor(current.id,history,5), twenty=trendFor(current.id,history,20);
   const creditHistory=report?.historicalContext?.find(x=>x.indicator==="hy_oas");
   const creditMixed=report?.dataQuality==="CURRENT" && creditHistory &&
     Number.isFinite(creditHistory.percentile) && creditHistory.percentile>=80 &&
     areas.some(a=>a.id==="credit" && a.state==="supportive");
   if(creditMixed){const a=areas.find(a=>a.id==="credit");if(a)a.state="mixed";}
+  const concerns = areas.filter(x=>x.state==="attention").length;
+  const mixed = areas.filter(x=>x.state==="mixed").length;
   const states=Object.fromEntries(areas.map(a=>[a.id,a.state]));
   const corroboration=states.credit==="attention" && states.volatility==="attention"
     ? "Credit and volatility independently show attention-level stress. This is corroboration, not a calibrated probability."
