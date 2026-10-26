@@ -2,6 +2,8 @@ name: Permanent encrypted credit archive
 
 on:
   workflow_dispatch: {}
+  schedule:
+    - cron: "45 7 * * *" # Daily collection; preserves new dated observations
 
 permissions:
   contents: write
