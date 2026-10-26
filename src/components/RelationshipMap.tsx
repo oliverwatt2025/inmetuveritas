@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { backtestRelationship } from "./relationshipBacktest";
 import { correlationFor, PROXIES } from "./historicalCorrelation";
 import { relationshipStability } from "./relationshipStability";
 import type { HistoricalRow } from "./historicalCorrelation";
@@ -55,8 +56,8 @@ export function RelationshipMap({report}:{report:Report|null}){
   }).catch(()=>{if(!cancelled){setHistory([]);setHistoryError(true)}});
   return ()=>{cancelled=true};
  },[]);
- const chooseNode=(id:string)=>{setFocus(id);setSelectedEdge(null)};
- const chooseEdge=(id:string)=>setSelectedEdge(id);
+ const chooseNode=(id:string)=>{setFocus(id);setSelectedEdge(null);setShowBacktest(false)};
+ const chooseEdge=(id:string)=>{setSelectedEdge(id);setShowBacktest(false)};
  const chosen=NODES.find(n=>n.id===focus)||NODES[1];
  const nodeState=Object.fromEntries(NODES.map(n=>[n.id,stateFor(n.id,report)])) as Record<string,Status>;
  const links=EDGES.filter(e=>e.a===chosen.id||e.b===chosen.id);
@@ -67,6 +68,10 @@ export function RelationshipMap({report}:{report:Report|null}){
  const corr252=activeEdge?correlationFor(history,activeEdge.a,activeEdge.b,252):null;
  const shift=activeEdge?relationshipStability(history,activeEdge.a,activeEdge.b):null;
  const [showCorrelationHelp,setShowCorrelationHelp]=useState(false);
+ const [showBacktest,setShowBacktest]=useState(false);
+ const replay=useMemo(()=>showBacktest&&activeEdge?
+  backtestRelationship(history,activeEdge.a,activeEdge.b):null,
+  [showBacktest,activeEdge?.a,activeEdge?.b,history]);
  const stability=(()=>{
   if(!corr60||!corr252)return {title:"Insufficient evidence",detail:"Both windows need sufficient matched data before their results can be compared."};
   const difference=Math.abs(corr60.value-corr252.value);
@@ -154,6 +159,24 @@ export function RelationshipMap({report}:{report:Report|null}){
         </div>}
         <small>{shift.windows} qualifying reference windows · recent sample {shift.sampleCount} paired daily changes{shift.firstBaselineDate?" · historical reference "+shift.firstBaselineDate+" to "+shift.lastBaselineDate:""}. Historical windows overlap; classifications are provisional, not calibrated tests.</small>
        </div>}
+      <div className="relationshipBacktest">
+       <div className="relationshipBacktestHead"><strong>V7 · HISTORICAL REPLAY</strong>
+        <button type="button" onClick={()=>setShowBacktest(!showBacktest)} aria-expanded={showBacktest}>{showBacktest?"Hide replay":"Run historical replay"}</button>
+       </div>
+       <p>Replay the provisional V6 rule at spaced historical checkpoints using only observations available by each date. This measures how often the rule would have fired; it does not establish prediction accuracy.</p>
+       {showBacktest&&replay&&<div>
+         <div className="relationshipReplayStats">
+          <span>Eligible checks <b>{replay.ordinary+replay.watches}</b></span>
+          <span>Research watches <b>{replay.watches}</b></span>
+          <span>Insufficient evidence <b>{replay.insufficient}</b></span>
+         </div>
+         <small>{replay.checked} replay checkpoints, spaced 20 stored dated rows apart · {replay.firstDate??"No usable history"} to {replay.lastDate??"—"}. Checks can overlap in underlying data and are not independent trials.</small>
+         {replay.events.length>0?<div className="relationshipReplayEvents"><strong>Historical watch dates</strong>
+           {replay.events.slice(-6).map(e=><p key={e.date}>{e.date} · r {e.current?.toFixed(2)??"—"} vs reference median {e.median?.toFixed(2)??"—"} · deviation rank {e.rank?.toFixed(0)??"—"}th percentile</p>)}
+         </div>:<p>No research watches at the sampled checkpoints. This does not imply the market was free of stress.</p>}
+       </div>}
+       <small>This preliminary test has no independently defined market-stress outcome labels and makes no claims about true-positive rates, false-positive rates or forecasting performance.</small>
+      </div>
       {historyError&&<p className="relationshipCaution">Historical file could not be loaded; no measured relationship is available.</p>}
       <p className="relationshipProxyNote">Compared: {PROXIES[activeEdge.a].description} versus {PROXIES[activeEdge.b].description}. Values are daily changes in indicators, not correlations between investment returns. Rolling drawdown and breadth proxies overlap across days.</p>
       <h4>Why this connection matters</h4><p>{activeEdge.why}</p>
