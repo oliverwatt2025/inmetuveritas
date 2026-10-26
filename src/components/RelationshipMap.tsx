@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { correlationFor, PROXIES } from "./historicalCorrelation";
+import { relationshipStability } from "./relationshipStability";
 import type { HistoricalRow } from "./historicalCorrelation";
 import "./RelationshipMap.css";
 
@@ -64,6 +65,7 @@ export function RelationshipMap({report}:{report:Report|null}){
  const edgeAssessment=activeEdge?relationship(nodeState[activeEdge.a],nodeState[activeEdge.b]):null;
  const corr60=activeEdge?correlationFor(history,activeEdge.a,activeEdge.b,60):null;
  const corr252=activeEdge?correlationFor(history,activeEdge.a,activeEdge.b,252):null;
+ const shift=activeEdge?relationshipStability(history,activeEdge.a,activeEdge.b):null;
  const [showCorrelationHelp,setShowCorrelationHelp]=useState(false);
  const stability=(()=>{
   if(!corr60||!corr252)return {title:"Insufficient evidence",detail:"Both windows need sufficient matched data before their results can be compared."};
@@ -142,6 +144,16 @@ export function RelationshipMap({report}:{report:Report|null}){
        </div>)}
       </div>
       <div className="relationshipStability"><strong>Relationship stability · descriptive comparison</strong><span>{stability.title}</span><p>{stability.detail}</p></div>
+      {shift&&<div className={"relationshipResearchWatch "+(shift.status==="watch"?"relationshipWatchAlert":"")}>
+        <strong>V6 · RELATIONSHIP CHANGE MONITOR</strong>
+        <h4>{shift.title}</h4>
+        <p>{shift.description}</p>
+        {shift.historicalMedian!==null&&<div className="relationshipWatchStats">
+          <span>Historical median r <b>{shift.historicalMedian.toFixed(2)}</b></span>
+          <span>Deviation rank <b>{shift.historicalPctl?.toFixed(0)}th percentile</b></span>
+        </div>}
+        <small>{shift.windows} qualifying reference windows · recent sample {shift.sampleCount} paired daily changes{shift.firstBaselineDate?" · historical reference "+shift.firstBaselineDate+" to "+shift.lastBaselineDate:""}. Historical windows overlap; classifications are provisional, not calibrated tests.</small>
+       </div>}
       {historyError&&<p className="relationshipCaution">Historical file could not be loaded; no measured relationship is available.</p>}
       <p className="relationshipProxyNote">Compared: {PROXIES[activeEdge.a].description} versus {PROXIES[activeEdge.b].description}. Values are daily changes in indicators, not correlations between investment returns. Rolling drawdown and breadth proxies overlap across days.</p>
       <h4>Why this connection matters</h4><p>{activeEdge.why}</p>
