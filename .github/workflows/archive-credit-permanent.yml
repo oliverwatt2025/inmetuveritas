@@ -26,7 +26,7 @@ jobs:
         run: python3 -m pip install "cryptography>=43,<47"
       - name: Test archive preservation
         run: python3 -m unittest discover -s tests -p 'test_permanent_credit_archive.py' -v
-      - name: Update encrypted historical archive
+      - name: Test safe health metadata\n        run: python3 -m unittest discover -s tests -p 'test_archive_health.py' -v\n      - name: Update encrypted historical archive
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           CREDIT_ARCHIVE_KEY: ${{ secrets.CREDIT_ARCHIVE_KEY }}
