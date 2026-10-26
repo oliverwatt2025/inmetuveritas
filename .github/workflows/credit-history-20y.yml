@@ -1,0 +1,51 @@
+name: Research credit history (20-year FRED)
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "10 7 * * 0" # Sunday UTC, outside daily updater window
+
+permissions:
+  contents: write
+
+concurrency:
+  group: research-credit-history
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Test archive
+        run: python3 -m unittest discover -s tests -p 'test_credit_archive.py' -v
+      - name: Fetch twenty years of HY and IG spread history
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python3 scripts/backfill_credit_20y.py
+      - name: Validate archive coverage
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          rows=[json.loads(line) for line in Path("public/credit_history_20y.ndjson").read_text().splitlines()]
+          for key in ("hy_oas","ig_oas"):
+              observations=[r["date"] for r in rows if key in r]
+              assert len(observations) >= 3500, f"{key}: insufficient history ({len(observations)})"
+              assert min(observations) <= "2008-12-31", f"{key}: no 2008 crisis coverage"
+              assert max(observations) >= "2025-01-01", f"{key}: recent observations missing"
+              print(key, len(observations), min(observations), max(observations))
+          PY
+      - name: Publish separate archive
+        run: |
+          git config user.name "inmetuveritas-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add public/credit_history_20y.ndjson
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Refresh 20-year credit research archive"
+          git push
