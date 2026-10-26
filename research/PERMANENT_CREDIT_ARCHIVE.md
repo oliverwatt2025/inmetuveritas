@@ -17,7 +17,7 @@ A separate *encrypted, durable* observation store prevents expiry of the 5-year 
 2. Add it to GitHub repository Settings → Secrets and variables → Actions as `CREDIT_ARCHIVE_KEY`. Never commit or paste this key into issues or messages.
 3. Keep a private offline backup of the key in a password manager.
 4. Once the workflow reaches the default branch, manually run **Permanent encrypted credit archive** once to initialise it; verify green success and an encrypted file commit.
-5. Subsequent schedules run at 07:45 UTC daily. New observations, normally on business days, increase the archive over time.
+5. The workflow is manual-only pending explicit confirmation of the applicable ICE/FRED storage and reuse permissions. Do not enable a daily schedule until permissions are clear.
 
 ## Safeguards and limits
 
@@ -27,3 +27,7 @@ A separate *encrypted, durable* observation store prevents expiry of the 5-year 
 - Data snapshots are captured when first encountered; they are **not a complete revision/vintage history**, and FRED observations can have publication lags.
 - Public dashboard history and historical research calculations do not change in this release.
 - Encrypting data inside a public Git repo hides ordinary contents but also preserves ciphertext in public Git history. Access control using a dedicated private repository or private object storage would offer stronger governance if future needs warrant it.
+
+## Licensing hold (October 2026)
+
+The source FRED series identify ICE Data Indices as the copyright owner; ICE terms restrict external publication/redistribution and FRED API terms preserve third-party restrictions. The archive must remain inactive until written clarification covers *ongoing private storage of dated observations*, any necessary permitted retention after FRED's rolling window removes older dates, *derived public statistics*, and optional AI-assisted interpretation. Encryption is not a substitute for permission.
