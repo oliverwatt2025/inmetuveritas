@@ -8,15 +8,15 @@ Source FRED series:
 
 FRED spreads are expressed in **percent**; stored values are converted to **basis points** (multiplied by 100). Observations retain exact provider dates and do not carry forward weekend/holiday data.
 
-The new independent workflow `.github/workflows/credit-history-20y.yml` supports manual execution on the development branch and weekly refresh on the default branch after release. It requires the existing `FRED_API_KEY` repository secret.
+The new independent workflow `.github/workflows/credit-history-20y.yml` is manual-only. GitHub Actions normally registers new workflows after they reach the default branch. The run uploads a short-lived GitHub Actions artifact for private review; it does not commit or publish raw archive data. It requires the existing `FRED_API_KEY` repository secret.
 
-The workflow **rejects** publication if either series has fewer than 3,500 dated points, lacks observations from 2008 or lacks recent observations, avoiding the accidental publication of truncated histories. A FRED API outage preserves the existing archive; if neither series updates, it exits without rewriting it.
+The workflow **rejects** the research artifact if either series has fewer than 3,500 dated points, lacks observations from 2008 or lacks recent observations, avoiding the accidental publication of truncated histories. A FRED API outage preserves the existing archive; if neither series updates, it exits without rewriting it.
 
 The archive is `public/credit_history_20y.ndjson`. It **does not replace** `history_5y.ndjson`, the nine gauges, daily AI evidence or production snapshots.
 
 ## Validation requirements before using the archive for risk classifications
 
-1. Execute the archive workflow on `v9-long-credit-history` and inspect dated counts/first and last dates. It will commit a new archive file on the branch.
+1. Execute the archive workflow on `v9-long-credit-history` and inspect dated counts/first and last dates. It will upload a seven-day review artifact, without committing the data to the repository.
 2. Confirm actual 2008 and 2020 spreads, source definition, basis-point units, observations and usage/attribution requirements.
 3. Treat the archive as **historical reference data**; data vintages may have revisions and differences from what was contemporaneously available.
 4. Independently define stress episodes and outcome windows. Backtest thresholds with blocked time-series splits before allowing the archive to change production risk classifications.
