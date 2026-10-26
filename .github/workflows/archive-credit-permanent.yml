@@ -1,0 +1,45 @@
+name: Permanent encrypted credit archive
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "45 7 * * *" # Daily collection; preserves new dated observations
+
+permissions:
+  contents: write
+
+concurrency:
+  group: permanent-credit-archive
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install encryption library
+        run: python3 -m pip install "cryptography>=43,<47"
+      - name: Test archive preservation
+        run: python3 -m unittest discover -s tests -p 'test_permanent_credit_archive.py' -v
+      - name: Update encrypted historical archive
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          CREDIT_ARCHIVE_KEY: ${{ secrets.CREDIT_ARCHIVE_KEY }}
+        run: python3 scripts/archive_credit_permanent.py
+      - name: Commit encrypted archive only
+        run: |
+          git config user.name "inmetuveritas-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add research/private_data/credit_archive.fernet
+          if git diff --cached --quiet; then
+            echo "No new dated observations"
+            exit 0
+          fi
+          git commit -m "Preserve encrypted dated credit archive"
+          git pull --rebase
+          git push
