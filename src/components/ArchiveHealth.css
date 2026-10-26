@@ -1,0 +1,16 @@
+.archiveHealth{background:rgba(5,14,23,.98);border:1px solid rgba(216,188,128,.3);border-radius:16px;color:#e9e5dd;padding:24px;margin:24px 0}
+.archiveHealthHeader{display:flex;justify-content:space-between;align-items:center;gap:14px}
+.archiveHealthEyebrow{font-size:10px;letter-spacing:.16em;color:#d8bc80;font-weight:700}
+.archiveHealth h2{font:normal clamp(22px,2.3vw,29px) Georgia,serif;color:#e9d19f;margin:7px 0}
+.archiveHealth p,.archiveHealth footer{font-size:12px;line-height:1.65;color:#b3bdc8}
+.archiveHealthStatus{font-size:11px;color:#b9d6cd;border:1px solid #516b65;border-radius:30px;padding:8px 12px;white-space:nowrap}
+.archiveHealthGrid{display:grid;grid-template-columns:1fr 1fr minmax(200px,.85fr);gap:12px;margin:18px 0}
+.archiveHealthTile{background:#101e2b;border:1px solid #334555;border-radius:11px;padding:17px}
+.archiveHealthTile>span{font-size:12px;color:#d8bc80}.archiveHealthTile>strong{font-size:28px;color:#f0e1bf;display:block;margin-top:10px;font-variant-numeric:tabular-nums}
+.archiveHealthTile small{color:#aeb9c5;font-size:11px;line-height:1.5}
+.archiveHealthTile dl{display:grid;grid-template-columns:1fr 1fr;gap:9px;font-size:11px;margin:15px 0 0}
+.archiveHealthTile dt{color:#96a7b8}.archiveHealthTile dd{text-align:right;margin:0;color:#dce3e9}
+.archiveHealthTile strong.archiveHealthDate{font-size:18px;line-height:1.4}
+.archiveHealth footer{margin-top:16px;font-size:10px}
+@media(max-width:950px){.archiveHealthGrid{grid-template-columns:1fr 1fr}.archiveHealthTiming{grid-column:1/-1}}
+@media(max-width:560px){.archiveHealth{padding:17px}.archiveHealthGrid{grid-template-columns:1fr}.archiveHealthTiming{grid-column:auto}.archiveHealthHeader{align-items:start;flex-direction:column}}
