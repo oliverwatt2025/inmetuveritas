@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "sourceAsOf": "2026-10-25T11:50:12Z",
-  "generatedAt": "2026-10-25T11:50:19.483295Z",
+  "sourceAsOf": "2026-10-26T13:21:29Z",
+  "generatedAt": "2026-10-26T13:21:34.764669Z",
   "dataAgeHours": 0.0,
   "dataQuality": "CURRENT",
   "regime": "NO BROAD STRESS CONFIRMATION",
@@ -12,9 +12,9 @@
     {
       "indicator": "vix",
       "value": 19.0,
-      "percentile": 60.7,
-      "observationCount": 1289,
-      "fromDate": "2021-10-21",
+      "percentile": 60.6,
+      "observationCount": 1288,
+      "fromDate": "2021-10-22",
       "toDate": "2026-10-22",
       "window": "available history, up to five years",
       "interpretation": "Within the middle of observed history"
@@ -53,8 +53,8 @@
       "indicator": "curve_10y2y",
       "value": 31.0,
       "percentile": 59.2,
-      "observationCount": 1251,
-      "fromDate": "2021-10-21",
+      "observationCount": 1250,
+      "fromDate": "2021-10-22",
       "toDate": "2026-10-23",
       "window": "available history, up to five years",
       "interpretation": "Within the middle of observed history"
@@ -106,7 +106,7 @@
           "indicator": "breadth",
           "value": 4.0,
           "unit": "%",
-          "observedAt": "2026-10-25T11:50:12Z"
+          "observedAt": "2026-10-26T13:21:29Z"
         }
       ]
     },
@@ -121,13 +121,13 @@
           "indicator": "hy_oas",
           "value": 340.0,
           "unit": " bp",
-          "observedAt": "2026-10-25T11:50:12Z"
+          "observedAt": "2026-10-26T13:21:29Z"
         },
         {
           "indicator": "ig_oas",
           "value": 89.0,
           "unit": " bp",
-          "observedAt": "2026-10-25T11:50:12Z"
+          "observedAt": "2026-10-26T13:21:29Z"
         }
       ]
     },
@@ -142,7 +142,7 @@
           "indicator": "vix",
           "value": 19.0,
           "unit": "",
-          "observedAt": "2026-10-25T11:50:12Z"
+          "observedAt": "2026-10-26T13:21:29Z"
         }
       ]
     }
@@ -162,7 +162,7 @@
   ],
   "editorialCommentary": {
     "mode": "AI_CURATED",
-    "sourceAsOf": "2026-10-25T11:50:12Z",
+    "sourceAsOf": "2026-10-26T13:21:29Z",
     "evidenceIds": [
       "historical:hy_oas",
       "divergence:1",
