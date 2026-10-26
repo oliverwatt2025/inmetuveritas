@@ -62,3 +62,18 @@
 .relationshipWatchStats span{border:1px solid #536371;border-radius:6px;padding:7px;color:#d4dee3}
 .relationshipWatchStats b{color:#e6d09f}
 .relationshipWatchAlert{background:#29251d;border-color:#c69f5c}
+
+.relationshipBacktest{padding:13px;border:1px solid #536071;border-radius:10px;margin:16px 0;background:#0f2130}
+.relationshipBacktestHead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.relationshipBacktestHead>strong{font-size:11px;letter-spacing:.11em;color:#dfca9e}
+.relationshipBacktestHead button{background:#342e23;border:1px solid #bfa674;color:#f1dfbb;padding:7px 10px;border-radius:7px;cursor:pointer;font-size:11px}
+.relationshipBacktestHead button:focus-visible{outline:2px solid #f1dfbb;outline-offset:2px}
+.relationshipBacktest>p{font-size:11px!important;color:#bcc8d0!important;line-height:1.65}
+.relationshipBacktest small{display:block;font-size:10px;line-height:1.5;color:#aebbc4;margin:12px 0}
+.relationshipReplayStats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:13px 0}
+.relationshipReplayStats span{font-size:10px;color:#b2bfca;border:1px solid #4a5869;border-radius:7px;padding:9px}
+.relationshipReplayStats b{display:block;font-size:20px;color:#e9d09f;margin-top:7px}
+.relationshipReplayEvents{border-top:1px solid #48525b;margin-top:12px;padding-top:11px}
+.relationshipReplayEvents strong{font-size:11px;color:#e4c990}
+.relationshipReplayEvents p{font-size:11px!important;color:#c3cdd3!important;line-height:1.6}
+@media(max-width:550px){.relationshipReplayStats{grid-template-columns:1fr}}
