@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { backtestRelationship } from "./relationshipBacktest";
+import { validateOutcomes } from "./outcomeValidation";
 import { correlationFor, PROXIES } from "./historicalCorrelation";
 import { relationshipStability } from "./relationshipStability";
 import type { HistoricalRow } from "./historicalCorrelation";
@@ -69,6 +70,9 @@ export function RelationshipMap({report}:{report:Report|null}){
  const shift=activeEdge?relationshipStability(history,activeEdge.a,activeEdge.b):null;
  const [showCorrelationHelp,setShowCorrelationHelp]=useState(false);
  const [showBacktest,setShowBacktest]=useState(false);
+ const validation=useMemo(()=>showBacktest&&activeEdge?
+  validateOutcomes(history,activeEdge.a,activeEdge.b):null,
+  [showBacktest,activeEdge?.a,activeEdge?.b,history]);
  const replay=useMemo(()=>showBacktest&&activeEdge?
   backtestRelationship(history,activeEdge.a,activeEdge.b):null,
   [showBacktest,activeEdge?.a,activeEdge?.b,history]);
@@ -175,7 +179,21 @@ export function RelationshipMap({report}:{report:Report|null}){
            {replay.events.slice(-6).map(e=><p key={e.date}>{e.date} · r {e.current?.toFixed(2)??"—"} vs reference median {e.median?.toFixed(2)??"—"} · deviation rank {e.rank?.toFixed(0)??"—"}th percentile</p>)}
          </div>:<p>No research watches at the sampled checkpoints. This does not imply the market was free of stress.</p>}
        </div>}
-       <small>This preliminary test has no independently defined market-stress outcome labels and makes no claims about true-positive rates, false-positive rates or forecasting performance.</small>
+       {showBacktest&&validation&&<div className="relationshipOutcome">
+         <strong>V8 · FORWARD OUTCOME RESEARCH</strong>
+         <p>Predefined outcome: a subsequent SPY one-month drawdown reading of −8% or worse within 20 stored dates. Excludes checkpoints already at that level; missing outcomes are not classified as safe.</p>
+         <div className="relationshipOutcomeGrid">
+           <span>Eligible signals <b>{validation.watchCount+validation.ordinaryCount}</b></span>
+           <span>Watch signals <b>{validation.watchCount}</b></span>
+           <span>Watch → drawdown <b>{validation.stressAfterWatch}</b></span>
+           <span>Ordinary → drawdown <b>{validation.stressAfterOrdinary}</b></span>
+           <span>Unresolved outcomes <b>{validation.unknownOutcome}</b></span>
+         </div>
+         {validation.watchCount===0?<p className="relationshipCaution">No eligible watch signals in this replay. Warning precision is undefined — not 0% and not 100%.</p>:
+         <p className="relationshipCaution">These counts are exploratory. They are not out-of-sample predictive performance measures.</p>}
+         <small>This uses a rolling SPY drawdown proxy, not an independent vintage-level equity price database. Signals involving equities can share underlying information with the outcome. Longer history, fully timestamped source vintages and out-of-sample testing are needed.</small>
+       </div>}
+       <small>V7 replay counts historical rule flags; the separate V8 outcome study applies a provisional, independently specified drawdown threshold. Neither establishes causal relationships or calibrated forecast skill.</small>
       </div>
       {historyError&&<p className="relationshipCaution">Historical file could not be loaded; no measured relationship is available.</p>}
       <p className="relationshipProxyNote">Compared: {PROXIES[activeEdge.a].description} versus {PROXIES[activeEdge.b].description}. Values are daily changes in indicators, not correlations between investment returns. Rolling drawdown and breadth proxies overlap across days.</p>

@@ -77,3 +77,11 @@
 .relationshipReplayEvents strong{font-size:11px;color:#e4c990}
 .relationshipReplayEvents p{font-size:11px!important;color:#c3cdd3!important;line-height:1.6}
 @media(max-width:550px){.relationshipReplayStats{grid-template-columns:1fr}}
+
+.relationshipOutcome{margin:16px 0;padding:14px;border:1px solid #6b6657;border-radius:10px;background:#172634}
+.relationshipOutcome>strong{font-size:11px;letter-spacing:.12em;color:#e3cb91}
+.relationshipOutcome>p,.relationshipOutcome>small{font-size:11px!important;color:#c0cbd2!important;line-height:1.6}
+.relationshipOutcomeGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:12px 0}
+.relationshipOutcomeGrid span{font-size:11px;color:#bccbd5;background:#20303d;border:1px solid #4a5966;border-radius:7px;padding:9px}
+.relationshipOutcomeGrid b{font-size:18px;color:#f1d69c;display:block;margin-top:6px}
+@media(max-width:520px){.relationshipOutcomeGrid{grid-template-columns:1fr}}
