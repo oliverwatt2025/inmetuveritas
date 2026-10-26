@@ -5,7 +5,8 @@ import json,os
 from datetime import datetime,timezone
 from pathlib import Path
 from cryptography.fernet import Fernet
-from archive_credit_permanent import PATH
+ROOT=Path(__file__).resolve().parents[1]
+PATH=ROOT/"research"/"private_data"/"credit_archive.fernet"
 
 OUT=Path(__file__).resolve().parents[1]/"public"/"archive_health.json"
 KEYS=("hy_oas","ig_oas")
