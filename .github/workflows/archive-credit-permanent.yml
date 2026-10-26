@@ -31,11 +31,15 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           CREDIT_ARCHIVE_KEY: ${{ secrets.CREDIT_ARCHIVE_KEY }}
         run: python3 scripts/archive_credit_permanent.py
-      - name: Commit encrypted archive only
+      - name: Publish count-and-date metadata only
+        env:
+          CREDIT_ARCHIVE_KEY: ${{ secrets.CREDIT_ARCHIVE_KEY }}
+        run: python3 scripts/publish_archive_health.py
+      - name: Commit encrypted archive and safe metadata
         run: |
           git config user.name "inmetuveritas-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add research/private_data/credit_archive.fernet
+          git add research/private_data/credit_archive.fernet public/archive_health.json
           if git diff --cached --quiet; then
             echo "No new dated observations"
             exit 0
