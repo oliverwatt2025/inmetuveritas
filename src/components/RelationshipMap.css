@@ -52,3 +52,13 @@
 .relationshipCorrelationHelp strong,.relationshipStability strong{font-size:11px;color:#e6d0a4;display:block}
 .relationshipStability span{color:#e7e1d0;font-weight:600;display:block;margin-top:8px;font-size:13px}
 .relationshipCorrelationHelp p,.relationshipStability p{font-size:11px!important;color:#c0cbd3!important;line-height:1.65}
+
+.relationshipResearchWatch{border:1px solid #526274;border-radius:10px;padding:13px;margin:16px 0;background:#152533}
+.relationshipResearchWatch>strong{color:#d7be8b;font-size:10px;letter-spacing:.13em}
+.relationshipResearchWatch h4{font-size:14px;letter-spacing:0;margin:9px 0;color:#f0e0b9}
+.relationshipResearchWatch p{font-size:11px!important;line-height:1.65!important;margin:7px 0}
+.relationshipResearchWatch>small{display:block;margin-top:9px;font-size:10px;line-height:1.5;color:#a9b9c4}
+.relationshipWatchStats{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;margin-top:11px}
+.relationshipWatchStats span{border:1px solid #536371;border-radius:6px;padding:7px;color:#d4dee3}
+.relationshipWatchStats b{color:#e6d09f}
+.relationshipWatchAlert{background:#29251d;border-color:#c69f5c}
