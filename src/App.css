@@ -324,3 +324,6 @@
 .intelligenceEditorial small { display:block; color:rgba(255,255,255,.55); margin:5px 0 10px; font-size:10px; }
 .intelligenceEditorial p { margin:9px 0; color:rgba(255,255,255,.86); font-size:12px; line-height:1.6; }
 
+
+/* Highest credit stress is a red risk classification, not stale data. */
+.pillHighStress { color: rgba(255, 120, 120, 0.97); border-color: rgba(255, 120, 120, 0.62); }
