@@ -1,0 +1,14 @@
+.creditEvidence{background:rgba(5,15,24,.95);border:1px solid rgba(216,188,128,.32);border-radius:16px;padding:24px;margin:24px 0;color:#e9e5dd}
+.creditEvidenceHeader{display:flex;justify-content:space-between;gap:20px;align-items:center}.creditEvidenceEyebrow,.creditEvidenceCategory{color:#d8bc80;letter-spacing:.16em;font-size:10px;font-weight:700}
+.creditEvidence h2{font:normal clamp(22px,2.4vw,30px) Georgia,serif;color:#ead3a1;margin:8px 0}.creditEvidenceHeader p{font-size:12px;line-height:1.65;color:#b4c0cb}
+.creditEvidenceScore{text-align:right;min-width:140px}.creditEvidenceScore strong{font-size:39px;line-height:1;display:block;color:#edd5a3}.creditEvidenceScore span{font-size:10px;color:#aebdc8}
+.creditEvidenceGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0}
+.creditEvidenceGrid article{background:#111f2b;border:1px solid #3a4856;border-radius:11px;padding:16px;min-width:0}
+.creditEvidenceGrid h3{font-size:17px;color:#ead8b6;margin:10px 0}.creditEvidenceState{font-size:11px;padding:7px 10px;border:1px solid;border-radius:7px;display:inline-block;margin:4px 0 8px}
+.creditEvidenceState.positive{color:#82dfb9;border-color:#3e947a}.creditEvidenceState.caution{color:#efd099;border-color:#b28c52}.creditEvidenceState.neutral{color:#c9d4dc;border-color:#62727c}
+.creditEvidenceGrid p{font-size:12px;color:#c8d3dc;line-height:1.65;margin:8px 0}.creditEvidenceGrid p strong{color:#f4dba6}.creditEvidenceGrid small{display:block;color:#9faebb;font-size:11px;line-height:1.6}
+.creditEvidenceMini{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #30404c;padding:4px 0}.creditEvidenceMini strong{white-space:nowrap}
+.creditEvidenceConclusion{border-left:2px solid #d8bc80;background:rgba(216,188,128,.09);padding:13px 16px;border-radius:0 8px 8px 0}.creditEvidenceConclusion strong{font-size:10px;letter-spacing:.12em;color:#e2c788}
+.creditEvidenceConclusion p{font-size:13px;line-height:1.65;color:#d5dee4;margin:8px 0 0}
+.creditEvidence footer{font-size:10px;color:#91a4b2;line-height:1.7;margin-top:16px}
+@media(max-width:950px){.creditEvidenceGrid{grid-template-columns:1fr}.creditEvidenceHeader{flex-direction:column;align-items:start}.creditEvidenceScore{text-align:left}}

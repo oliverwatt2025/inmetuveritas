@@ -2,6 +2,7 @@ import { DefconMeter } from "./components/DefconMeter";
 import { ConfirmationMatrix } from "./components/ConfirmationMatrix";
 import { RelationshipMap } from "./components/RelationshipMap";
 import { ArchiveHealth } from "./components/ArchiveHealth";
+import { CreditEvidence } from "./components/CreditEvidence";
 import type { DefconLevel } from "./components/DefconMeter";
 import { useEffect, useMemo, useState } from "react";
 const MINER_URL = "/miner-status.json";
@@ -918,6 +919,7 @@ if (Array.isArray(data.cards) && data.cards.length) {
         ))}
       </main>
       <RelationshipMap report={intelligence} />
+      <CreditEvidence />
       <ConfirmationMatrix report={intelligence} />
       <IntelligencePanels report={intelligence} />
       <ArchiveHealth />
