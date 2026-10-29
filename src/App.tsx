@@ -582,7 +582,7 @@ function GaugeCard({
     <div className="card" title={g.tooltip}>
       <div className="cardTop">
         <div className="cardTitle">{g.title.toUpperCase()}</div>
-        <div className={statusClass(g.status)}>{g.status}</div>
+        <div className={statusClass(g.status)}>{g.key === "credit_stress" && g.status === "DELAYED" ? "HIGH STRESS" : g.status}</div>
       </div>
 
       <div className="cardBody">
@@ -869,10 +869,6 @@ if (Array.isArray(data.cards) && data.cards.length) {
         </div>
       </header>
 
-      <section className="manualUpdateBar" aria-label="Daily market data controls">
-        <div><strong>Daily data refresh</strong><small>If the scheduled market update fails, run it manually through GitHub Actions.</small></div>
-        <a href="https://github.com/oliverwatt2025/inmetuveritas/actions/workflows/update-indicators.yml" target="_blank" rel="noopener noreferrer">Run Daily Update ↗</a>
-      </section>
       <main className="grid">
         {displayGauges.map((g) => (
           <GaugeCard
