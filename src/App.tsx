@@ -605,30 +605,32 @@ function GaugeCard({
                 strokeWidth="16"
                 strokeLinecap="round"
               />
-              {/* Green segment */}
-              <path
-                d="M 30 110 A 70 70 0 0 1 110 42"
-                fill="none"
-                stroke="rgba(90, 235, 170, 0.85)"
-                strokeWidth="16"
-                strokeLinecap="round"
-              />
-              {/* Amber segment */}
-              <path
-                d="M 110 42 A 70 70 0 0 1 150 68"
-                fill="none"
-                stroke="rgba(255, 205, 120, 0.80)"
-                strokeWidth="16"
-                strokeLinecap="round"
-              />
-              {/* Red segment */}
-              <path
-                d="M 150 68 A 70 70 0 0 1 170 110"
-                fill="none"
-                stroke="rgba(255, 120, 120, 0.75)"
-                strokeWidth="16"
-                strokeLinecap="round"
-              />
+              {g.key === "breadth" ? (
+                <>
+                  {/* Breadth uses WARN through +2 percentage points and GOOD above.
+                      With the -10..+10 range, +2 is 60% of the gauge's span.
+                      Broader participation belongs at the green/right end. */}
+                  <path d="M 30 110 A 70 70 0 0 1 111.6 40.9"
+                    fill="none" stroke="rgba(255, 205, 120, 0.82)"
+                    strokeWidth="16" strokeLinecap="round" />
+                  <path d="M 111.6 40.9 A 70 70 0 0 1 170 110"
+                    fill="none" stroke="rgba(90, 235, 170, 0.85)"
+                    strokeWidth="16" strokeLinecap="round" />
+                </>
+              ) : (
+                <>
+                  {/* Default stress-gauge risk scale: green → amber → red. */}
+                  <path d="M 30 110 A 70 70 0 0 1 110 42"
+                    fill="none" stroke="rgba(90, 235, 170, 0.85)"
+                    strokeWidth="16" strokeLinecap="round" />
+                  <path d="M 110 42 A 70 70 0 0 1 150 68"
+                    fill="none" stroke="rgba(255, 205, 120, 0.80)"
+                    strokeWidth="16" strokeLinecap="round" />
+                  <path d="M 150 68 A 70 70 0 0 1 170 110"
+                    fill="none" stroke="rgba(255, 120, 120, 0.75)"
+                    strokeWidth="16" strokeLinecap="round" />
+                </>
+              )}
             </svg>
 
             {/* Extremes shown below the dial to avoid colliding with the readout.
