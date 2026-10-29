@@ -310,6 +310,17 @@ function statusClass(s: Status) {
   return "pill pillDelayed";
 }
 
+function arcSegment(start: number, end: number): string {
+  // The gauge uses an upper semicircle from left (0%) to right (100%).
+  const point = (fraction: number) => {
+    const angle = Math.PI * fraction;
+    return [100 - 70 * Math.cos(angle), 110 - 70 * Math.sin(angle)];
+  };
+  const a = point(start);
+  const b = point(end);
+  return `M ${a[0].toFixed(2)} ${a[1].toFixed(2)} A 70 70 0 0 1 ${b[0].toFixed(2)} ${b[1].toFixed(2)}`;
+}
+
 function needleRotationFromPct(pct: number) {
   // Map 0..100 to -120deg .. +120deg (240-degree sweep)
   const clamped = Math.max(0, Math.min(100, pct));
@@ -589,7 +600,7 @@ function GaugeCard({
     <div className="card" title={g.tooltip}>
       <div className="cardTop">
         <div className="cardTitle">{g.title.toUpperCase()}</div>
-        <div className={statusClass(g.status)}>{g.key === "credit_stress" && g.status === "DELAYED" ? "HIGH STRESS" : g.status}</div>
+        <div className={g.key === "credit_stress" && g.status === "DELAYED" ? "pill pillHighStress" : statusClass(g.status)}>{g.key === "credit_stress" && g.status === "DELAYED" ? "HIGH STRESS" : g.status}</div>
       </div>
 
       <div className="cardBody">
@@ -605,7 +616,25 @@ function GaugeCard({
                 strokeWidth="16"
                 strokeLinecap="round"
               />
-              {g.key === "breadth" ? (
+              {g.key === "curve_10y2y" || g.key === "credit_stress" ? (
+                <>
+                  {(g.key === "curve_10y2y"
+                    ? [
+                        { from: 0, to: 0.375, colour: "rgba(255, 120, 120, 0.85)" },
+                        { from: 0.375, to: 0.5, colour: "rgba(255, 205, 120, 0.85)" },
+                        { from: 0.5, to: 1, colour: "rgba(90, 235, 170, 0.85)" },
+                      ]
+                    : [
+                        { from: 0, to: 0.4, colour: "rgba(90, 235, 170, 0.85)" },
+                        { from: 0.4, to: 0.65, colour: "rgba(255, 205, 120, 0.85)" },
+                        { from: 0.65, to: 1, colour: "rgba(255, 120, 120, 0.85)" },
+                      ]).map((band, i) => (
+                    <path key={i} d={arcSegment(band.from, band.to)}
+                      fill="none" stroke={band.colour} strokeWidth="16"
+                      strokeLinecap="butt" />
+                  ))}
+                </>
+              ) : g.key === "breadth" ? (
                 <>
                   {/* Breadth uses WARN through +2 percentage points and GOOD above.
                       With the -10..+10 range, +2 is 60% of the gauge's span.
