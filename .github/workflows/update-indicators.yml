@@ -27,6 +27,9 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install archive test dependency
+        run: python3 -m pip install "cryptography>=43,<47"
+
       - name: Run updater script
         env:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
