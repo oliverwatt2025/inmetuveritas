@@ -323,3 +323,10 @@
 .intelligenceEditorial strong { display:block; color:#a5e1c6; letter-spacing:.12em; font-size:10px; }
 .intelligenceEditorial small { display:block; color:rgba(255,255,255,.55); margin:5px 0 10px; font-size:10px; }
 .intelligenceEditorial p { margin:9px 0; color:rgba(255,255,255,.86); font-size:12px; line-height:1.6; }
+
+.manualUpdateBar{display:flex;justify-content:space-between;align-items:center;gap:16px;max-width:1600px;margin:10px auto 20px;padding:14px 18px;background:rgba(5,14,23,.94);border:1px solid rgba(216,188,128,.3);border-radius:12px;color:#e7d7bb}
+.manualUpdateBar strong{display:block;font-size:13px;letter-spacing:.03em}
+.manualUpdateBar small{display:block;color:#aebbc5;margin-top:5px;font-size:11px}
+.manualUpdateBar a{display:inline-block;white-space:nowrap;border:1px solid #d8bc80;border-radius:8px;padding:10px 14px;color:#eed9a9;background:#25251f;text-decoration:none;font-size:12px;font-weight:600}
+.manualUpdateBar a:hover,.manualUpdateBar a:focus-visible{background:#3c3528;outline-offset:3px}
+@media(max-width:650px){.manualUpdateBar{flex-direction:column;align-items:flex-start}.manualUpdateBar a{white-space:normal}}
