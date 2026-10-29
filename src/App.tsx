@@ -371,6 +371,13 @@ function toGauge(c: RawCard): Gauge | null {
   }
   pct = Math.max(0, Math.min(100, pct));
 
+  // Drawdown magnitudes run opposite to ordinary gauge values:
+  // 0% (little stress) belongs at the green/left end, while a larger
+  // negative loss belongs at the red/right end. Keep the reported value
+  // and underlying GOOD/WARN/DELAYED statuses untouched.
+  const drawdownGauge = key === "spy_dd_1m" || key === "kre_dd_3m";
+  if (drawdownGauge && typeof c.value === "number") pct = 100 - pct;
+
   const valueText =
     typeof c.valueText === "string"
       ? c.valueText
@@ -384,9 +391,9 @@ function toGauge(c: RawCard): Gauge | null {
     status,
     valueText,
     pct,
-    minLabel: c.minLabel ?? String(min),
+    minLabel: drawdownGauge ? (c.maxLabel ?? String(max)) : (c.minLabel ?? String(min)),
     midLabel: c.midLabel ?? "",
-    maxLabel: c.maxLabel ?? String(max),
+    maxLabel: drawdownGauge ? (c.minLabel ?? String(min)) : (c.maxLabel ?? String(max)),
     tooltip: c.tooltip ?? "",
     updatedAt: c.updatedAt,
     updatedText: c.updatedText,
