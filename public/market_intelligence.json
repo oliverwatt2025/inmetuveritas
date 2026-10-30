@@ -1,80 +1,80 @@
 {
   "schemaVersion": 1,
-  "sourceAsOf": "2026-10-29T13:24:27Z",
-  "generatedAt": "2026-10-29T13:24:38.568072Z",
+  "sourceAsOf": "2026-10-30T13:13:56Z",
+  "generatedAt": "2026-10-30T13:14:04.283153Z",
   "dataAgeHours": 0.0,
   "dataQuality": "CURRENT",
   "regime": "NO BROAD STRESS CONFIRMATION",
   "summary": "The monitored signals do not currently show broad stress; this is not a forecast or assurance.",
-  "changeSummary": "Notable changes since the last comparable dated observation: hy oas -22.",
+  "changeSummary": "Notable changes since the last comparable dated observation: breadth +1.3.",
   "notableChanges": [
     {
-      "indicator": "hy_oas",
-      "current": 318.0,
-      "previous": 340.0,
-      "delta": -22.0,
-      "previousDate": "2026-10-26",
-      "direction": "lower"
+      "indicator": "breadth",
+      "current": 4.6,
+      "previous": 3.3,
+      "delta": 1.3,
+      "previousDate": "2026-10-29",
+      "direction": "higher"
     }
   ],
   "historicalContext": [
     {
       "indicator": "vix",
-      "value": 17.5,
-      "percentile": 49.0,
+      "value": 16.9,
+      "percentile": 42.5,
       "observationCount": 1290,
-      "fromDate": "2021-10-25",
-      "toDate": "2026-10-27",
+      "fromDate": "2021-10-26",
+      "toDate": "2026-10-28",
       "window": "available history, up to five years",
       "interpretation": "Within the middle of observed history"
     },
     {
       "indicator": "hy_oas",
-      "value": 318.0,
-      "percentile": 67.3,
-      "observationCount": 790,
+      "value": 314.0,
+      "percentile": 61.1,
+      "observationCount": 791,
       "fromDate": "2023-10-23",
-      "toDate": "2026-10-27",
+      "toDate": "2026-10-28",
       "window": "available history, up to five years",
       "interpretation": "Within the middle of observed history"
     },
     {
       "indicator": "ig_oas",
-      "value": 88.0,
-      "percentile": 57.5,
-      "observationCount": 789,
+      "value": 86.0,
+      "percentile": 53.4,
+      "observationCount": 790,
       "fromDate": "2023-10-23",
-      "toDate": "2026-10-27",
+      "toDate": "2026-10-28",
       "window": "available history, up to five years",
       "interpretation": "Within the middle of observed history"
     },
     {
       "indicator": "breadth",
-      "value": 3.3,
-      "percentile": 96.9,
-      "observationCount": 1238,
+      "value": 4.6,
+      "percentile": 99.4,
+      "observationCount": 1239,
       "fromDate": "2021-11-22",
-      "toDate": "2026-10-28",
+      "toDate": "2026-10-29",
       "window": "available history, up to five years",
       "interpretation": "High relative to observed history"
     },
     {
       "indicator": "curve_10y2y",
-      "value": 38.0,
-      "percentile": 64.9,
+      "value": 37.0,
+      "percentile": 64.3,
       "observationCount": 1252,
-      "fromDate": "2021-10-25",
-      "toDate": "2026-10-28",
+      "fromDate": "2021-10-26",
+      "toDate": "2026-10-29",
       "window": "available history, up to five years",
       "interpretation": "Within the middle of observed history"
     },
     {
       "indicator": "kre_dd_3m",
-      "value": -7.5,
-      "percentile": 48.6,
-      "observationCount": 1196,
+      "value": -6.5,
+      "percentile": 55.4,
+      "observationCount": 1197,
       "fromDate": "2022-01-24",
-      "toDate": "2026-10-28",
+      "toDate": "2026-10-29",
       "window": "available history, up to five years",
       "interpretation": "Within the middle of observed history"
     }
@@ -83,11 +83,11 @@
     {
       "indicator": "breadth",
       "headline": "Equal-weight market breadth is historically elevated",
-      "explanation": "Equal-weight market breadth has percentile rank 96.9 among 1238 available dated observations from 2021-11-22 to 2026-10-28; this suggests supportive participation relative to its history.",
-      "percentile": 96.9,
+      "explanation": "Equal-weight market breadth has percentile rank 99.4 among 1239 available dated observations from 2021-11-22 to 2026-10-29; this suggests supportive participation relative to its history.",
+      "percentile": 99.4,
       "fromDate": "2021-11-22",
-      "toDate": "2026-10-28",
-      "observationCount": 1238
+      "toDate": "2026-10-29",
+      "observationCount": 1239
     }
   ],
   "divergences": [
@@ -103,9 +103,9 @@
       "evidence": [
         {
           "indicator": "breadth",
-          "value": 3.3,
+          "value": 4.6,
           "unit": "%",
-          "observedAt": "2026-10-29T13:24:27Z"
+          "observedAt": "2026-10-30T13:13:56Z"
         }
       ]
     },
@@ -118,15 +118,15 @@
       "evidence": [
         {
           "indicator": "hy_oas",
-          "value": 318.0,
+          "value": 314.0,
           "unit": " bp",
-          "observedAt": "2026-10-29T13:24:27Z"
+          "observedAt": "2026-10-30T13:13:56Z"
         },
         {
           "indicator": "ig_oas",
-          "value": 88.0,
+          "value": 86.0,
           "unit": " bp",
-          "observedAt": "2026-10-29T13:24:27Z"
+          "observedAt": "2026-10-30T13:13:56Z"
         }
       ]
     },
@@ -139,9 +139,9 @@
       "evidence": [
         {
           "indicator": "vix",
-          "value": 17.5,
+          "value": 16.9,
           "unit": "",
-          "observedAt": "2026-10-29T13:24:27Z"
+          "observedAt": "2026-10-30T13:13:56Z"
         }
       ]
     }
@@ -161,7 +161,7 @@
   ],
   "editorialCommentary": {
     "mode": "AI_CURATED",
-    "sourceAsOf": "2026-10-29T13:24:27Z",
+    "sourceAsOf": "2026-10-30T13:13:56Z",
     "evidenceIds": [
       "finding:broad_participation",
       "divergence:0",
