@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "sourceAsOf": "2026-11-02T15:22:09Z",
-  "generatedAt": "2026-11-02T15:22:19.707093Z",
+  "sourceAsOf": "2026-11-02T16:20:31Z",
+  "generatedAt": "2026-11-02T16:20:40.510819Z",
   "dataAgeHours": 0.0,
   "dataQuality": "CURRENT",
   "regime": "NO BROAD STRESS CONFIRMATION",
@@ -58,8 +58,8 @@
     },
     {
       "indicator": "breadth",
-      "value": 6.1,
-      "percentile": 99.7,
+      "value": 6.3,
+      "percentile": 99.8,
       "observationCount": 1241,
       "fromDate": "2021-11-22",
       "toDate": "2026-11-02",
@@ -78,8 +78,8 @@
     },
     {
       "indicator": "kre_dd_3m",
-      "value": -5.9,
-      "percentile": 58.1,
+      "value": -5.4,
+      "percentile": 60.5,
       "observationCount": 1199,
       "fromDate": "2022-01-24",
       "toDate": "2026-11-02",
@@ -100,8 +100,8 @@
     {
       "indicator": "breadth",
       "headline": "Equal-weight market breadth is historically elevated",
-      "explanation": "Equal-weight market breadth has percentile rank 99.7 among 1241 available dated observations from 2021-11-22 to 2026-11-02; this suggests supportive participation relative to its history.",
-      "percentile": 99.7,
+      "explanation": "Equal-weight market breadth has percentile rank 99.8 among 1241 available dated observations from 2021-11-22 to 2026-11-02; this suggests supportive participation relative to its history.",
+      "percentile": 99.8,
       "fromDate": "2021-11-22",
       "toDate": "2026-11-02",
       "observationCount": 1241
@@ -121,9 +121,9 @@
       "evidence": [
         {
           "indicator": "breadth",
-          "value": 6.1,
+          "value": 6.3,
           "unit": "%",
-          "observedAt": "2026-11-02T15:22:09Z"
+          "observedAt": "2026-11-02T16:20:31Z"
         }
       ]
     },
@@ -138,13 +138,13 @@
           "indicator": "hy_oas",
           "value": 344.0,
           "unit": " bp",
-          "observedAt": "2026-11-02T15:22:09Z"
+          "observedAt": "2026-11-02T16:20:31Z"
         },
         {
           "indicator": "ig_oas",
           "value": 94.0,
           "unit": " bp",
-          "observedAt": "2026-11-02T15:22:09Z"
+          "observedAt": "2026-11-02T16:20:31Z"
         }
       ]
     },
@@ -159,7 +159,7 @@
           "indicator": "vix",
           "value": 19.4,
           "unit": "",
-          "observedAt": "2026-11-02T15:22:09Z"
+          "observedAt": "2026-11-02T16:20:31Z"
         }
       ]
     }
@@ -179,7 +179,7 @@
   ],
   "editorialCommentary": {
     "mode": "AI_CURATED",
-    "sourceAsOf": "2026-11-02T15:22:09Z",
+    "sourceAsOf": "2026-11-02T16:20:31Z",
     "evidenceIds": [
       "historical:hy_oas",
       "divergence:1",
