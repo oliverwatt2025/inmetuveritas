@@ -1,22 +1,13 @@
 {
   "schemaVersion": 1,
-  "sourceAsOf": "2026-11-07T13:21:05Z",
-  "generatedAt": "2026-11-07T13:21:13.653826Z",
+  "sourceAsOf": "2026-11-08T13:41:15Z",
+  "generatedAt": "2026-11-08T13:41:23.374513Z",
   "dataAgeHours": 0.0,
   "dataQuality": "CURRENT",
   "regime": "NO BROAD STRESS CONFIRMATION",
   "summary": "The monitored signals do not currently show broad stress; this is not a forecast or assurance.",
-  "changeSummary": "Notable changes since the last comparable dated observation: hy oas +16.",
-  "notableChanges": [
-    {
-      "indicator": "hy_oas",
-      "current": 348.0,
-      "previous": 332.0,
-      "delta": 16.0,
-      "previousDate": "2026-11-06",
-      "direction": "higher"
-    }
-  ],
+  "changeSummary": "No large changes met the provisional monitoring thresholds in the available daily comparison.",
+  "notableChanges": [],
   "historicalContext": [
     {
       "indicator": "hy_oas",
@@ -52,8 +43,8 @@
       "indicator": "curve_10y2y",
       "value": 35.0,
       "percentile": 62.9,
-      "observationCount": 1252,
-      "fromDate": "2021-11-03",
+      "observationCount": 1251,
+      "fromDate": "2021-11-04",
       "toDate": "2026-11-06",
       "window": "available history, up to five years",
       "interpretation": "Within the middle of observed history"
@@ -105,7 +96,7 @@
           "indicator": "breadth",
           "value": 7.0,
           "unit": "%",
-          "observedAt": "2026-11-07T13:21:05Z"
+          "observedAt": "2026-11-08T13:41:15Z"
         }
       ]
     },
@@ -120,13 +111,13 @@
           "indicator": "hy_oas",
           "value": 348.0,
           "unit": " bp",
-          "observedAt": "2026-11-07T13:21:05Z"
+          "observedAt": "2026-11-08T13:41:15Z"
         },
         {
           "indicator": "ig_oas",
           "value": 93.0,
           "unit": " bp",
-          "observedAt": "2026-11-07T13:21:05Z"
+          "observedAt": "2026-11-08T13:41:15Z"
         }
       ]
     }
@@ -145,7 +136,7 @@
   ],
   "editorialCommentary": {
     "mode": "AI_CURATED",
-    "sourceAsOf": "2026-11-07T13:21:05Z",
+    "sourceAsOf": "2026-11-08T13:41:15Z",
     "evidenceIds": [
       "historical:hy_oas",
       "divergence:1"

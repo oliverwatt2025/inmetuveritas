@@ -275,3 +275,4 @@
 {"date":"2026-11-05","vix":16.6,"hy_oas":340.0,"ig_oas":93.0,"curve_10y2y":32.0,"spy_dd_1m":-2.9,"kre_dd_3m":-3.7,"recession_risk":16.0,"credit_stress":74.0,"breadth":7.4}
 {"date":"2026-11-06","vix":16.6,"hy_oas":332.0,"ig_oas":91.0,"curve_10y2y":38.0,"spy_dd_1m":-5.9,"kre_dd_3m":-7.2,"recession_risk":16.0,"credit_stress":74.0,"breadth":7.6}
 {"date":"2026-11-07","vix":28.2,"hy_oas":348.0,"ig_oas":93.0,"curve_10y2y":35.0,"spy_dd_1m":-5.6,"kre_dd_3m":-7.4,"recession_risk":16.0,"credit_stress":75.0,"breadth":7.0}
+{"date":"2026-11-08","vix":28.2,"hy_oas":348.0,"ig_oas":93.0,"curve_10y2y":35.0,"spy_dd_1m":-5.6,"kre_dd_3m":-7.4,"recession_risk":16.0,"credit_stress":76.0,"breadth":7.0}
