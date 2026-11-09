@@ -1,16 +1,16 @@
 {
-  "asOf": "2026-11-08T14:32:25Z",
+  "asOf": "2026-11-09T17:48:39Z",
   "status": "collected",
   "series": {
     "hy_oas": {
-      "count": 793,
+      "count": 794,
       "earliest": "2023-10-27",
-      "latest": "2026-11-05"
+      "latest": "2026-11-06"
     },
     "ig_oas": {
-      "count": 792,
+      "count": 793,
       "earliest": "2023-10-27",
-      "latest": "2026-11-05"
+      "latest": "2026-11-06"
     }
   },
   "note": "Counts and observation dates only; underlying observations are encrypted and are not published."
