@@ -1,21 +1,30 @@
 {
   "schemaVersion": 1,
-  "sourceAsOf": "2026-11-08T13:41:15Z",
-  "generatedAt": "2026-11-08T13:41:23.374513Z",
+  "sourceAsOf": "2026-11-09T16:40:49Z",
+  "generatedAt": "2026-11-09T16:40:58.290065Z",
   "dataAgeHours": 0.0,
   "dataQuality": "CURRENT",
   "regime": "NO BROAD STRESS CONFIRMATION",
   "summary": "The monitored signals do not currently show broad stress; this is not a forecast or assurance.",
-  "changeSummary": "No large changes met the provisional monitoring thresholds in the available daily comparison.",
-  "notableChanges": [],
+  "changeSummary": "Notable changes since the last comparable dated observation: spy dd 1m +2.",
+  "notableChanges": [
+    {
+      "indicator": "spy_dd_1m",
+      "current": -3.6,
+      "previous": -5.6,
+      "delta": 2.0,
+      "previousDate": "2026-11-08",
+      "direction": "higher"
+    }
+  ],
   "historicalContext": [
     {
       "indicator": "hy_oas",
-      "value": 348.0,
-      "percentile": 88.0,
-      "observationCount": 797,
+      "value": 342.0,
+      "percentile": 85.8,
+      "observationCount": 798,
       "fromDate": "2023-10-23",
-      "toDate": "2026-11-05",
+      "toDate": "2026-11-06",
       "window": "available history, up to five years",
       "interpretation": "High relative to observed history"
     },
@@ -23,39 +32,39 @@
       "indicator": "ig_oas",
       "value": 93.0,
       "percentile": 72.7,
-      "observationCount": 796,
+      "observationCount": 797,
       "fromDate": "2023-10-23",
-      "toDate": "2026-11-05",
+      "toDate": "2026-11-06",
       "window": "available history, up to five years",
       "interpretation": "Within the middle of observed history"
     },
     {
       "indicator": "breadth",
       "value": 7.0,
-      "percentile": 99.8,
-      "observationCount": 1245,
+      "percentile": 99.7,
+      "observationCount": 1246,
       "fromDate": "2021-11-22",
-      "toDate": "2026-11-06",
+      "toDate": "2026-11-09",
       "window": "available history, up to five years",
       "interpretation": "High relative to observed history"
     },
     {
       "indicator": "curve_10y2y",
       "value": 35.0,
-      "percentile": 62.9,
-      "observationCount": 1251,
-      "fromDate": "2021-11-04",
+      "percentile": 63.0,
+      "observationCount": 1250,
+      "fromDate": "2021-11-05",
       "toDate": "2026-11-06",
       "window": "available history, up to five years",
       "interpretation": "Within the middle of observed history"
     },
     {
       "indicator": "kre_dd_3m",
-      "value": -7.4,
-      "percentile": 49.2,
-      "observationCount": 1203,
+      "value": -5.6,
+      "percentile": 59.7,
+      "observationCount": 1204,
       "fromDate": "2022-01-24",
-      "toDate": "2026-11-06",
+      "toDate": "2026-11-09",
       "window": "available history, up to five years",
       "interpretation": "Within the middle of observed history"
     }
@@ -64,24 +73,24 @@
     {
       "indicator": "hy_oas",
       "headline": "High-yield credit spread is historically elevated",
-      "explanation": "High-yield credit spread has percentile rank 88 among 797 available dated observations from 2023-10-23 to 2026-11-05; this suggests more caution than the history median.",
-      "percentile": 88.0,
+      "explanation": "High-yield credit spread has percentile rank 85.8 among 798 available dated observations from 2023-10-23 to 2026-11-06; this suggests more caution than the history median.",
+      "percentile": 85.8,
       "fromDate": "2023-10-23",
-      "toDate": "2026-11-05",
-      "observationCount": 797
+      "toDate": "2026-11-06",
+      "observationCount": 798
     },
     {
       "indicator": "breadth",
       "headline": "Equal-weight market breadth is historically elevated",
-      "explanation": "Equal-weight market breadth has percentile rank 99.8 among 1245 available dated observations from 2021-11-22 to 2026-11-06; this suggests supportive participation relative to its history.",
-      "percentile": 99.8,
+      "explanation": "Equal-weight market breadth has percentile rank 99.7 among 1246 available dated observations from 2021-11-22 to 2026-11-09; this suggests supportive participation relative to its history.",
+      "percentile": 99.7,
       "fromDate": "2021-11-22",
-      "toDate": "2026-11-06",
-      "observationCount": 1245
+      "toDate": "2026-11-09",
+      "observationCount": 1246
     }
   ],
   "divergences": [
-    "High-yield spreads remain below the absolute 400 bp watch threshold, but have percentile rank 88 among observations from 2023-10-23 to 2026-11-05. The level looks contained, but its historical position merits monitoring.",
+    "High-yield spreads remain below the absolute 400 bp watch threshold, but have percentile rank 85.8 among observations from 2023-10-23 to 2026-11-06. The level looks contained, but its historical position merits monitoring.",
     "Broad equal-weight outperformance is unusual in the observed sample; this is supportive participation, not evidence by itself of lower future volatility."
   ],
   "keyFindings": [
@@ -96,7 +105,7 @@
           "indicator": "breadth",
           "value": 7.0,
           "unit": "%",
-          "observedAt": "2026-11-08T13:41:15Z"
+          "observedAt": "2026-11-09T16:40:49Z"
         }
       ]
     },
@@ -109,15 +118,15 @@
       "evidence": [
         {
           "indicator": "hy_oas",
-          "value": 348.0,
+          "value": 342.0,
           "unit": " bp",
-          "observedAt": "2026-11-08T13:41:15Z"
+          "observedAt": "2026-11-09T16:40:49Z"
         },
         {
           "indicator": "ig_oas",
           "value": 93.0,
           "unit": " bp",
-          "observedAt": "2026-11-08T13:41:15Z"
+          "observedAt": "2026-11-09T16:40:49Z"
         }
       ]
     }
@@ -136,14 +145,14 @@
   ],
   "editorialCommentary": {
     "mode": "AI_CURATED",
-    "sourceAsOf": "2026-11-08T13:41:15Z",
+    "sourceAsOf": "2026-11-09T16:40:49Z",
     "evidenceIds": [
       "historical:hy_oas",
-      "divergence:1"
+      "historical:breadth"
     ],
     "paragraphs": [
-      "High-yield credit spread has percentile rank 88 among 797 available dated observations from 2023-10-23 to 2026-11-05; this suggests more caution than the history median.",
-      "Broad equal-weight outperformance is unusual in the observed sample; this is supportive participation, not evidence by itself of lower future volatility."
+      "High-yield credit spread has percentile rank 85.8 among 798 available dated observations from 2023-10-23 to 2026-11-06; this suggests more caution than the history median.",
+      "Equal-weight market breadth has percentile rank 99.7 among 1246 available dated observations from 2021-11-22 to 2026-11-09; this suggests supportive participation relative to its history."
     ],
     "disclaimer": "An evidence selection, not a prediction. Interpretations use provisional thresholds."
   }
