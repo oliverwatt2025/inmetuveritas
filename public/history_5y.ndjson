@@ -1,4 +1,3 @@
-{"date":"2021-11-05","vix":16.48,"curve_10y2y":106.0}
 {"date":"2021-11-08","vix":17.22,"curve_10y2y":106.0}
 {"date":"2021-11-09","vix":17.78,"curve_10y2y":105.0}
 {"date":"2021-11-10","vix":18.73,"curve_10y2y":105.0}
@@ -1299,5 +1298,6 @@
 {"date":"2026-11-03","vix":20.83,"hy_oas":340.0,"ig_oas":93.0,"curve_10y2y":34.0,"spy_dd_1m":-3.18,"kre_dd_3m":-6.48,"breadth":6.44}
 {"date":"2026-11-04","spy_dd_1m":-1.51,"kre_dd_3m":-4.88,"breadth":7.38,"vix":16.61,"curve_10y2y":32.0,"hy_oas":332.0,"ig_oas":91.0}
 {"date":"2026-11-05","spy_dd_1m":-5.85,"kre_dd_3m":-7.21,"breadth":7.65,"curve_10y2y":38.0,"vix":28.18,"hy_oas":348.0,"ig_oas":93.0}
-{"date":"2026-11-06","curve_10y2y":35.0,"spy_dd_1m":-5.56,"kre_dd_3m":-7.35,"breadth":6.97,"hy_oas":342.0,"ig_oas":93.0}
-{"date":"2026-11-09","spy_dd_1m":-3.62,"kre_dd_3m":-5.63,"breadth":7.0}
+{"date":"2026-11-06","curve_10y2y":35.0,"spy_dd_1m":-5.56,"kre_dd_3m":-7.35,"breadth":6.97,"hy_oas":342.0,"ig_oas":93.0,"vix":25.64}
+{"date":"2026-11-09","spy_dd_1m":-3.27,"kre_dd_3m":-5.75,"breadth":6.91,"vix":19.92,"curve_10y2y":32.0}
+{"date":"2026-11-10","spy_dd_1m":-3.38,"kre_dd_3m":-6.11,"breadth":6.36}
