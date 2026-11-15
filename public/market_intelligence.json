@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "sourceAsOf": "2026-11-14T13:41:13Z",
-  "generatedAt": "2026-11-14T13:41:19.565332Z",
+  "sourceAsOf": "2026-11-15T14:08:56Z",
+  "generatedAt": "2026-11-15T14:09:02.132114Z",
   "dataAgeHours": 0.0,
   "dataQuality": "CURRENT",
   "regime": "NO BROAD STRESS CONFIRMATION",
@@ -12,9 +12,9 @@
     {
       "indicator": "vix",
       "value": 18.7,
-      "percentile": 57.9,
-      "observationCount": 1290,
-      "fromDate": "2021-11-10",
+      "percentile": 58.0,
+      "observationCount": 1289,
+      "fromDate": "2021-11-11",
       "toDate": "2026-11-12",
       "window": "available history, up to five years",
       "interpretation": "Within the middle of observed history"
@@ -53,8 +53,8 @@
       "indicator": "curve_10y2y",
       "value": 27.0,
       "percentile": 56.7,
-      "observationCount": 1251,
-      "fromDate": "2021-11-10",
+      "observationCount": 1250,
+      "fromDate": "2021-11-12",
       "toDate": "2026-11-13",
       "window": "available history, up to five years",
       "interpretation": "Within the middle of observed history"
@@ -96,7 +96,7 @@
           "indicator": "breadth",
           "value": 4.5,
           "unit": "%",
-          "observedAt": "2026-11-14T13:41:13Z"
+          "observedAt": "2026-11-15T14:08:56Z"
         }
       ]
     },
@@ -111,13 +111,13 @@
           "indicator": "hy_oas",
           "value": 320.0,
           "unit": " bp",
-          "observedAt": "2026-11-14T13:41:13Z"
+          "observedAt": "2026-11-15T14:08:56Z"
         },
         {
           "indicator": "ig_oas",
           "value": 89.0,
           "unit": " bp",
-          "observedAt": "2026-11-14T13:41:13Z"
+          "observedAt": "2026-11-15T14:08:56Z"
         }
       ]
     },
@@ -132,7 +132,7 @@
           "indicator": "vix",
           "value": 18.7,
           "unit": "",
-          "observedAt": "2026-11-14T13:41:13Z"
+          "observedAt": "2026-11-15T14:08:56Z"
         }
       ]
     }
@@ -152,7 +152,7 @@
   ],
   "editorialCommentary": {
     "mode": "AI_CURATED",
-    "sourceAsOf": "2026-11-14T13:41:13Z",
+    "sourceAsOf": "2026-11-15T14:08:56Z",
     "evidenceIds": [
       "finding:broad_participation",
       "divergence:0",
