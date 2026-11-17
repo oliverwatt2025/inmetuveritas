@@ -1,96 +1,115 @@
 {
   "schemaVersion": 1,
-  "sourceAsOf": "2026-11-16T16:10:20Z",
-  "generatedAt": "2026-11-16T16:10:28.925700Z",
+  "sourceAsOf": "2026-11-17T16:16:57Z",
+  "generatedAt": "2026-11-17T16:17:06.486278Z",
   "dataAgeHours": 0.0,
   "dataQuality": "CURRENT",
   "regime": "NO BROAD STRESS CONFIRMATION",
   "summary": "The monitored signals do not currently show broad stress; this is not a forecast or assurance.",
-  "changeSummary": "Notable changes since the last comparable dated observation: breadth +1.3.",
+  "changeSummary": "Notable changes since the last comparable dated observation: vix +3.6.",
   "notableChanges": [
     {
-      "indicator": "breadth",
-      "current": 5.8,
-      "previous": 4.5,
-      "delta": 1.3,
-      "previousDate": "2026-11-15",
+      "indicator": "vix",
+      "current": 22.9,
+      "previous": 19.3,
+      "delta": 3.6,
+      "previousDate": "2026-11-16",
       "direction": "higher"
     }
   ],
   "historicalContext": [
     {
       "indicator": "vix",
-      "value": 19.3,
-      "percentile": 62.6,
+      "value": 22.9,
+      "percentile": 80.0,
       "observationCount": 1289,
-      "fromDate": "2021-11-12",
-      "toDate": "2026-11-13",
-      "window": "available history, up to five years",
-      "interpretation": "Within the middle of observed history"
-    },
-    {
-      "indicator": "hy_oas",
-      "value": 323.0,
-      "percentile": 73.7,
-      "observationCount": 803,
-      "fromDate": "2023-10-23",
-      "toDate": "2026-11-13",
-      "window": "available history, up to five years",
-      "interpretation": "Within the middle of observed history"
-    },
-    {
-      "indicator": "ig_oas",
-      "value": 89.0,
-      "percentile": 59.8,
-      "observationCount": 802,
-      "fromDate": "2023-10-23",
-      "toDate": "2026-11-13",
-      "window": "available history, up to five years",
-      "interpretation": "Within the middle of observed history"
-    },
-    {
-      "indicator": "breadth",
-      "value": 5.8,
-      "percentile": 98.9,
-      "observationCount": 1251,
-      "fromDate": "2021-11-22",
+      "fromDate": "2021-11-15",
       "toDate": "2026-11-16",
       "window": "available history, up to five years",
       "interpretation": "High relative to observed history"
     },
     {
+      "indicator": "hy_oas",
+      "value": 334.0,
+      "percentile": 81.8,
+      "observationCount": 804,
+      "fromDate": "2023-10-23",
+      "toDate": "2026-11-16",
+      "window": "available history, up to five years",
+      "interpretation": "High relative to observed history"
+    },
+    {
+      "indicator": "ig_oas",
+      "value": 90.0,
+      "percentile": 62.6,
+      "observationCount": 803,
+      "fromDate": "2023-10-23",
+      "toDate": "2026-11-16",
+      "window": "available history, up to five years",
+      "interpretation": "Within the middle of observed history"
+    },
+    {
+      "indicator": "breadth",
+      "value": 5.3,
+      "percentile": 98.7,
+      "observationCount": 1252,
+      "fromDate": "2021-11-22",
+      "toDate": "2026-11-17",
+      "window": "available history, up to five years",
+      "interpretation": "High relative to observed history"
+    },
+    {
       "indicator": "curve_10y2y",
-      "value": 27.0,
-      "percentile": 56.7,
+      "value": 29.0,
+      "percentile": 58.1,
       "observationCount": 1250,
-      "fromDate": "2021-11-12",
-      "toDate": "2026-11-13",
+      "fromDate": "2021-11-15",
+      "toDate": "2026-11-16",
       "window": "available history, up to five years",
       "interpretation": "Within the middle of observed history"
     },
     {
       "indicator": "kre_dd_3m",
-      "value": -3.9,
-      "percentile": 69.5,
-      "observationCount": 1209,
+      "value": -5.6,
+      "percentile": 59.7,
+      "observationCount": 1210,
       "fromDate": "2022-01-24",
-      "toDate": "2026-11-16",
+      "toDate": "2026-11-17",
       "window": "available history, up to five years",
       "interpretation": "Within the middle of observed history"
     }
   ],
   "historicalFindings": [
     {
+      "indicator": "vix",
+      "headline": "VIX is historically elevated",
+      "explanation": "VIX has percentile rank 80 among 1289 available dated observations from 2021-11-15 to 2026-11-16; this suggests more caution than the history median.",
+      "percentile": 80.0,
+      "fromDate": "2021-11-15",
+      "toDate": "2026-11-16",
+      "observationCount": 1289
+    },
+    {
+      "indicator": "hy_oas",
+      "headline": "High-yield credit spread is historically elevated",
+      "explanation": "High-yield credit spread has percentile rank 81.8 among 804 available dated observations from 2023-10-23 to 2026-11-16; this suggests more caution than the history median.",
+      "percentile": 81.8,
+      "fromDate": "2023-10-23",
+      "toDate": "2026-11-16",
+      "observationCount": 804
+    },
+    {
       "indicator": "breadth",
       "headline": "Equal-weight market breadth is historically elevated",
-      "explanation": "Equal-weight market breadth has percentile rank 98.9 among 1251 available dated observations from 2021-11-22 to 2026-11-16; this suggests supportive participation relative to its history.",
-      "percentile": 98.9,
+      "explanation": "Equal-weight market breadth has percentile rank 98.7 among 1252 available dated observations from 2021-11-22 to 2026-11-17; this suggests supportive participation relative to its history.",
+      "percentile": 98.7,
       "fromDate": "2021-11-22",
-      "toDate": "2026-11-16",
-      "observationCount": 1251
+      "toDate": "2026-11-17",
+      "observationCount": 1252
     }
   ],
   "divergences": [
+    "High-yield spreads remain below the absolute 400 bp watch threshold, but have percentile rank 81.8 among observations from 2023-10-23 to 2026-11-16. The level looks contained, but its historical position merits monitoring.",
     "Broad equal-weight outperformance is unusual in the observed sample; this is supportive participation, not evidence by itself of lower future volatility."
   ],
   "keyFindings": [
@@ -103,9 +122,9 @@
       "evidence": [
         {
           "indicator": "breadth",
-          "value": 5.8,
+          "value": 5.3,
           "unit": "%",
-          "observedAt": "2026-11-16T16:10:20Z"
+          "observedAt": "2026-11-17T16:16:57Z"
         }
       ]
     },
@@ -118,30 +137,15 @@
       "evidence": [
         {
           "indicator": "hy_oas",
-          "value": 323.0,
+          "value": 334.0,
           "unit": " bp",
-          "observedAt": "2026-11-16T16:10:20Z"
+          "observedAt": "2026-11-17T16:16:57Z"
         },
         {
           "indicator": "ig_oas",
-          "value": 89.0,
+          "value": 90.0,
           "unit": " bp",
-          "observedAt": "2026-11-16T16:10:20Z"
-        }
-      ]
-    },
-    {
-      "id": "volatility_calm",
-      "family": "volatility",
-      "severity": "supportive",
-      "headline": "Options markets imply relatively calm conditions",
-      "explanation": "VIX is below the defined watch threshold.",
-      "evidence": [
-        {
-          "indicator": "vix",
-          "value": 19.3,
-          "unit": "",
-          "observedAt": "2026-11-16T16:10:20Z"
+          "observedAt": "2026-11-17T16:16:57Z"
         }
       ]
     }
@@ -161,16 +165,16 @@
   ],
   "editorialCommentary": {
     "mode": "AI_CURATED",
-    "sourceAsOf": "2026-11-16T16:10:20Z",
+    "sourceAsOf": "2026-11-17T16:16:57Z",
     "evidenceIds": [
-      "finding:broad_participation",
-      "divergence:0",
-      "finding:volatility_calm"
+      "historical:vix",
+      "historical:hy_oas",
+      "finding:broad_participation"
     ],
     "paragraphs": [
-      "Equal-weight participation is supportive. Equal-weight equities have outperformed the cap-weighted benchmark over the measurement window.",
-      "Broad equal-weight outperformance is unusual in the observed sample; this is supportive participation, not evidence by itself of lower future volatility.",
-      "Options markets imply relatively calm conditions. VIX is below the defined watch threshold."
+      "VIX has percentile rank 80 among 1289 available dated observations from 2021-11-15 to 2026-11-16; this suggests more caution than the history median.",
+      "High-yield credit spread has percentile rank 81.8 among 804 available dated observations from 2023-10-23 to 2026-11-16; this suggests more caution than the history median.",
+      "Equal-weight participation is supportive. Equal-weight equities have outperformed the cap-weighted benchmark over the measurement window."
     ],
     "disclaimer": "An evidence selection, not a prediction. Interpretations use provisional thresholds."
   }
