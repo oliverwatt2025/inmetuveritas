@@ -1,30 +1,13 @@
 {
   "schemaVersion": 1,
-  "sourceAsOf": "2026-11-20T15:38:38Z",
-  "generatedAt": "2026-11-20T15:38:48.744431Z",
+  "sourceAsOf": "2026-11-21T14:48:48Z",
+  "generatedAt": "2026-11-21T14:48:54.748944Z",
   "dataAgeHours": 0.0,
   "dataQuality": "CURRENT",
-  "regime": "NO BROAD STRESS CONFIRMATION",
-  "summary": "The monitored signals do not currently show broad stress; this is not a forecast or assurance.",
-  "changeSummary": "Notable changes since the last comparable dated observation: spy dd 1m -2.4; breadth +2.1.",
-  "notableChanges": [
-    {
-      "indicator": "spy_dd_1m",
-      "current": -8.2,
-      "previous": -5.8,
-      "delta": -2.4,
-      "previousDate": "2026-11-19",
-      "direction": "lower"
-    },
-    {
-      "indicator": "breadth",
-      "current": 4.7,
-      "previous": 2.6,
-      "delta": 2.1,
-      "previousDate": "2026-11-19",
-      "direction": "higher"
-    }
-  ],
+  "regime": "INSUFFICIENT CURRENT EVIDENCE",
+  "summary": "The available observations are too old or incomplete for a current cross-market conclusion.",
+  "changeSummary": "No large changes met the provisional monitoring thresholds in the available daily comparison.",
+  "notableChanges": [],
   "historicalContext": [
     {
       "indicator": "hy_oas",
@@ -48,8 +31,8 @@
     },
     {
       "indicator": "breadth",
-      "value": 4.7,
-      "percentile": 98.5,
+      "value": 5.0,
+      "percentile": 98.6,
       "observationCount": 1255,
       "fromDate": "2021-11-22",
       "toDate": "2026-11-20",
@@ -58,18 +41,18 @@
     },
     {
       "indicator": "curve_10y2y",
-      "value": 28.0,
-      "percentile": 57.5,
+      "value": 29.0,
+      "percentile": 58.2,
       "observationCount": 1252,
-      "fromDate": "2021-11-16",
-      "toDate": "2026-11-19",
+      "fromDate": "2021-11-17",
+      "toDate": "2026-11-20",
       "window": "available history, up to five years",
       "interpretation": "Within the middle of observed history"
     },
     {
       "indicator": "kre_dd_3m",
-      "value": -7.3,
-      "percentile": 49.5,
+      "value": -9.2,
+      "percentile": 35.2,
       "observationCount": 1213,
       "fromDate": "2022-01-24",
       "toDate": "2026-11-20",
@@ -90,8 +73,8 @@
     {
       "indicator": "breadth",
       "headline": "Equal-weight market breadth is historically elevated",
-      "explanation": "Equal-weight market breadth has percentile rank 98.5 among 1255 available dated observations from 2021-11-22 to 2026-11-20; this suggests supportive participation relative to its history.",
-      "percentile": 98.5,
+      "explanation": "Equal-weight market breadth has percentile rank 98.6 among 1255 available dated observations from 2021-11-22 to 2026-11-20; this suggests supportive participation relative to its history.",
+      "percentile": 98.6,
       "fromDate": "2021-11-22",
       "toDate": "2026-11-20",
       "observationCount": 1255
@@ -103,21 +86,6 @@
   ],
   "keyFindings": [
     {
-      "id": "broad_participation",
-      "family": "equities",
-      "severity": "supportive",
-      "headline": "Equal-weight participation is supportive",
-      "explanation": "Equal-weight equities have outperformed the cap-weighted benchmark over the measurement window.",
-      "evidence": [
-        {
-          "indicator": "breadth",
-          "value": 4.7,
-          "unit": "%",
-          "observedAt": "2026-11-20T15:38:38Z"
-        }
-      ]
-    },
-    {
       "id": "credit_contained",
       "family": "credit",
       "severity": "supportive",
@@ -128,13 +96,13 @@
           "indicator": "hy_oas",
           "value": 352.0,
           "unit": " bp",
-          "observedAt": "2026-11-20T15:38:38Z"
+          "observedAt": "2026-11-21T14:48:48Z"
         },
         {
           "indicator": "ig_oas",
           "value": 94.0,
           "unit": " bp",
-          "observedAt": "2026-11-20T15:38:38Z"
+          "observedAt": "2026-11-21T14:48:48Z"
         }
       ]
     }
@@ -153,7 +121,7 @@
   ],
   "editorialCommentary": {
     "mode": "AI_CURATED",
-    "sourceAsOf": "2026-11-20T15:38:38Z",
+    "sourceAsOf": "2026-11-21T14:48:48Z",
     "evidenceIds": [
       "historical:hy_oas",
       "divergence:1"
