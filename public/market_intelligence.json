@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "sourceAsOf": "2026-11-21T14:48:48Z",
-  "generatedAt": "2026-11-21T14:48:54.748944Z",
+  "sourceAsOf": "2026-11-22T14:45:00Z",
+  "generatedAt": "2026-11-22T14:45:07.121735Z",
   "dataAgeHours": 0.0,
   "dataQuality": "CURRENT",
   "regime": "INSUFFICIENT CURRENT EVIDENCE",
@@ -43,8 +43,8 @@
       "indicator": "curve_10y2y",
       "value": 29.0,
       "percentile": 58.2,
-      "observationCount": 1252,
-      "fromDate": "2021-11-17",
+      "observationCount": 1251,
+      "fromDate": "2021-11-18",
       "toDate": "2026-11-20",
       "window": "available history, up to five years",
       "interpretation": "Within the middle of observed history"
@@ -96,13 +96,13 @@
           "indicator": "hy_oas",
           "value": 352.0,
           "unit": " bp",
-          "observedAt": "2026-11-21T14:48:48Z"
+          "observedAt": "2026-11-22T14:45:00Z"
         },
         {
           "indicator": "ig_oas",
           "value": 94.0,
           "unit": " bp",
-          "observedAt": "2026-11-21T14:48:48Z"
+          "observedAt": "2026-11-22T14:45:00Z"
         }
       ]
     }
@@ -121,14 +121,14 @@
   ],
   "editorialCommentary": {
     "mode": "AI_CURATED",
-    "sourceAsOf": "2026-11-21T14:48:48Z",
+    "sourceAsOf": "2026-11-22T14:45:00Z",
     "evidenceIds": [
       "historical:hy_oas",
-      "divergence:1"
+      "historical:breadth"
     ],
     "paragraphs": [
       "High-yield credit spread has percentile rank 89.4 among 807 available dated observations from 2023-10-23 to 2026-11-19; this suggests more caution than the history median.",
-      "Broad equal-weight outperformance is unusual in the observed sample; this is supportive participation, not evidence by itself of lower future volatility."
+      "Equal-weight market breadth has percentile rank 98.6 among 1255 available dated observations from 2021-11-22 to 2026-11-20; this suggests supportive participation relative to its history."
     ],
     "disclaimer": "An evidence selection, not a prediction. Interpretations use provisional thresholds."
   }
